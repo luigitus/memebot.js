@@ -1,7 +1,12 @@
+var fs = require('fs');
+var log = require("./mlog.js");
+
 module.exports = {
-  ircServer: "irc.twitch.tv",
-  ircPort: 6667,
-  botName: "username",
-  botPassword: "password",
-  debug: true
+  gs: {},
+
+  readSettings: function(file) {
+    var contents = fs.readFileSync(file, 'utf8');
+
+    this.gs = JSON.parse(contents);
+  }
 }

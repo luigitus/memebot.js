@@ -1,5 +1,5 @@
 var net = require('net');
-var globalSettings = require("./settings.js");
+var settings = require("./settings.js");
 var log = require("./mlog.js");
 
 module.exports = {
@@ -9,10 +9,10 @@ module.exports = {
     init: function() {
       var obj = this; // bind parrent object so that it can be access
 
-      this.client.connect(globalSettings.ircPort, globalSettings.ircServer, function() {
+      this.client.connect(settings.gs.ircPort, settings.gs.ircServer, function() {
       	log.log('Connected');
-        obj.writeBytes('PASS ' + globalSettings.botPassword);
-        obj.writeBytes('NICK ' + globalSettings.botName);
+        obj.writeBytes('PASS ' + settings.gs.botPassword);
+        obj.writeBytes('NICK ' + settings.gs.botName);
       });
       this.client.on('data', function(data) {
       	log.log('Received: ' + data);
