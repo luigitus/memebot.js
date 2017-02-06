@@ -1,0 +1,14 @@
+{
+  "name": "memebotjs",
+  "version": "1.0.0",
+  "description": "memebotjs chat bot for twitch.tv",
+  "main": "memebot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Lukas Myers",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.10.2"
+  }
+}
