@@ -3,9 +3,16 @@ var webui = require("./webui.js");
 var tmi = require("./tmiconnection.js");
 var log = require("./mlog.js");
 var util = require("./utility.js");
-//webui.initweb();
+var channel = require('./channel.js');
 
 // read settings.json
 settings.readSettings('./config/settings.json');
-var test = Object.create(tmi.ConnectionHandler);
-test.init();
+util.minit();
+
+// shutdown hook
+process.on('exit', function() {
+  log.log('About to exit.');
+});
+
+var ch = Object.create(channel.Channel);
+ch.init(0, Object.create(tmi.ConnectionHandler));
