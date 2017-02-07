@@ -14,6 +14,16 @@ module.exports = {
         obj.properties = JSON.parse(data);
       });
 
+      this.setDefaults();
+
+      // update function
+      setInterval(function() {
+        obj.save();
+      }, 60 * 1000);
+    },
+
+    setDefaults: function() {
+
     },
 
     save: function() {

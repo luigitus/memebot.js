@@ -7,9 +7,9 @@ module.exports = {
   users: {},
   commands: {},
   build: {
-    appName: 'memebot',
+    appName: 'memebot.js',
     version: '1.0.0',
-    dev: ''
+    dev: 'Lukas Myers'
   },
 
   readSettings: function(file) {

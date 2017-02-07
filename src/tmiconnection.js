@@ -1,10 +1,12 @@
 var net = require('net');
 var settings = require("./settings.js");
 var log = require("./mlog.js");
+var text = require('./text.js');
 
 module.exports = {
   ConnectionHandler: {
     client: null,
+    messageCount: 0,
 
     init: function(cb, username, password) {
       this.client = new net.Socket();
@@ -31,6 +33,11 @@ module.exports = {
       	log.log('Connection closed');
         cb.disconnect();
       });
+
+      // update function
+      setInterval(function() {
+        obj.messageCount = 0;
+      }, 30 * 1000);
     },
 
     writeBytes: function(message) {
@@ -69,7 +76,7 @@ module.exports = {
       while(i < ircMessageBuffer.length) {
         var msg = ircMessageBuffer[i];
         if ((msg == "PRIVMSG" || msg == "WHISPER" || msg == "MODE" || msg == "PART"
-        || msg == "JOIN" || msg == "CLEARCHAT") && messageType == "UNDEFINED") {
+        || msg == "JOIN" || msg == "CLEARCHAT" || msg == 'PING') && messageType == "UNDEFINED") {
           messageType = msg;
         }
         if(msg.charAt(0) == '@' && i == 0) {
@@ -108,7 +115,7 @@ module.exports = {
       // handle other messages
       if(messageType != 'PRIVMSG' && messageType != 'WHISPER') {
         if(messageType == 'PING') {
-          this.writeBytes('PING :PONG');
+          this.writeBytes('PONG :tmi.twitch.tv');
         }
         // todo handle other events here
       } else {
@@ -120,6 +127,7 @@ module.exports = {
       return {
         content: messageContent,
         name: senderName,
+        sender: null,
         userID: senderID,
         displayName: ircTags['display-name'],
         type: messageType,
@@ -130,12 +138,22 @@ module.exports = {
     },
 
 
-    sendMessage: function(message, channel, sender, whisper) {
-      if(message == '') {
+    sendMessage: function(message, channel, sender, format, whisper) {
+      if(message == '' || channel.properties.silent) {
         return;
       }
 
-      this.writeBytes('PRIVMSG ' + channel + " : " + message);
+      if(format || typeof(format) === 'undefined') {
+        message = text.formatText(message, false, channel);
+      }
+
+      if(this.messageCount > settings.gs.messageLimit) {
+        return;
+      }
+
+      this.messageCount++;
+
+      this.writeBytes('PRIVMSG ' + channel.properties.channel + " : " + message);
     }
   }
 }
