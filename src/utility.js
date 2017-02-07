@@ -1,4 +1,5 @@
 var fs = require('fs');
+var settings = require('./settings.js');
 
 module.exports = {
   parseCliArgs: function() {
@@ -19,15 +20,9 @@ module.exports = {
   },
 
   minit: function() {
-    var dirsToCreate = [
-      './config/channels',
-      './config/commands',
-      './config/users'
-    ];
-
-    for(i = 0; i < dirsToCreate.length; i++) {
-      if (!fs.existsSync(dirsToCreate[i])) {
-        fs.mkdirSync(dirsToCreate[i]);
+    for(var i in settings.gs.paths) {
+      if (!fs.existsSync(settings.gs.paths[i])) {
+        fs.mkdirSync(settings.gs.paths[i]);
       }
     }
   }

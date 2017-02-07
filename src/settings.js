@@ -4,6 +4,8 @@ var log = require("./mlog.js");
 module.exports = {
   gs: {},
   ch: {},
+  users: {},
+  commands: {},
   build: {
     appName: 'memebot',
     version: '1.0.0',
@@ -22,7 +24,9 @@ module.exports = {
     this.gs = JSON.parse(contents);
   },
 
-  readChannels: function(path) {
-    this.ch = fs.readdirSync(path);
+  readDirs: function() {
+    this.users = fs.readdirSync(this.gs.paths.users);
+    this.ch = fs.readdirSync(this.gs.paths.channels);
+    this.commands = fs.readdirSync(this.gs.paths.commands);
   }
 }
