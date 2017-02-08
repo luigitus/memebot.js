@@ -1,14 +1,15 @@
-var command = require('./command.js');
+var command = require('../command.js');
+var text = require('../text.js');
 
 module.exports = {
-  AboutCommand: {
+  DefaultCommand: {
     init: function(base) {
       // inherit prototype
       this.p = base;
     },
 
     execute: function(data, channel, sender) {
-      return ['memebot standalone experiment about command'];
+      return this.p.p.properties.output;
     }
   },
 }
