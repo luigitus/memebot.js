@@ -2,6 +2,8 @@ var net = require('net');
 var settings = require("./settings.js");
 var log = require("./mlog.js");
 var text = require('./text.js');
+var util = require('./utility.js');
+var user = require('./user.js');
 
 module.exports = {
   ConnectionHandler: {
@@ -113,9 +115,43 @@ module.exports = {
       // todo add users and create sender object here!
 
       // handle other messages
+      /*
+      join and part are pretty much ignored for now
+      because neither seem to be broadcasting the user-id which is used to identify users
+      in memebot.js.
+      As soon as join/part actually do transmit those I will use them to
+      add users to the user list.
+      My current workaround is to just add users as soon as they send a message
+      if they do not appear in the user list as of that time. Users will part after
+      a certain amount of inactivity (e.g. 1 hour).
+      If a user has parted from every channel, the user object will be freeed.
+      */
+      var senderObject = null;
+
+      // check if user is in list, if not create it
+      if(!(senderID in util.users) && typeof(senderID) != 'undefined') {
+        var newUser = Object.create(user.User);
+        newUser.init(senderID);
+        util.users[senderID] = newUser;
+        newUser.p.properties.username = senderName;
+        newUser.p.properties.displayName = ircTags['display-name'];
+        senderObject = newUser;
+      } else {
+        senderObject = util.users[senderID];
+      }
+
+      if(senderObject) {
+        // check if user is marked as being in this channel
+        if(!(channel in senderObject.inChannels)) {
+          senderObject.inChannels.push(channel);
+        }
+      }
+
       if(messageType != 'PRIVMSG' && messageType != 'WHISPER') {
         if(messageType == 'PING') {
           this.writeBytes('PONG :tmi.twitch.tv');
+        } else if(messageType == 'JOIN') {
+        } else if(messageType == 'PART') {
         }
         // todo handle other events here
       } else {
@@ -126,10 +162,7 @@ module.exports = {
 
       return {
         content: messageContent,
-        name: senderName,
-        sender: null,
-        userID: senderID,
-        displayName: ircTags['display-name'],
+        sender: senderObject,
         type: messageType,
         channeName: channel,
         id: messageID,
@@ -139,12 +172,12 @@ module.exports = {
 
 
     sendMessage: function(message, channel, sender, format, whisper) {
-      if(message == '' || channel.properties.silent) {
+      if(message == '' || channel.p.properties.silent) {
         return;
       }
 
       if(format || typeof(format) === 'undefined') {
-        message = text.formatText(message, false, channel);
+        message = text.formatText(message, false, channel, sender);
       }
 
       if(this.messageCount > settings.gs.messageLimit) {
@@ -153,7 +186,7 @@ module.exports = {
 
       this.messageCount++;
 
-      this.writeBytes('PRIVMSG ' + channel.properties.channel + " : " + message);
+      this.writeBytes('PRIVMSG ' + channel.p.properties.channel + " : " + message);
     }
   }
 }
