@@ -1,15 +1,14 @@
 var fs = require('fs');
 var log = require("./mlog.js");
+var Datastore = require('nedb');
 
 module.exports = {
   gs: {},
-  ch: {},
-  users: {},
-  commands: {},
   build: {
     appName: 'memebot.js',
     version: '1.0.0',
-    dev: 'Lukas Myers'
+    dev: 'Lukas Myers',
+    git: 'https://github.com/unlink2/memebot.js/'
   },
 
   readSettings: function(file) {
@@ -24,9 +23,179 @@ module.exports = {
     this.gs = JSON.parse(contents);
   },
 
-  readDirs: function() {
-    this.users = fs.readdirSync(this.gs.paths.users);
+  readIDs: function() {
+    var util = this;
+    /*this.users = fs.readdirSync(this.gs.paths.users);
     this.ch = fs.readdirSync(this.gs.paths.channels);
-    this.commands = fs.readdirSync(this.gs.paths.commands);
+    this.commands = fs.readdirSync(this.gs.paths.commands);*/
+    var obj = this;
+
+    this.db['commands'].find({_id : {$gt: 1000}}, function(err, doc) {
+      if(err != null) {
+        log.log(err);
+      }
+      for(var command in doc) {
+        obj.loadCommand(doc[command]._id);
+      }
+    });
+
+    // load default commands if not already loaded
+    var dc = require('./defaultcommands.js');
+    for(var c in dc) {
+      if(module.exports.getCommandByID(dc[c]._id) == null) {
+        module.exports.loadCommand(dc[c]._id, dc[c]);
+      }
+    }
+
+    this.db['channels'].find({}, function(err, doc) {
+      if(err != null) {
+        log.log(err);
+      }
+      if(doc.length == 0) {
+        module.exports.joinChannel(1);
+      }
+
+      for(var channel in doc) {
+        module.exports.joinChannel(doc[channel]._id);
+      }
+    });
+  },
+
+  // utility functions
+  joinedChannels: {}, // id = key
+  commands: {},
+  users: {},
+  db: {},
+  commandPower: {
+    user: 0,
+    mod: 25,
+    broadcaster: 50,
+    moderator: 75,
+    admin: 100
+  },
+
+  // note to self; require may be needed at bottom
+  minit: function() {
+    for(var i in this.gs.paths) {
+      var newdb = new Datastore({filename: this.gs.paths[i], autoload: true,
+        onload: function(err) {
+          if(err != null) {
+            log.log(err);
+          }
+        }
+      });
+      this.db[i] = newdb;
+    }
+  },
+
+  parseCliArgs: function() {
+    var args = [];
+
+    process.argv.forEach(function (val, index, array) {
+      args.push(val);
+    });
+
+    return args;
+  },
+
+  getRandomInt: function(min, max) {
+    if(typeof min === 'undefined') {
+      min = 0;
+    } else if(typeof max === 'undefined') {
+      max = Number.MAX_SAFE_INTEGER
+    }
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  },
+
+  getChannelByName: function(name) {
+    for(var key in module.exports.joinedChannels) {
+
+      if(name == module.exports.joinedChannels[key].p.properties.channel) {
+        return module.exports.joinedChannels[key]
+      }
+    }
+
+    return null;
+  },
+
+  getChannelByID: function(id) {
+    for(var key in module.exports.joinedChannels) {
+      if(id == module.exports.joinedChannels[key].p.properties._id) {
+        return module.exports.joinedChannels[key]
+      }
+    }
+
+    return null;
+  },
+
+  getUserByName: function(name) {
+    for(var key in module.exports.users) {
+      if(name == module.exports.users[key].p.properties.username) {
+        return module.exports.users[key]
+      }
+    }
+    return null;
+  },
+
+  getUserByID: function(id) {
+    for(var key in module.exports.users) {
+      if(id == module.exports.users[key].p.properties._id) {
+        return module.exports.users[key]
+      }
+    }
+    return null;
+  },
+
+  getCommandByName: function(name, channelID) {
+    for(var key in module.exports.commands) {
+      if(module.exports.commands[key].p.properties.name.indexOf(name) != -1) {
+        return module.exports.commands[key]
+      }
+    }
+
+    return null;
+  },
+
+  getCommandByID: function(id, channelID) {
+    for(var key in module.exports.commands) {
+      if(module.exports.commands[key].p.properties._id == id) {
+        return module.exports.commands[key]
+      }
+    }
+
+    return null;
+  },
+
+  checkCommandPower: function(cp, neededcp) {
+    if(typeof cp == 'undefined') {
+      cp = 0;
+    }
+    return cp >= neededcp;
+  },
+
+  joinChannel: function(channelID, settings) {
+    var channel = require('./channel.js');
+    var ch = new channel.Channel(channelID, settings);
+    module.exports.joinedChannels[channelID] = ch;
+  },
+
+  loadCommand: function(commandID, settings) {
+    var command = require('./command.js');
+    var cmd = new command.Command(commandID, settings);
+    module.exports.commands[commandID] = cmd;
+  },
+
+  saveAll: function() {
+    for(var key in module.exports.commands) {
+      module.exports.commands[key].p.save();
+    }
+
+    for(var key in module.exports.joinedChannels) {
+      module.exports.joinedChannels[key].p.save();
+    }
+
+    for(var key in module.exports.users) {
+      module.exports.users[key].p.save();
+    }
   }
 }

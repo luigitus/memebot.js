@@ -1,5 +1,3 @@
-var globalSettings = require("./settings.js");
-
 module.exports = {
   LOGLEVEL: {
     DEBUG: "DEBUG",

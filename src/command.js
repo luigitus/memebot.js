@@ -4,64 +4,77 @@ var base = require('./baseobj.js');
 var cd = require('./cooldown.js');
 var cr = require('./commandreference.js');
 
-module.exports = {
-  Command: {
-    init: function(id) {
-      this.p = Object.create(base.BaseObject);
-      this.p.init(this);
-      var obj = this;
-      this.p.path = settings.gs.paths['commands'] + '/' + id + '.json';
+var Command = function(id, cs) {
+  this.p = new base.BaseObject(id, 'commands', this);
+  var obj = this;
+  this.cs = cs;
+  this.p.defaults = {
+    _id: id,
+    name: ['!unknown'],
+    channelID: ['#all#'],
+    ownerChannelID: '#internal#',
+    cooldownLength: 0,
+    helptext: [],
+    types: ['default'],
+    output: ['NULL'],
+    prefix: '',
+    suffix: '',
+    cost: 0,
+    counter: 0,
+    locked: false,
+    textTrigger: false,
+    requriedCommandPower: settings.commandPower.user,
+    userCooldownLenght: 0,
+    enabled: true,
+    timesExecuted: 0,
+    formatData: true,
+    useWhisper: false,
+    hideCommand: false,
+    suggestedList: [],
+    isTimer: false,
+    timer: 100,
+    chance: 100
+  }
 
-      this.p.defaults = {
-        _id: id,
-        name: '',
-        channelID: '#all#',
-        cooldownLength: 0,
-        helptext: [],
-        types: ['default'],
-        output: [],
-        prefix: '',
-        suffix: '',
-        cost: 0,
-        counter: 0,
-        locked: false,
-        textTrigger: false,
-        requriedCommandPower: 10,
-        userCooldownLenght: 0,
-        enabled: true,
-        timesExecuted: 0,
-        formatData: true,
-        useWhisper: false,
-        hideCommand: false,
-        suggestedList: [],
-        isTimer: false,
-        timer: 100,
-        chance: 100
-      }
+  this.p.load(this.afterLoad);
 
-      this.p.load();
-      this.p.setDefaults(this.p.defaults);
+  // update function
+  setInterval(function() {
+    obj.p.save();
+  }, 60 * 1000);
+}
 
-      this.cooldown = Object.create(cd.Cooldown);
+Command.prototype = {
+  afterLoad: function(p) {
+    if(typeof(p.cs) != 'undefined') {
+      p.p.setDefaults(p.cs, true);
+    }
+    p.p.setDefaults(p.p.defaults);
 
-      // create command type objects
-      this.scripts = [];
-      for(var i = 0; i < this.p.properties.types.length; i++) {
-        var newScript = Object.create(cr[this.p.properties.types[i]]);
-        newScript.init(this);
-        this.scripts.push(newScript);
-      }
+    p.cooldown = new cd.Cooldown(0);
 
-      // update function
-      setInterval(function() {
-        obj.p.save();
-      }, 60 * 1000);
-    },
+    // create command type objects
+    p.scripts = [];
+    for(var i = 0; i < p.p.properties.types.length; i++) {
+      var newScript = new cr[p.p.properties.types[i]](p);
+      p.scripts.push(newScript);
+    }
+  },
 
-    execute: function(data, channel, sender, callback) {
+  execute: function(data, channel, sender, callback) {
+    if(!settings.checkCommandPower(sender.p.properties.commandpower[channel.p.properties._id],
+    this.p.properties.requriedCommandPower)) {
+      callback(['Not enough command power '], channel, sender);
+      return;
+    }
+    if(this.p.properties.enabled) {
       for(var i = 0; i < this.scripts.length; i++) {
         callback(this.scripts[i].execute(data, channel, sender), channel, sender);
       }
     }
   }
+}
+
+module.exports = {
+  Command
 }

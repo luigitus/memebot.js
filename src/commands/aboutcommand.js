@@ -1,14 +1,15 @@
 var command = require('../command.js');
 
-module.exports = {
-  AboutCommand: {
-    init: function(base) {
-      // inherit prototype
-      this.p = base;
-    },
+var AboutCommand = function(base) {
+  this.p = base;
+}
 
-    execute: function(data, channel, sender) {
-      return ['memebot standalone experiment about command'];
-    }
-  },
+AboutCommand.prototype = {
+  execute: function(data, channel, sender) {
+    return ['@{sender}: {appname} {version} developed by {dev}. Fork me on github: {git}'];
+  }
+}
+
+module.exports = {
+  AboutCommand
 }

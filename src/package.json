@@ -9,6 +9,7 @@
   "author": "Lukas Myers",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.10.2"
+    "express": "^4.10.2",
+    "nedb": "^1.8.0"
   }
 }

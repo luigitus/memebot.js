@@ -4,6 +4,10 @@ var fs = require('fs');
 module.exports = {
   local: {},
 
+  formatParameters: function(message, data) {
+    return message;
+  },
+
   formatText: function(message, local, channel, user) {
     if(local) {
       message = message.replace(message, local[message]);
@@ -15,6 +19,7 @@ module.exports = {
     message = message.replace('{space}', ' ');
     message = message.replace('{}', ' ');
     message = message.replace('{none}', '');
+    message = message.replace('{git}', settings.build.git)
 
     if(!(typeof(channel) === 'undefined')) {
       message = message.replace('{currency}', channel.p.properties.currency);
@@ -23,6 +28,9 @@ module.exports = {
     if(!(typeof(user) === 'undefined')) {
       message = message.replace('{sender}', user.p.properties.displayName);
       message = message.replace('{username}', user.p.properties.username);
+      if(!(typeof(channel) === 'undefined')) {
+        message = message.replace('{points}', user.p.properties.points[channel.p.properties._id]);
+      }
     }
     return message;
   },
