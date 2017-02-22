@@ -84,6 +84,7 @@ module.exports = {
           }
         }
       });
+      newdb.persistence.setAutocompactionInterval(1800 * 1000)
       this.db[i] = newdb;
     }
   },

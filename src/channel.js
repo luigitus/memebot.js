@@ -69,7 +69,7 @@ Channel.prototype = {
       for(var key in settings.commands) {
         var cmd = settings.commands[key];
 
-        if((cmd.p.properties.channelID.indexOf(this.p.properties.channelID) == -1)
+        if((cmd.p.properties.channelID.indexOf(this.p.properties._id) == -1)
           && (cmd.p.properties.channelID.indexOf('#all#') == -1)) {
             continue;
         }

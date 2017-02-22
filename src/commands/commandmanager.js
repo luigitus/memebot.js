@@ -33,6 +33,33 @@ CommandManager.prototype = {
       }
 
       return [retList];
+    } else if(data[1] == 'add' &&
+    settings.checkCommandPower(sender.p.properties.commandpower[channel.p.properties._id], 25)) {
+      var newID = settings.getRandomInt(1000);
+      while(newID in settings.commands) {
+        newID = settings.getRandomInt(1000);
+      }
+      var output = '';
+      for(var i = 3; i < data.length; i++) {
+        output = output + data[i] + ' ';
+      }
+
+      settings.loadCommand(newID, {name: [data[2]], ownerChannelID: channel.p.properties._id,
+      channelID: [channel.p.properties._id], output: [output]});
+      
+      return ['Added command'];
+    } else if(data[1] == 'remove' &&
+    settings.checkCommandPower(sender.p.properties.commandpower[channel.p.properties._id], 25)) {
+      var exists = false;
+      // check if command exists for this channel; only first name is valid in this case
+      for(var i in settings.commands) {
+        var cmd = settings.commands[i];
+        if(cmd.p.properties.name[0] == data[2] && cmd.p.properties.ownerChannelID == channel.p.properties._id) {
+          delete settings.commands[i];
+        }
+      }
+
+      return ['Removed command(s)'];
     }
   }
 }

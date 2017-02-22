@@ -14,6 +14,7 @@ settings.readSettings('./config/settings.json');
 text.loadLocals('./config/' + settings.gs.local + '.json');
 settings.minit();
 settings.readIDs();
+webui.initweb();
 
 // shutdown hook
 process.on('exit', function() {

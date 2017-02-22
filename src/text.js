@@ -15,7 +15,7 @@ module.exports = {
 
     message = message.replace("{version}", settings.build.version);
     message = message.replace('{appname}', settings.build.appName);
-    message =message.replace('{dev}', settings.build.dev);
+    message = message.replace('{dev}', settings.build.dev);
     message = message.replace('{space}', ' ');
     message = message.replace('{}', ' ');
     message = message.replace('{none}', '');

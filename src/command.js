@@ -16,7 +16,7 @@ var Command = function(id, cs) {
     cooldownLength: 0,
     helptext: [],
     types: ['default'],
-    output: ['NULL'],
+    output: [],
     prefix: '',
     suffix: '',
     cost: 0,
@@ -31,6 +31,7 @@ var Command = function(id, cs) {
     useWhisper: false,
     hideCommand: false,
     suggestedList: [],
+    listContent: [],
     isTimer: false,
     timer: 100,
     chance: 100
