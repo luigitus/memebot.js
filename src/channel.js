@@ -20,7 +20,14 @@ var Channel = function(id, cs) {
     silent: false,
     offlinepoints: false,
     currency: 'points',
-    _id: id
+    _id: id,
+    title: '',
+    game: '',
+    uptime_t: 0,
+    useDefaultLogin: true,
+    botoauth: '',
+    botName: '',
+    isLive: false
   }
 
   var obj = this;
@@ -47,7 +54,12 @@ Channel.prototype = {
   join: function() {
     var tmi = require("./tmiconnection.js");
     this.connected = true;
-    this.connection = new tmi.ConnectionHandler(this);
+    if(this.p.properties.useDefaultLogin) {
+      this.connection = new tmi.ConnectionHandler(this);
+    } else {
+      this.connection = new tmi.ConnectionHandler(this, this.p.properties.botName,
+      this.p.properties.botoauth);
+    }
   },
 
   connect: function() {
@@ -82,9 +94,9 @@ Channel.prototype = {
     }
   },
 
-  commandCallback: function(messages, channel, sender) {
+  commandCallback: function(messages, channel, sender, command, data) {
     for(message in messages) {
-      channel.connection.sendMessage(messages[message], channel, sender, true);
+      channel.connection.sendMessage(messages[message], channel, sender, command, data, true);
     }
   },
 

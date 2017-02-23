@@ -34,11 +34,13 @@ var User = function(id, cs) {
       var currentChannel = settings.getChannelByID(obj.inChannels[c]);
 
       if(currentChannel != null) {
-        if(obj.p.properties.points[obj.inChannels[c]] == null ||
-          isNaN(obj.p.properties.points[obj.inChannels[c]])) {
-          obj.p.properties.points[obj.inChannels[c]] = 0;
+        if(currentChannel.p.properties.isLive || currentChannel.p.properties.offlinepoints) {
+          if(obj.p.properties.points[obj.inChannels[c]] == null ||
+            isNaN(obj.p.properties.points[obj.inChannels[c]])) {
+            obj.p.properties.points[obj.inChannels[c]] = 0;
+          }
+          obj.p.properties.points[obj.inChannels[c]] += currentChannel.p.properties.pointsperupdate;
         }
-        obj.p.properties.points[obj.inChannels[c]] += currentChannel.p.properties.pointsperupdate;
       }
     }
 

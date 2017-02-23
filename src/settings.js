@@ -150,7 +150,10 @@ module.exports = {
   getCommandByName: function(name, channelID) {
     for(var key in module.exports.commands) {
       if(module.exports.commands[key].p.properties.name.indexOf(name) != -1) {
-        return module.exports.commands[key]
+        if(typeof channelID === 'undefined'
+        || module.exports.commands[key].p.properties.ownerChannelID == channelID) {
+          return module.exports.commands[key]
+        }
       }
     }
 
@@ -160,7 +163,10 @@ module.exports = {
   getCommandByID: function(id, channelID) {
     for(var key in module.exports.commands) {
       if(module.exports.commands[key].p.properties._id == id) {
-        return module.exports.commands[key]
+        if(typeof channelID === 'undefined'
+        || module.exports.commands[key].p.properties.ownerChannelID == channelID) {
+          return module.exports.commands[key]
+        }
       }
     }
 

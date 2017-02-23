@@ -35,7 +35,7 @@ setInterval(function() {
       }
     }
   }
-}, 60 * 10);
+}, 60 * 5);
 
 // system log update function
 setInterval(function() {

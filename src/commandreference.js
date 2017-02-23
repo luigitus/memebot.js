@@ -13,5 +13,10 @@ module.exports = {
   save: save.SaveCommand,
   points: points.PointsCommand,
   join: require('./commands/joincommand.js').JoinCommand,
-  part: require('./commands/partcommand.js').PartCommand
+  part: require('./commands/partcommand.js').PartCommand,
+  help: require('./commands/helpcommand.js').HelpCommand,
+  list: require('./commands/listcommand.js').ListCommand,
+  counter: require('./commands/countercommand.js').CounterCommand,
+  user: require('./commands/usermanager.js').UserManager,
+  channel: require('./commands/channelmanager.js').ChannelManager
 }

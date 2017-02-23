@@ -13,7 +13,9 @@ module.exports = {
       res.setHeader('Content-Type', 'application/json');
       var channel = settings.joinedChannels[req.query.id];
       if(typeof channel !== 'undefined') {
-        res.send({data: channel.p.properties, links : {}});
+        var datatosend = JSON.parse(JSON.stringify(channel.p.properties));
+        datatosend.botoauth = null;
+        res.send({data: datatosend, links : {}});
       } else {
         res.send({error: 404, message: 'Not found'});
       }
@@ -75,7 +77,7 @@ module.exports = {
 
     app.get('/api/v1/command', function(req, res){
       res.setHeader('Content-Type', 'application/json');
-      
+
       var command = settings.commands[req.query.id];
       if(typeof command !== 'undefined') {
         res.send({data: command.p.properties, links : {}});
@@ -88,8 +90,8 @@ module.exports = {
       res.setHeader('Content-Type', 'application/json');
 
       var page = parseInt(req.query.page);
-      var channel = req.query.channel;
-      var channelID = req.query.channelID;
+      var channelID = req.query.channelid;
+
       if(typeof page === 'undefined' || isNaN(page)) {
         page = 0;
       }
@@ -99,6 +101,11 @@ module.exports = {
       var resData = {};
       for(var i in settings.commands) {
         if(counter >= startAt && counter < itemsPerPage) {
+          if(typeof channelID != 'undefined') {
+            if(channelID != settings.commands[i].p.properties.ownerChannelID) {
+              continue;
+            }
+          }
           resData[i] = settings.gs.url + '/api/v1/command?id=' +
           settings.commands[i].p.properties._id;
         }

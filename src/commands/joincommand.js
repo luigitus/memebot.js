@@ -19,11 +19,12 @@ JoinCommand.prototype = {
       }
     } else {
       var newChannelID = 1;
-      while(newChannelID in settings.joinedChannels) {
+      /*while(newChannelID in settings.joinedChannels) {
         newChannelID = settings.getRandomInt(1000);
-      }
+      }*/
 
-      settings.joinChannel(newChannelID, {channel: '#' + sender.p.properties.username});
+      // channel id is always the same as the sender's id
+      settings.joinChannel(sender.p.properties._id, {channel: '#' + sender.p.properties.username});
       return ['Joined channel #{sender} :D'];
     }
   }

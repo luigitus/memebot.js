@@ -8,7 +8,7 @@ module.exports = {
     return message;
   },
 
-  formatText: function(message, local, channel, user) {
+  formatText: function(message, local, channel, user, command, data) {
     if(local) {
       message = message.replace(message, local[message]);
     }
@@ -23,6 +23,10 @@ module.exports = {
 
     if(!(typeof(channel) === 'undefined')) {
       message = message.replace('{currency}', channel.p.properties.currency);
+    }
+
+    if(!(typeof(command) === 'undefined')) {
+      message = message.replace('{counter}', command.p.properties.counter);
     }
 
     if(!(typeof(user) === 'undefined')) {

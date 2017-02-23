@@ -9,9 +9,15 @@ var ConnectionHandler = function(cb, username, password) {
   var obj = this; // bind parrent object so that it can be access
 
   this.client.connect(settings.gs.ircPort, settings.gs.ircServer, function() {
-    log.log('Connected: logging in as ' + settings.gs.botName);
-    obj.writeBytes('PASS ' + settings.gs.botPassword);
-    obj.writeBytes('NICK ' + settings.gs.botName);
+    if(typeof username === 'undefined' || typeof password === 'undefined') {
+      log.log('Connected: logging in as ' + settings.gs.botName);
+      obj.writeBytes('PASS ' + settings.gs.botPassword);
+      obj.writeBytes('NICK ' + settings.gs.botName);
+    } else {
+      log.log('Connected: logging in as ' + username);
+      obj.writeBytes('PASS ' + password);
+      obj.writeBytes('NICK ' + username);
+    }
 
     obj.writeBytes('CAP REQ :twitch.tv/membership');
     obj.writeBytes('CAP REQ :twitch.tv/commands');
@@ -144,6 +150,7 @@ ConnectionHandler.prototype = {
         senderObject.inChannels.push(settings.getChannelByName(channel).p.properties._id);
       }
       senderObject.p.properties.displayName = ircTags['display-name'];
+      senderObject.p.properties.username = senderName;
       if(senderObject.p.isLoaded) {
         if(ircTags['user-type'] == 'mod') {
           senderObject.p.properties.commandpower[settings.getChannelByName(channel).p.properties._id] = settings.commandPower.mod;
@@ -193,13 +200,13 @@ ConnectionHandler.prototype = {
   },
 
 
-  sendMessage: function(message, channel, sender, format, whisper) {
+  sendMessage: function(message, channel, sender, command, data, format, whisper) {
     if(message == '' || channel.p.properties.silent) {
       return;
     }
 
     if(format || typeof(format) === 'undefined') {
-      message = text.formatText(message, false, channel, sender);
+      message = text.formatText(message, false, channel, sender, command, data);
     }
 
     if(this.messageCount > settings.gs.messageLimit) {

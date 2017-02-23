@@ -7,7 +7,7 @@ var DefaultCommand = function(base) {
 
 DefaultCommand.prototype = {
   execute: function(data, channel, sender) {
-    return this.p.p.properties.output;
+    return this.p.p.properties.output
   }
 }
 
