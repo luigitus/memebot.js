@@ -1,6 +1,7 @@
 var settings = require('./settings.js');
 var fs = require('fs');
 var base = require('./baseobj.js');
+var log = require('./mlog.js');
 
 var Channel = function(id, cs) {
   this.p = new base.BaseObject(id, 'channels', this);
@@ -75,6 +76,8 @@ Channel.prototype = {
   join: function() {
     var tmi = require("./tmiconnection.js");
     this.connected = true;
+    this.p.properties.shouldJoin = true;
+    log.log('Creating connection for channel ' + this.p.properties.channel);
     if(this.p.properties.useDefaultLogin) {
       this.connection = new tmi.ConnectionHandler(this);
     } else {
@@ -85,6 +88,7 @@ Channel.prototype = {
 
   connect: function() {
     this.connected = true;
+    this.p.properties.shouldJoin = true;
     this.connection.writeBytes('JOIN ' + this.p.properties.channel);
     if(this.p.properties.greet) {
       this.connection.sendMessage(this.p.properties.greetMessage, this);
@@ -93,11 +97,13 @@ Channel.prototype = {
 
   reJoin: function() {
     this.connected = false;
+    this.p.properties.shouldJoin = true;
     this.connection.writeBytes('JOIN ' + this.p.properties.channel);
   },
 
   part: function() {
     this.connected = false;
+    this.p.properties.shouldJoin = false;
     this.connection.writeBytes('PART ' + this.p.properties.channel);
   },
 

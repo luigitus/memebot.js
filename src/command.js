@@ -103,14 +103,13 @@ Command.prototype = {
     }
     // check global cooldown
     if(!this.globalCooldown.canContinue() ||
-    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.properties.cooldownbypasspower)) {
-      console.log(this.globalCooldown.getRemainder());
+    !settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.properties.cooldownbypasspower)) {
       return;
     }
     // check for user cooldown
     if(typeof this.userCooldowns[sender.p.properties._id] !== 'undefined') {
       if(!this.userCooldowns[sender.p.properties._id].canContinue() ||
-      settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.properties.cooldownbypasspower)) {
+      !settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.properties.cooldownbypasspower)) {
         return;
       } else {
         delete this.userCooldowns[sender.p.properties._id];

@@ -24,6 +24,7 @@ var User = function(id, cs) {
     _id: id,
     username: '',
     displayName: '',
+    joined_t: 0
   };
 
   this.p.load(this.afterLoad);

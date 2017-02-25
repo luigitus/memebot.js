@@ -12,6 +12,18 @@ module.exports = {
     git: 'https://github.com/unlink2/memebot.js/'
   },
 
+  joinedChannels: {}, // id = key
+  commands: {},
+  users: {},
+  db: {},
+  commandPower: {
+    user: 0,
+    mod: 25,
+    broadcaster: 50,
+    moderator: 75,
+    admin: 100
+  },
+
   readSettings: function(file) {
     var contents;
     try {
@@ -63,17 +75,6 @@ module.exports = {
   },
 
   // utility functions
-  joinedChannels: {}, // id = key
-  commands: {},
-  users: {},
-  db: {},
-  commandPower: {
-    user: 0,
-    mod: 25,
-    broadcaster: 50,
-    moderator: 75,
-    admin: 100
-  },
 
   // note to self; require may be needed at bottom
   minit: function() {
@@ -88,16 +89,40 @@ module.exports = {
       newdb.persistence.setAutocompactionInterval(1800 * 1000)
       this.db[i] = newdb;
     }
-    if(!fs.existsSync('./config/toconvert')) {
-      fs.mkdirSync('./config/toconvert');
+
+    // check for backup folder
+    if(!fs.existsSync('./config/backups')) {
+      fs.mkdirSync('./config/backups');
     }
-    if(!fs.existsSync('./config/converted')) {
-      fs.mkdirSync('./config/converted');
+
+    // do convertion of old database files
+    if(module.exports.gs.doImport) {
+      if(!fs.existsSync('./config/toconvert')) {
+        fs.mkdirSync('./config/toconvert');
+      }
+      if(!fs.existsSync('./config/converted')) {
+        fs.mkdirSync('./config/converted');
+      }
+      var importFiles = fs.readdirSync('./config/toconvert');
+      // do the bson convert job
+      for(var i in importFiles) {
+        importer.bsonToJson('./config/toconvert/' + importFiles[i], './config/converted/' + importFiles[i].replace('.bson', '.json'));
+      }
     }
-    var importFiles = fs.readdirSync('./config/toconvert');
-    // do the bson convert job
-    for(var i in importFiles) {
-      importer.bsonToJson('./config/toconvert/' + importFiles[i], './config/converted/' + importFiles[i].replace('.bson', '.json'));
+    // do import of old database files
+    if(module.exports.gs.doConvert) {
+      // import files in converted directory
+      importFiles = fs.readdirSync('./config/converted');
+      for(var i in importFiles) {
+        if(importFiles[i].search('_commands.json')) {
+          importer.importCommandFromLegacyDB('./config/converted/' + importFiles[i]);
+        } else if(importFiles[i].search('_users.json')) {
+          importer.importUserFromLegacyDB('./config/converted/' + importFiles[i]);
+        } else {
+          // assume it's channel file
+          importer.importChannelFromLegacyDB('./config/converted/' + importFiles[i]);
+        }
+      }
     }
   },
 

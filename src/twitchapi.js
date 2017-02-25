@@ -14,6 +14,29 @@ TwitchAPI.updateAll = function() {
   }
 }
 
+TwitchAPI.getUserInformationFromName = function(username, callback) {
+  var options = {
+    host: 'api.twitch.tv',
+    path: '/kraken/users?login=' + username,
+    method: 'GET',
+    headers: {'Content-Type' : 'application/json',
+    'Client-ID' : settings.gs.clientid,
+    'Accept' : 'application/vnd.twitchtv.v5+json'
+    },
+    json: true
+  };
+  var req = https.request(options, function(res) {
+    res.setEncoding('utf8');
+    res.on('data', function(data) {
+        callback(username, JSON.parse(data));
+      });
+      res.on('error', function(err) {
+        log.log(err);
+      });
+  });
+  req.end();
+},
+
 TwitchAPI.makeStreamsRequest = function(id, callback) {
   var options = {
     host: 'api.twitch.tv',
