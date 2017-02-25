@@ -34,8 +34,10 @@ module.exports = {
       var resData = {};
       for(var i in settings.joinedChannels) {
         if(counter >= startAt && counter < itemsPerPage) {
-          resData[i] = settings.gs.url + '/api/v1/channel?id=' +
-          settings.joinedChannels[i].p.properties._id;
+          resData[i] = {links : {channel : settings.gs.url + '/api/v1/channel?id=' +
+          settings.joinedChannels[i].p.properties._id},
+          name : settings.joinedChannels[i].p.properties.channel
+          };
         }
 
         counter++;
@@ -66,8 +68,10 @@ module.exports = {
       var resData = {};
       for(var i in settings.users) {
         if(counter >= startAt && counter < itemsPerPage) {
-          resData[i] = settings.gs.url + '/api/v1/user?id=' +
-          settings.users[i].p.properties._id;
+          resData[i] = {links : {user : settings.gs.url + '/api/v1/user?id=' +
+          settings.users[i].p.properties._id},
+          name : settings.users[i].p.properties.username
+          };
         }
 
         counter++;
@@ -106,8 +110,10 @@ module.exports = {
               continue;
             }
           }
-          resData[i] = settings.gs.url + '/api/v1/command?id=' +
-          settings.commands[i].p.properties._id;
+          resData[i] = {links : {command : settings.gs.url + '/api/v1/command?id=' +
+          settings.commands[i].p.properties._id},
+          name: settings.commands[i].p.properties.name
+          };
         }
 
         counter++;

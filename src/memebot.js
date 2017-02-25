@@ -8,6 +8,7 @@ var text = require('./text.js');
 var base = require('./baseobj.js');
 var os = require('os');
 var command = require('./command.js');
+var twitchapi = require('./twitchapi.js');
 
 // read settings.json
 settings.readSettings('./config/settings.json');
@@ -35,7 +36,12 @@ setInterval(function() {
       }
     }
   }
-}, 60 * 5);
+}, 180);
+
+// twitch api update
+setInterval(function() {
+  twitchapi.TwitchAPI.updateAll();
+}, 1800 * 100);
 
 // system log update function
 setInterval(function() {

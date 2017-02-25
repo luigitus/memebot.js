@@ -8,7 +8,7 @@ var ChannelManager = function(base) {
 ChannelManager.prototype = {
   execute: function(data, channel, sender) {
     if(data[1] == 'edit' &&
-    settings.checkCommandPower(sender.p.properties.commandpower[channel.p.properties._id], 50)) {
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 50)) {
       var constantSettings = ['_id'];
       if(constantSettings.indexOf(data[2]) != -1) {
         return ['{sender}: You cannot edit this setting!'];
@@ -31,7 +31,7 @@ ChannelManager.prototype = {
         return ['{sender}: Value edited!'];
       }
     } else if(data[1] == 'get' &&
-    settings.checkCommandPower(sender.p.properties.commandpower[channel.p.properties._id], 50)) {
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 50)) {
       // check if command exists for this channel; only first name is valid in this case
       var output = JSON.stringify(channel.p.properties[data[2]]);
       if(typeof output === 'undefined') {

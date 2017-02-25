@@ -1,4 +1,5 @@
 var settings = require('../settings.js');
+var log = require('../mlog.js');
 
 var CommandManager = function(base) {
   // inherit prototype
@@ -36,7 +37,7 @@ CommandManager.prototype = {
     } else if(data[1] == 'list') {
       return ['{sender}: Coming soon'];
     } else if(data[1] == 'add' &&
-    settings.checkCommandPower(sender.p.properties.commandpower[channel.p.properties._id], 25)) {
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25)) {
       var newID = settings.getRandomInt(1000);
       while(newID in settings.commands) {
         newID = settings.getRandomInt(1000);
@@ -55,22 +56,28 @@ CommandManager.prototype = {
 
       return ['{sender}: Added command'];
     } else if(data[1] == 'remove' &&
-    settings.checkCommandPower(sender.p.properties.commandpower[channel.p.properties._id], 25)) {
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25)) {
       var exists = false;
       // check if command exists for this channel; only first name is valid in this case
       for(var i in settings.commands) {
         var cmd = settings.commands[i];
         if(cmd.p.properties.name[0] == data[2] && cmd.p.properties.ownerChannelID == channel.p.properties._id) {
+          log.log(sender.p.properties.username + '(' + sender.p.properties._id + ')' +
+          ' removed command ' + cmd.p.properties.name + '(' +
+          cmd.p.properties._id + ') from channel ' + channel.p.properties.channel + '(' +
+          cmd.p.properties._id + ')');
+          settings.commands[i].p.remove();
           delete settings.commands[i];
         }
       }
 
       return ['{sender}: Removed command(s)'];
     } else if(data[1] == 'edit' &&
-    settings.checkCommandPower(sender.p.properties.commandpower[channel.p.properties._id], 25)) {
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25)) {
       // check if command exists for this channel; only first name is valid in this case
       var cmd = settings.getCommandByName(data[2], channel.p.properties._id);
-      var constantSettings = ['channelID', 'timesExecuted', 'ownerChannelID', 'channelID', '_id'];
+      var constantSettings = ['channelID', 'timesExecuted', 'ownerChannelID', 'channelID', '_id',
+      'pointsperupdate'];
       if(constantSettings.indexOf(data[3]) != -1) {
         return ['{sender}: You cannot edit this setting!'];
       }
@@ -161,7 +168,16 @@ CommandManager.prototype = {
 
             return ['{sender}: Could not edit output!'];
           } else {
-            return ['{sender}: Please specify which option (add/remove/edit)'];
+            var output = '';
+            for(var i = 5; i < data.length; i++) {
+              output = output + data[i] + ' ';
+            }
+            if(output === '' || output === ' ') {
+              return ['{sender}: Please specify an output value!'];
+            }
+
+            cmd.p.properties.output[0] = output;
+            return ['{sender}: Output edited'];
           }
         }
 
@@ -245,20 +261,17 @@ CommandManager.prototype = {
 
       } else if(typeof obj === 'number') {
         cmd.p.properties[data[3]] = parseFloat(data[4]);
-        if(data[3] == 'cooldownLength') {
-          var cd = require('../cooldown.js');
-          cmd.globalCooldown = new cd.Cooldown(parseFloat(data[4]));
-        }
+
         return ['{sender}: Value edited!'];
       } else if(typeof obj === 'boolean') {
-        cdm.p.properties[data[3]] = (data[4] == 'true');
+        cmd.p.properties[data[3]] = (data[4] == 'true');
         return ['{sender}: Value edited!'];
       } else {
         cdm.p.properties[data[3]] = data[4];
         return ['{sender}: Value edited!'];
       }
     } else if(data[1] == 'get' &&
-    settings.checkCommandPower(sender.p.properties.commandpower[channel.p.properties._id], 25)) {
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25)) {
       // check if command exists for this channel; only first name is valid in this case
       var cmd = settings.getCommandByName(data[2], channel.p.properties._id);
       if(cmd == null) {

@@ -10,11 +10,13 @@ var ConnectionHandler = function(cb, username, password) {
 
   this.client.connect(settings.gs.ircPort, settings.gs.ircServer, function() {
     if(typeof username === 'undefined' || typeof password === 'undefined') {
-      log.log('Connected: logging in as ' + settings.gs.botName);
+      log.log('Connected: logging in as ' + settings.gs.botName + ' on ' +
+      settings.gs.ircServer + ":" + settings.gs.ircPort);
       obj.writeBytes('PASS ' + settings.gs.botPassword);
       obj.writeBytes('NICK ' + settings.gs.botName);
     } else {
-      log.log('Connected: logging in as ' + username);
+      log.log('Connected: logging in as ' + username  + ' on ' +
+      settings.gs.ircServer + ":" + settings.gs.ircPort);
       obj.writeBytes('PASS ' + password);
       obj.writeBytes('NICK ' + username);
     }

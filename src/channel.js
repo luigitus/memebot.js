@@ -16,6 +16,8 @@ var Channel = function(id, cs) {
     greet: false,
     greetMessage: 'Hello I\'m {appname} version {version} the dankest irc bot ever RitzMitz',
     maxfnlen: 8,
+    fnList: [],
+    currentfn: {},
     pointsperupdate: 1,
     silent: false,
     offlinepoints: false,
@@ -35,6 +37,25 @@ var Channel = function(id, cs) {
 
   // update function
   setInterval(function() {
+    // check and execute timer commands here
+    for(var i in settings.commands) {
+      var cmd = settings.commands[i];
+      var user = require('./user.js');
+      if(cmd.p.properties.channelID.indexOf(obj.p.properties._id) != -1) {
+        if(cmd.canExecuteTimer()) {
+          obj.commandQueue.push({command: cmd, msg: {
+            content: [],
+            sender: new user.User('#internal#'),
+            type: 'PRIVMSG',
+            channeName: obj.p.properties.channel,
+            id: '#internal#',
+            tags: {}
+          },
+          channel: obj});
+        }
+      }
+    }
+
     obj.p.save();
   }, 60 * 1000);
 }
@@ -68,6 +89,11 @@ Channel.prototype = {
     if(this.p.properties.greet) {
       this.connection.sendMessage(this.p.properties.greetMessage, this);
     }
+  },
+
+  reJoin: function() {
+    this.connected = false;
+    this.connection.writeBytes('JOIN ' + this.p.properties.channel);
   },
 
   part: function() {

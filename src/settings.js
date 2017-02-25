@@ -52,7 +52,7 @@ module.exports = {
         log.log(err);
       }
       if(doc.length == 0) {
-        module.exports.joinChannel(1);
+        module.exports.joinChannel(module.exports.gs.defaultchannelid);
       }
 
       for(var channel in doc) {

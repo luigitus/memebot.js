@@ -58,7 +58,7 @@ BaseObject.prototype = {
   },
 
   remove: function() {
-    db.remove({_id: this.properties._id}, {}, function(err, numRemoved) {
+    settings.db[this.path].remove({_id: this.properties._id}, {}, function(err, numRemoved) {
       if(err != null) {
         log.log(err);
       }

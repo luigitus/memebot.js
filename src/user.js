@@ -39,6 +39,9 @@ var User = function(id, cs) {
             isNaN(obj.p.properties.points[obj.inChannels[c]])) {
             obj.p.properties.points[obj.inChannels[c]] = 0;
           }
+          if(obj.p.properties.points[obj.inChannels[c]] < 0) {
+            obj.p.properties.points[obj.inChannels[c]] = 0;
+          }
           obj.p.properties.points[obj.inChannels[c]] += currentChannel.p.properties.pointsperupdate;
         }
       }
@@ -56,8 +59,23 @@ User.prototype = {
     p.p.setDefaults(p.p.defaults);
   },
 
-  commandPower: function() {
-    return this.p.properties.commandPower + this.p.properties.commandPowerModifier;
+  commandPower: function(channelID) {
+    if(isNaN(this.p.properties.commandPowerModifier[channelID])) {
+      return this.p.properties.commandpower[channelID];
+    }
+    return this.p.properties.commandpower[channelID] + this.p.properties.commandPowerModifier[channelID];
+  },
+
+  payPoints: function(channelid, amount) {
+    if(settings.checkCommandPower(this.commandPower(channelid), 75)) {
+      return true;
+    }
+    if(this.p.properties[channelid] >= amount) {
+      this.p.properties[channelid] = this.p.properties[channelid] - amount;
+      return true;
+    }
+
+    return false;
   }
 }
 

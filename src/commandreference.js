@@ -18,5 +18,8 @@ module.exports = {
   list: require('./commands/listcommand.js').ListCommand,
   counter: require('./commands/countercommand.js').CounterCommand,
   user: require('./commands/usermanager.js').UserManager,
-  channel: require('./commands/channelmanager.js').ChannelManager
+  channel: require('./commands/channelmanager.js').ChannelManager,
+  list: require('./commands/listcommand.js').ListCommand,
+  dampe: require('./commands/dampecommand.js').DampeCommand,
+  name: require('./commands/filenamecommand.js').FilenameCommand
 }
