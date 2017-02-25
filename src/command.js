@@ -39,7 +39,8 @@ var Command = function(id, cs) {
     listContent: [],
     isTimer: false,
     timer: 100,
-    chance: 100
+    chance: 100,
+    cooldownbypasspower: settings.commandPower.broadcaster
   }
 
   this.p.load(this.afterLoad);
@@ -101,13 +102,15 @@ Command.prototype = {
       return;
     }
     // check global cooldown
-    if(!this.globalCooldown.canContinue()) {
+    if(!this.globalCooldown.canContinue() ||
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.properties.cooldownbypasspower)) {
       console.log(this.globalCooldown.getRemainder());
       return;
     }
     // check for user cooldown
     if(typeof this.userCooldowns[sender.p.properties._id] !== 'undefined') {
-      if(!this.userCooldowns[sender.p.properties._id].canContinue()) {
+      if(!this.userCooldowns[sender.p.properties._id].canContinue() ||
+      settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.properties.cooldownbypasspower)) {
         return;
       } else {
         delete this.userCooldowns[sender.p.properties._id];

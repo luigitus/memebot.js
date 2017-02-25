@@ -9,6 +9,7 @@
   "author": "Lukas Myers",
   "license": "ISC",
   "dependencies": {
+    "bson-json-transform": "^1.0.3",
     "express": "^4.10.2",
     "nedb": "^1.8.0",
     "sprintf-js": "^1.0.3"

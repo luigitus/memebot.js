@@ -1,6 +1,7 @@
 var fs = require('fs');
 var log = require("./mlog.js");
 var Datastore = require('nedb');
+var importer = require('./import.js');
 
 module.exports = {
   gs: {},
@@ -86,6 +87,17 @@ module.exports = {
       });
       newdb.persistence.setAutocompactionInterval(1800 * 1000)
       this.db[i] = newdb;
+    }
+    if(!fs.existsSync('./config/toconvert')) {
+      fs.mkdirSync('./config/toconvert');
+    }
+    if(!fs.existsSync('./config/converted')) {
+      fs.mkdirSync('./config/converted');
+    }
+    var importFiles = fs.readdirSync('./config/toconvert');
+    // do the bson convert job
+    for(var i in importFiles) {
+      importer.bsonToJson('./config/toconvert/' + importFiles[i], './config/converted/' + importFiles[i].replace('.bson', '.json'));
     }
   },
 
