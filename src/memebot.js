@@ -11,6 +11,7 @@ var command = require('./command.js');
 var twitchapi = require('./twitchapi.js');
 var srcapi = require('./srcapi.js');
 var fs = require('fs');
+var importer = require('./import.js');
 
 // read settings.json
 settings.readSettings('./config/settings.json');
@@ -18,6 +19,7 @@ text.loadLocals('./config/' + settings.gs.local + '.json');
 settings.minit();
 settings.readIDs();
 memebotapi.initweb();
+importer.checkImport();
 
 // shutdown hook
 process.on('exit', function() {
@@ -63,10 +65,7 @@ setInterval(function() {
     var path = settings.gs.paths[i];
 
     fs.createReadStream(path)
-    .pipe(fs.createWriteStream('./config/backups/' + i + '_' + dformat + '_' + timeFormat + '.backup'))
-    .on('end', function (data) {
-        log.log('Database backup finished.');
-    });
+    .pipe(fs.createWriteStream('./config/backups/' + i + '_' + dformat + '_' + timeFormat + '.backup'));
   }
 }, settings.gs.backupInterval * 1000);
 

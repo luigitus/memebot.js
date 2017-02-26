@@ -14,7 +14,7 @@ TwitchAPI.updateAll = function() {
   }
 }
 
-TwitchAPI.getUserInformationFromName = function(username, callback) {
+TwitchAPI.getUserInformationFromName = function(username, datatopass, callback) {
   var options = {
     host: 'api.twitch.tv',
     path: '/kraken/users?login=' + username,
@@ -28,7 +28,7 @@ TwitchAPI.getUserInformationFromName = function(username, callback) {
   var req = https.request(options, function(res) {
     res.setEncoding('utf8');
     res.on('data', function(data) {
-        callback(username, JSON.parse(data));
+        callback(username, JSON.parse(data), datatopass);
       });
       res.on('error', function(err) {
         log.log(err);

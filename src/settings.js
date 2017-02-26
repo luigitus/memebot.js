@@ -1,7 +1,6 @@
 var fs = require('fs');
 var log = require("./mlog.js");
 var Datastore = require('nedb');
-var importer = require('./import.js');
 
 module.exports = {
   gs: {},
@@ -93,36 +92,6 @@ module.exports = {
     // check for backup folder
     if(!fs.existsSync('./config/backups')) {
       fs.mkdirSync('./config/backups');
-    }
-
-    // do convertion of old database files
-    if(module.exports.gs.doImport) {
-      if(!fs.existsSync('./config/toconvert')) {
-        fs.mkdirSync('./config/toconvert');
-      }
-      if(!fs.existsSync('./config/converted')) {
-        fs.mkdirSync('./config/converted');
-      }
-      var importFiles = fs.readdirSync('./config/toconvert');
-      // do the bson convert job
-      for(var i in importFiles) {
-        importer.bsonToJson('./config/toconvert/' + importFiles[i], './config/converted/' + importFiles[i].replace('.bson', '.json'));
-      }
-    }
-    // do import of old database files
-    if(module.exports.gs.doConvert) {
-      // import files in converted directory
-      importFiles = fs.readdirSync('./config/converted');
-      for(var i in importFiles) {
-        if(importFiles[i].search('_commands.json')) {
-          importer.importCommandFromLegacyDB('./config/converted/' + importFiles[i]);
-        } else if(importFiles[i].search('_users.json')) {
-          importer.importUserFromLegacyDB('./config/converted/' + importFiles[i]);
-        } else {
-          // assume it's channel file
-          importer.importChannelFromLegacyDB('./config/converted/' + importFiles[i]);
-        }
-      }
     }
   },
 
@@ -221,12 +190,24 @@ module.exports = {
     var channel = require('./channel.js');
     var ch = new channel.Channel(channelID, settings);
     module.exports.joinedChannels[channelID] = ch;
+
+    return ch;
   },
 
   loadCommand: function(commandID, settings) {
     var command = require('./command.js');
     var cmd = new command.Command(commandID, settings);
     module.exports.commands[commandID] = cmd;
+
+    return cmd;
+  },
+
+  loadUser: function(userID, settings) {
+    var user = require('./user.js');
+    var usr = new user.User(userID, settings);
+    module.exports.users[userID] = usr;
+
+    return usr;
   },
 
   saveAll: function() {
