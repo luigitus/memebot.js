@@ -1,6 +1,7 @@
 var fs = require('fs');
 var log = require("./mlog.js");
 var Datastore = require('nedb');
+var npid = require('npid');
 
 module.exports = {
   gs: {},
@@ -77,6 +78,15 @@ module.exports = {
 
   // note to self; require may be needed at bottom
   minit: function() {
+    // write pid file
+    try {
+      var pid = npid.create('./config/process.pid');
+      pid.removeOnExit();
+    } catch (err) {
+      log.log(err);
+      process.exit(1);
+    }
+
     for(var i in this.gs.paths) {
       var newdb = new Datastore({filename: this.gs.paths[i], autoload: true,
         onload: function(err) {

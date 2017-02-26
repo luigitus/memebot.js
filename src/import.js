@@ -60,7 +60,7 @@ module.exports = {
       var cs = {name: [], helptext: [], types: [], output: [], ownerChannelID: id, channelID: [id]};
       var ch = settings.getChannelByName(commandData.channel);
       if(ch == null) {
-        log.log('Cannot find channel ' + userData.channel + ' for user ' + editUser);
+        log.log('Cannot find channel ' + commandData.channel + ' for user ' + editUser);
         return;
       }
 

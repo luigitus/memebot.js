@@ -12,6 +12,7 @@
     "bson-json-transform": "^1.0.3",
     "express": "^4.10.2",
     "nedb": "^1.8.0",
+    "npid": "^0.4.0",
     "sprintf-js": "^1.0.3"
   }
 }

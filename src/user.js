@@ -49,7 +49,7 @@ var User = function(id, cs) {
     }
 
     obj.p.save();
-  }, 60 * 1000);
+  }, 60 * 1000 * 10);
 }
 
 User.prototype = {
