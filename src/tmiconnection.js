@@ -208,6 +208,9 @@ ConnectionHandler.prototype = {
     }
 
     if(format || typeof(format) === 'undefined') {
+      var bannedStrings = ['.ban', '!ban'];
+      // todo check for banned strings
+
       message = text.formatText(message, false, channel, sender, command, data);
     }
 

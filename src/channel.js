@@ -117,12 +117,22 @@ Channel.prototype = {
           && (cmd.p.properties.channelID.indexOf('#all#') == -1)) {
             continue;
         }
-
-        if(cmd.p.properties.name.indexOf(message.content[0]) != -1) {
-          this.commandQueue.push({command: cmd, msg: message,
-          channel: this});
+        if(!cmd.p.properties.textTrigger) {
+          if(cmd.p.properties.name.indexOf(message.content[0]) != -1) {
+            this.commandQueue.push({command: cmd, msg: message,
+            channel: this});
+          }
+        } else {
+          for(var i in message.content) {
+            if(cmd.p.properties.name.indexOf(message.content[i]) != -1) {
+              this.commandQueue.push({command: cmd, msg: message,
+              channel: this});
+            }
+          }
         }
+
       }
+
     }
   },
 

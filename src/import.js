@@ -108,6 +108,10 @@ module.exports = {
           cs.suggestedList = commandData[key];
         } else if(key == 'executeChance') {
           cs.chance = commandData[key];
+        } else if(key == 'script') {
+          cs.output[2] = commandData[key];
+        } else if(key == 'param') {
+          cs.parametres = commandData[key];
         }
       }
 

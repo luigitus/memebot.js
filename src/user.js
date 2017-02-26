@@ -68,6 +68,9 @@ User.prototype = {
   },
 
   payPoints: function(channelid, amount) {
+    if(amount <= 0) {
+      return true;
+    }
     if(settings.checkCommandPower(this.commandPower(channelid), 75)) {
       return true;
     }

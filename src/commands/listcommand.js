@@ -49,11 +49,33 @@ ListCommand.prototype = {
       }
     } else if(data[1] == 'approve' &&
     settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25)) {
-
+      var id = parseInt(data[2]);
+      if(isNaN(id) || id >= this.p.p.properties.suggestedList.length) {
+        return ['{sender}: Please specify a valid id!'];
+      }
+      this.p.p.properties.listContent.push(this.p.p.properties.suggestedList[id]);
+      this.p.p.properties.suggestedList.splice(id, 1);
+      return ['{sender}: Approved suggested item!'];
     } else if(data[1] == 'deny' &&
     settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25)) {
-
+      var id = parseInt(data[2]);
+      if(isNaN(id) || id >= this.p.p.properties.suggestedList.length) {
+        return ['{sender}: Please specify a valid id!'];
+      }
+      this.p.p.properties.suggestedList.splice(id, 1);
+      return ['{sender}: Denied suggested item!'];
     } else if(data[1] == 'suggest') {
+      var inputString = '';
+      for(var i = 2; i < data.length; i++) {
+        inputString = inputString + data[i] + ' ';
+      }
+      if(inputString == '' || inputString == ' ') {
+        return ['{sender}: List content cannot be empty!'];
+      } else {
+        this.p.p.properties.suggestedList.push(text.formatList(this.p.p.properties.output[1], inputString, 0,
+        '', ''));
+        return ['{sender}: Suggested item!'];
+      }
     } else {
       var id = parseInt(data[1]);
       if(isNaN(id)) {

@@ -4,6 +4,7 @@ var base = require('./baseobj.js');
 var cd = require('./cooldown.js');
 var cr = require('./commandreference.js');
 var sprintf = require("sprintf-js").sprintf;
+var text = require('./text.js');
 
 var Command = function(id, cs) {
   this.p = new base.BaseObject(id, 'commands', this);
@@ -40,7 +41,8 @@ var Command = function(id, cs) {
     isTimer: false,
     timer: 100,
     chance: 100,
-    cooldownbypasspower: settings.commandPower.broadcaster
+    cooldownbypasspower: settings.commandPower.broadcaster,
+    parametres: 0
   }
 
   this.p.load(this.afterLoad);
@@ -90,7 +92,6 @@ Command.prototype = {
   execute: function(data, channel, sender, callback) {
     // assume command was successful; scripts can cahnge that during execution
     this.success = true;
-
     if(!settings.checkCommandPower(sender.commandPower(channel.p.properties._id),
     this.p.properties.requriedCommandPower)) {
       callback(['{sender}: You do not have sufficient permission to run this command!'], channel, sender);
@@ -101,28 +102,45 @@ Command.prototype = {
     if(settings.getRandomInt(0, 100) >= this.p.properties.chance) {
       return;
     }
+
     // check global cooldown
-    if(!this.globalCooldown.canContinue() ||
-    !settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.properties.cooldownbypasspower)) {
-      return;
+    if(!this.globalCooldown.canContinue()) {
+      if(!settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.properties.cooldownbypasspower)) {
+        return;
+      }
     }
+
     // check for user cooldown
     if(typeof this.userCooldowns[sender.p.properties._id] !== 'undefined') {
-      if(!this.userCooldowns[sender.p.properties._id].canContinue() ||
-      !settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.properties.cooldownbypasspower)) {
-        return;
+      if(!this.userCooldowns[sender.p.properties._id].canContinue()) {
+        if(!settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.properties.cooldownbypasspower)) {
+          return;
+        }
       } else {
         delete this.userCooldowns[sender.p.properties._id];
       }
     }
+
 
     // check payment
     if(!sender.payPoints(channel.p.properties._id, this.p.properties.cost)) {
       return [sprintf('{sender}: Sorry, you do not have %d {currency}', this.p.properties.cost)];
     }
 
-
     if(this.p.properties.enabled) {
+      if(this.p.properties.formatData) {
+        for(var i in data) {
+          data[i] = text.formatText(data[i], false, channel, sender, this, data);
+        }
+      }
+
+      // if parametres do not match return helptext
+      if(data.length <= this.p.properties.parametres && this.p.properties.parametres != 0) {
+        this.success = false;
+        callback(this.p.properties.helptext, channel, sender, this, data);
+        return;
+      }
+
       for(var i = 0; i < this.scripts.length; i++) {
         if(this.scripts[i] != null && typeof this.scripts[i] !== 'undefined') {
           callback(this.scripts[i].execute(data, channel, sender), channel, sender, this, data);
