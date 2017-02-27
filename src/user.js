@@ -5,6 +5,8 @@ var util = settings;
 var User = function(id, cs) {
   this.path = '';
   this.inChannels = [];
+  this.lastActivity = {};
+  this.shouldSendGreet = {};
   this.cooldowns = {};
   this.cs = cs;
   this.p = new base.BaseObject(id, 'users', this);
@@ -18,7 +20,6 @@ var User = function(id, cs) {
     isCat: false,
     autoGreetMessage: {},
     enableAutogreet: true,
-    timeJoined: 0,
     newUser: true,
     wonJackpots: 0,
     _id: id,
@@ -31,10 +32,20 @@ var User = function(id, cs) {
 
   // update function
   setInterval(function() {
+    if(!obj.isLoaded) {
+      return;
+    }
     for(var c in obj.inChannels) {
       var currentChannel = settings.getChannelByID(obj.inChannels[c]);
 
       if(currentChannel != null) {
+        // check for autoGreetMessage
+        if(obj.shouldSendGreet[obj.inChannels[c]]) {
+          obj.shouldSendGreet[obj.inChannels[c]] = false;
+          currentChannel.connection.writeBytes('PRIVMSG ' + currentChannel.p.properties.channel +
+          ' : ' + obj.p.properties.autoGreetMessage[obj.inChannels[c]]);
+        }
+
         if(currentChannel.p.properties.isLive || currentChannel.p.properties.offlinepoints) {
           if(obj.p.properties.points[obj.inChannels[c]] == null ||
             isNaN(obj.p.properties.points[obj.inChannels[c]])) {
@@ -45,6 +56,16 @@ var User = function(id, cs) {
           }
           obj.p.properties.points[obj.inChannels[c]] += currentChannel.p.properties.pointsperupdate;
         }
+      }
+
+      // check activity
+      var currentTime = Math.floor(Date.now() / 1000);
+      if(currentTime > (obj.lastActivity[obj.inChannels[c]] + 3600)) {
+        delete obj.lastActivity[obj.inChannels[c]];
+        obj.inChannels.splice(c, 1);
+      }
+      if(obj.inChannels.length == 0) {
+        // todo remove user from list here
       }
     }
 

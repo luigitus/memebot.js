@@ -28,8 +28,6 @@ module.exports = {
       res.sendfile('./web/public/index.html');
     });
 
-
-
     // api calls are implemented here
 
     app.get('/api/v1/info', function(req, res) {
@@ -147,6 +145,10 @@ module.exports = {
         counter++;
       }
       res.send({data: resData, links : {}});
+    });
+
+    app.get('*', function(req, res){
+      res.sendfile('./web/public/notfound.html');
     });
 
     http.listen(settings.gs.expressport, function(){

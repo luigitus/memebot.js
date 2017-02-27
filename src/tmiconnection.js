@@ -150,6 +150,7 @@ ConnectionHandler.prototype = {
       // check if user is marked as being in this channel
       if(senderObject.inChannels.indexOf(settings.getChannelByName(channel).p.properties._id) == -1) {
         senderObject.inChannels.push(settings.getChannelByName(channel).p.properties._id);
+        senderObject.shouldSendGreet[settings.getChannelByName(channel).p.properties._id] = true;
       }
       senderObject.p.properties.displayName = ircTags['display-name'];
       senderObject.p.properties.username = senderName;

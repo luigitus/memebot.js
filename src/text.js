@@ -43,7 +43,6 @@ module.exports = {
     message = message.replace('{git}', settings.build.git)
     message = message.replace('{time}', timeFormat);
     message = message.replace('{date}', dformat);
-    message = message.replace('{random}', settings.getRandomInt(0));
 
     var randomUserName = '';
     message = message.replace('{randomuser}', randomUserName);
@@ -78,7 +77,9 @@ module.exports = {
     if(typeof data !== 'undefined') {
       for(var i = 1; i < data.length; i++) {
         var parametreString = '{param' + i + '}'
-        message = message.replace(parametreString, data[i]);
+        while(message.search('{param' + i + '}') != -1) {
+          message = message.replace(parametreString, data[i]);
+        }
       }
     }
 

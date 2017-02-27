@@ -110,6 +110,9 @@ Channel.prototype = {
   message: function(message) {
     // parse commands here and add them to the queue
     if(message.type == 'PRIVMSG') {
+      // set last activity
+      message.sender.lastActivity[this.p.properties._id] = Math.floor(Date.now() / 1000);
+
       for(var key in settings.commands) {
         var cmd = settings.commands[key];
 

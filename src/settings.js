@@ -129,15 +129,18 @@ module.exports = {
 
   evalExpression: function(toEval) {
     var evaled = '';
-    var status = true;
+    var retstatus = true;
     try {
       evaled = math.eval(toEval);
     } catch(err) {
       evaled = err;
-      status = false;
+      retstatus = false;
+    }
+    if(isNaN(evaled) || typeof evaled !== 'number') {
+      retstatus = false;
     }
 
-    return {e: evaled, status: true};
+    return {e: evaled, status: retstatus};
   },
 
   getChannelByName: function(name) {
