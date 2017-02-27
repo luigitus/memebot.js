@@ -267,7 +267,7 @@ CommandManager.prototype = {
         cmd.p.properties[data[3]] = (data[4] == 'true');
         return ['{sender}: Value edited!'];
       } else {
-        cdm.p.properties[data[3]] = data[4];
+        cmd.p.properties[data[3]] = data[4];
         return ['{sender}: Value edited!'];
       }
     } else if(data[1] == 'get' &&

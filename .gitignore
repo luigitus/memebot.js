@@ -2,3 +2,6 @@ src/node_modules/
 workingdir/
 config/
 src/config/
+node_modules/
+web/node_modules/
+web/public/scripts/lib/

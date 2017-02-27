@@ -21,5 +21,7 @@ module.exports = {
   channel: require('./commands/channelmanager.js').ChannelManager,
   list: require('./commands/listcommand.js').ListCommand,
   dampe: require('./commands/dampecommand.js').DampeCommand,
-  name: require('./commands/filenamecommand.js').FilenameCommand
+  name: require('./commands/filenamecommand.js').FilenameCommand,
+  sm: require('./commands/sendmessagecommand.js').SendMessageCommand,
+  calc: require('./commands/calculatorcommand.js').CalculatorCommand
 }

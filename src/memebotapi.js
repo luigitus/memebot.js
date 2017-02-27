@@ -1,15 +1,43 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var settings = require('./settings.js');
+var io = require('socket.io').listen(http);
+var log = require('./mlog.js');
+var express = require('express');
 
 module.exports = {
   initweb: function() {
-    app.get('/api/v1/info', function(req, res){
+    // Websocket
+    io.sockets.on('connection', function (socket) {
+	     socket.emit('chat', {time: new Date(), text: 'You are connected to the server!'});
+	     socket.on('chat', function (data) {
+
+		   io.sockets.emit('chat', {time: new Date(), name: data.name || 'null', text: data.text});
+	    });
+    });
+
+
+    // deliver website
+	  app.use(express.static('./web/public'));
+
+    app.get('/test', function (req, res) {
+    	res.sendfile('./web/public/test.html');
+    });
+
+    app.get('/', function (req, res) {
+      res.sendfile('./web/public/index.html');
+    });
+
+
+
+    // api calls are implemented here
+
+    app.get('/api/v1/info', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
       res.send({data: settings.build, links : {}});
     });
 
-    app.get('/api/v1/channel', function(req, res){
+    app.get('/api/v1/channel', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
       var channel = settings.joinedChannels[req.query.id];
       if(typeof channel !== 'undefined') {
@@ -21,7 +49,7 @@ module.exports = {
       }
     });
 
-    app.get('/api/v1/channellist', function(req, res){
+    app.get('/api/v1/channellist', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
 
       var page = parseInt(req.query.page);
@@ -45,7 +73,7 @@ module.exports = {
       res.send({data: resData, links : {}});
     });
 
-    app.get('/api/v1/user', function(req, res){
+    app.get('/api/v1/user', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
       var user = settings.users[req.query.id];
       if(typeof user !== 'undefined') {
@@ -55,7 +83,7 @@ module.exports = {
       }
     });
 
-    app.get('/api/v1/userlist', function(req, res){
+    app.get('/api/v1/userlist', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
 
       var page = parseInt(req.query.page);
@@ -79,7 +107,7 @@ module.exports = {
       res.send({data: resData, links : {}});
     });
 
-    app.get('/api/v1/command', function(req, res){
+    app.get('/api/v1/command', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
 
       var command = settings.commands[req.query.id];
@@ -90,7 +118,7 @@ module.exports = {
       }
     });
 
-    app.get('/api/v1/commandlist', function(req, res){
+    app.get('/api/v1/commandlist', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
 
       var page = parseInt(req.query.page);
@@ -121,8 +149,8 @@ module.exports = {
       res.send({data: resData, links : {}});
     });
 
-    http.listen(3000, function(){
-      console.log('listening on *:3000');
+    http.listen(settings.gs.expressport, function(){
+      log.log('listening on *:' + settings.gs.expressport);
     });
   }
 }

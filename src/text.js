@@ -45,6 +45,9 @@ module.exports = {
     message = message.replace('{date}', dformat);
     message = message.replace('{random}', settings.getRandomInt(0));
 
+    var randomUserName = '';
+    message = message.replace('{randomuser}', randomUserName);
+
     if(!(typeof(channel) === 'undefined')) {
       message = message.replace('{currency}', channel.p.properties.currency);
       message = message.replace('{broadcaster}', channel.p.properties.channel.replace('#', ''));
@@ -68,11 +71,28 @@ module.exports = {
           user.p.properties.points[channel.p.properties._id]));
       }
     }
+
+
+
     // handle parametres
     if(typeof data !== 'undefined') {
       for(var i = 1; i < data.length; i++) {
         var parametreString = '{param' + i + '}'
         message = message.replace(parametreString, data[i]);
+      }
+    }
+
+    // try parsing as expression
+    var found = message.match('(\\{.*?\\})');
+    for(var i in found) {
+      if(typeof found[i] !== 'string') {continue;}
+      var toEval = found[i].replace('{', '');
+      toEval = toEval.replace('}', '');
+
+      var result = settings.evalExpression(toEval);
+
+      if(result.status) {
+        message = message.replace(found[i], result.e);
       }
     }
 

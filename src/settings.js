@@ -2,11 +2,12 @@ var fs = require('fs');
 var log = require("./mlog.js");
 var Datastore = require('nedb');
 var npid = require('npid');
+var math = require('mathjs');
 
 module.exports = {
   gs: {},
   build: {
-    appName: 'memebot.js',
+    appName: 'memebot',
     version: '1.0.0',
     dev: 'Lukas Myers',
     git: 'https://github.com/unlink2/memebot.js/'
@@ -84,7 +85,9 @@ module.exports = {
       pid.removeOnExit();
     } catch (err) {
       log.log(err);
-      process.exit(1);
+      if(!this.gs.debug) {
+        process.exit(1);
+      }
     }
 
     for(var i in this.gs.paths) {
@@ -122,6 +125,19 @@ module.exports = {
       max = Number.MAX_SAFE_INTEGER
     }
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  },
+
+  evalExpression: function(toEval) {
+    var evaled = '';
+    var status = true;
+    try {
+      evaled = math.eval(toEval);
+    } catch(err) {
+      evaled = err;
+      status = false;
+    }
+
+    return {e: evaled, status: true};
   },
 
   getChannelByName: function(name) {

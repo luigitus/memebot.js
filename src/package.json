@@ -11,8 +11,10 @@
   "dependencies": {
     "bson-json-transform": "^1.0.3",
     "express": "^4.10.2",
+    "mathjs": "^3.9.3",
     "nedb": "^1.8.0",
     "npid": "^0.4.0",
+    "socket.io": "^1.7.3",
     "sprintf-js": "^1.0.3"
   }
 }

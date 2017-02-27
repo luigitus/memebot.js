@@ -17,7 +17,6 @@ TwitchAPI.updateAll = function() {
 TwitchAPI.getUserInformationFromName = function(username, datatopass, callback) {
   var options = {
     host: 'api.twitch.tv',
-    path: '/kraken/users?login=' + username,
     method: 'GET',
     headers: {'Content-Type' : 'application/json',
     'Client-ID' : settings.gs.clientid,
@@ -25,10 +24,20 @@ TwitchAPI.getUserInformationFromName = function(username, datatopass, callback) 
     },
     json: true
   };
+  if(typeof username === 'string') {
+    options.path = '/kraken/users?login=' + username;
+  } else {
+    options.path = '/kraken/users?login=' + username.join(',');
+  }
+
   var req = https.request(options, function(res) {
     res.setEncoding('utf8');
     res.on('data', function(data) {
-        callback(username, JSON.parse(data), datatopass);
+        try {
+          callback(username, JSON.parse(data), datatopass);
+        } catch(err) {
+          log.log(err + ' ' + data);
+        }
       });
       res.on('error', function(err) {
         log.log(err);
@@ -40,7 +49,7 @@ TwitchAPI.getUserInformationFromName = function(username, datatopass, callback) 
 TwitchAPI.makeStreamsRequest = function(id, callback) {
   var options = {
     host: 'api.twitch.tv',
-    path: '/kraken/streams/?channel=' + id,
+
     method: 'GET',
     headers: {'Content-Type' : 'application/json',
     'Client-ID' : settings.gs.clientid,
@@ -48,10 +57,21 @@ TwitchAPI.makeStreamsRequest = function(id, callback) {
     },
     json: true
   };
+
+  if(typeof id === 'string') {
+    options.path = '/kraken/streams/?channel=' + id;
+  } else {
+    options.path = '/kraken/streams/?channel=' + id.join(',');
+  }
+
   var req = https.request(options, function(res) {
     res.setEncoding('utf8');
     res.on('data', function(data) {
-        callback(id, JSON.parse(data));
+        try {
+          callback(id, JSON.parse(data));
+        } catch(err) {
+          log.log(err + ' ' + data);
+        }
       });
       res.on('error', function(err) {
         log.log(err);
@@ -74,7 +94,11 @@ TwitchAPI.makeChannelRequest = function(id, callback) {
   var req = https.request(options, function(res) {
     res.setEncoding('utf8');
     res.on('data', function(data) {
-        callback(id, JSON.parse(data));
+        try {
+          callback(id, JSON.parse(data));
+        } catch(err) {
+          log.log(err + ' ' + data);
+        }
       });
       res.on('error', function(err) {
         log.log(err);

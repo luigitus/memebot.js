@@ -14,7 +14,11 @@ module.exports = [
   {types: ['channel'], name: ['!channel'], _id: 10, requriedCommandPower: 0},
   {types: ['dampe'], name: ['!dampe'], _id: 11, requriedCommandPower: 0},
   {types: ['name'], name: ['!name'], _id: 12, requriedCommandPower: 0},
+
   {types: ['default'], name: ['!mehug'], _id: 13, requriedCommandPower: 0,
   output: ['{sender} hugs {param1}! How cute! <3'], parametres: 1,
-  helptext: ['{sender} hugs nobody! How pathetic!']}
+  helptext: ['{sender} hugs nobody! How pathetic!']},
+
+  {types: ['sm'], name: ['!sm'], _id: 14, requriedCommandPower: 100},
+  {types: ['calc'], name: ['!calc'], _id: 15, requriedCommandPower: 0},
 ]
