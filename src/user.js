@@ -95,12 +95,19 @@ User.prototype = {
     if(settings.checkCommandPower(this.commandPower(channelid), 75)) {
       return true;
     }
-    if(this.p.properties[channelid] >= amount) {
-      this.p.properties[channelid] = this.p.properties[channelid] - amount;
+    if(this.p.properties.points[channelid] >= amount) {
+      this.p.properties.points[channelid] = this.p.properties.points[channelid] - amount;
       return true;
     }
 
     return false;
+  },
+
+  receivePoints: function(channelid, amount) {
+    if(isNaN(this.p.properties.points[channelid])) {
+      this.p.properties.points[channelid] = 0;
+    }
+    this.p.properties.points[channelid] = this.p.properties.points[channelid] + amount;
   }
 }
 

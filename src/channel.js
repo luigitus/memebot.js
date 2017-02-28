@@ -42,6 +42,9 @@ var Channel = function(id, cs) {
     for(var i in settings.commands) {
       var cmd = settings.commands[i];
       var user = require('./user.js');
+      if(!cmd.p.isLoaded) {
+        continue;
+      }
       if(cmd.p.properties.channelID.indexOf(obj.p.properties._id) != -1) {
         if(cmd.canExecuteTimer()) {
           obj.commandQueue.push({command: cmd, msg: {
@@ -111,7 +114,9 @@ Channel.prototype = {
     // parse commands here and add them to the queue
     if(message.type == 'PRIVMSG') {
       // set last activity
-      message.sender.lastActivity[this.p.properties._id] = Math.floor(Date.now() / 1000);
+      if(message.sender != null) {
+        message.sender.lastActivity[this.p.properties._id] = Math.floor(Date.now() / 1000);
+      }
 
       for(var key in settings.commands) {
         var cmd = settings.commands[key];
