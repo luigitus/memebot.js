@@ -35,7 +35,8 @@ CommandManager.prototype = {
 
       return [retList];
     } else if(data[1] == 'list') {
-      return ['{sender}: Coming soon'];
+      return ['{sender}: ' + channel.p.properties.channel + '\'s comamnds can be found here: ' +
+      settings.gs.url + '/commandlist?page=0&channelid=' + channel.p.properties._id];
     } else if(data[1] == 'add' &&
     settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25)) {
       var newID = settings.getRandomInt(1000);

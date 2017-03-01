@@ -4,21 +4,40 @@ var fs = require('fs');
 module.exports = {
   local: {},
 
+  replaceAll: function(input, toReplace, data) {
+    var formatted = input;
+    // counter just in case
+    var counter = 0;
+    while(input.search(toReplace) != -1) {
+      formatted = formatted.replace(toReplace, data);
+      if(counter > 50) {
+        break;
+      }
+      counter++;
+    }
+
+    return formatted;
+  },
+
   formatParameters: function(message, data) {
     return message;
   },
 
-  formatList: function(output, item, id, prefix, suffix) {
+  formatList: function(output, item, id, prefix, suffix, channel, user, command, data) {
     var formatted = output;
     if(typeof formatted !== 'undefined') {
-      formatted = formatted.replace('{number}', id.toString());
-      formatted = formatted.replace('{list}', item);
-
-      formatted = this.formatText(formatted);
+      formatted = this.replaceAll(formatted, '{number}', id.toString());
+      formatted = this.replaceAll(formatted, '{list}', item);
+      formatted = this.formatText(formatted, false, channel, user, command, data);
     } else {
       formatted = item;
     }
-    formatted = prefix + ' ' + formatted + ' ' + suffix;
+    if(prefix != '') {
+      formatted = prefix + ' ' + formatted;
+    }
+    if(suffix != '') {
+      formatted = formatted + ' ' + suffix;
+    }
     return formatted;
   },
 
@@ -34,39 +53,39 @@ module.exports = {
       message = message.replace(message, local[message]);
     }
 
-    message = message.replace("{version}", settings.build.version);
-    message = message.replace('{appname}', settings.build.appName);
-    message = message.replace('{dev}', settings.build.dev);
-    message = message.replace('{space}', ' ');
-    message = message.replace('{}', ' ');
-    message = message.replace('{none}', '');
-    message = message.replace('{git}', settings.build.git)
-    message = message.replace('{time}', timeFormat);
-    message = message.replace('{date}', dformat);
+    message = this.replaceAll(message, "{version}", settings.build.version);
+    message = this.replaceAll(message, '{appname}', settings.build.appName);
+    message = this.replaceAll(message, '{dev}', settings.build.dev);
+    message = this.replaceAll(message, '{space}', ' ');
+    message = this.replaceAll(message, '{}', ' ');
+    message = this.replaceAll(message, '{none}', '');
+    message = this.replaceAll(message, '{git}', settings.build.git)
+    message = this.replaceAll(message, '{time}', timeFormat);
+    message = this.replaceAll(message, '{date}', dformat);
 
     var randomUserName = '';
-    message = message.replace('{randomuser}', randomUserName);
+    message = this.replaceAll(message, '{randomuser}', randomUserName);
 
     if(!(typeof(channel) === 'undefined')) {
-      message = message.replace('{currency}', channel.p.properties.currency);
-      message = message.replace('{broadcaster}', channel.p.properties.channel.replace('#', ''));
-      message = message.replace('{streamer}', channel.p.properties.channel.replace('#', ''));
-      message = message.replace('{game}', channel.p.properties.game);
-      message = message.replace('{title}', channel.p.properties.title);
+      message = this.replaceAll(message, '{currency}', channel.p.properties.currency);
+      message = this.replaceAll(message, '{broadcaster}', channel.p.properties.channel.replace('#', ''));
+      message = this.replaceAll(message, '{streamer}', channel.p.properties.channel.replace('#', ''));
+      message = this.replaceAll(message, '{game}', channel.p.properties.game);
+      message = this.replaceAll(message, '{title}', channel.p.properties.title);
     }
 
     if(!(typeof(command) === 'undefined')) {
-      message = message.replace('{counter}', command.p.properties.counter);
+      message = this.replaceAll(message, '{counter}', command.p.properties.counter);
     }
 
     if(!(typeof(user) === 'undefined')) {
-      message = message.replace('{sender}', user.p.properties.displayName);
-      message = message.replace('{username}', user.p.properties.username);
-      message = message.replace('{senderid}', channel.p.properties._id);
+      message = this.replaceAll(message, '{sender}', user.p.properties.displayName);
+      message = this.replaceAll(message, '{username}', user.p.properties.username);
+      message = this.replaceAll(message, '{senderid}', channel.p.properties._id);
 
       if(!(typeof(channel) === 'undefined')) {
-        message = message.replace('{points}', user.p.properties.points[channel.p.properties._id]);
-        message = message.replace('{randompoints}', settings.getRandomInt(0,
+        message = this.replaceAll(message, '{points}', user.getPoints(channel.p.properties._id));
+        message = this.replaceAll(message, '{randompoints}', settings.getRandomInt(0,
           user.p.properties.points[channel.p.properties._id]));
       }
     }
@@ -77,9 +96,7 @@ module.exports = {
     if(typeof data !== 'undefined') {
       for(var i = 1; i < data.length; i++) {
         var parametreString = '{param' + i + '}'
-        while(message.search('{param' + i + '}') != -1) {
-          message = message.replace(parametreString, data[i]);
-        }
+        message = this.replaceAll(message, parametreString, data[i]);
       }
     }
 
@@ -93,7 +110,7 @@ module.exports = {
       var result = settings.evalExpression(toEval);
 
       if(result.status) {
-        message = message.replace(found[i], result.e);
+        message = this.replaceAll(message,found[i], result.e);
       }
     }
 

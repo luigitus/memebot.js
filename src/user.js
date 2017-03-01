@@ -25,14 +25,15 @@ var User = function(id, cs) {
     _id: id,
     username: '',
     displayName: '',
-    joined_t: 0
+    joined_t: 0,
+    defaultPoints: 100
   };
 
   this.p.load(this.afterLoad);
 
   // update function
   setInterval(function() {
-    if(!obj.isLoaded) {
+    if(!obj.p.isLoaded) {
       return;
     }
     for(var c in obj.inChannels) {
@@ -42,19 +43,14 @@ var User = function(id, cs) {
         // check for autoGreetMessage
         if(obj.shouldSendGreet[obj.inChannels[c]]) {
           obj.shouldSendGreet[obj.inChannels[c]] = false;
-          currentChannel.connection.writeBytes('PRIVMSG ' + currentChannel.p.properties.channel +
-          ' : ' + obj.p.properties.autoGreetMessage[obj.inChannels[c]]);
+          if(typeof obj.p.properties.autoGreetMessage[obj.inChannels[c]] !== 'undefined') {
+            currentChannel.connection.writeBytes('PRIVMSG ' + currentChannel.p.properties.channel +
+            ' : ' + obj.p.properties.autoGreetMessage[obj.inChannels[c]]);
+          }
         }
-
         if(currentChannel.p.properties.isLive || currentChannel.p.properties.offlinepoints) {
-          if(obj.p.properties.points[obj.inChannels[c]] == null ||
-            isNaN(obj.p.properties.points[obj.inChannels[c]])) {
-            obj.p.properties.points[obj.inChannels[c]] = 0;
-          }
-          if(obj.p.properties.points[obj.inChannels[c]] < 0) {
-            obj.p.properties.points[obj.inChannels[c]] = 0;
-          }
-          obj.p.properties.points[obj.inChannels[c]] += currentChannel.p.properties.pointsperupdate;
+          this.pointsCheck(channelid);
+          this.receivePoints(obj.inChannels[c], currentChannel.p.properties.pointsperupdate);
         }
       }
 
@@ -89,14 +85,17 @@ User.prototype = {
   },
 
   payPoints: function(channelid, amount) {
+    this.pointsCheck(channelid);
     if(amount <= 0) {
       return true;
     }
-    if(settings.checkCommandPower(this.commandPower(channelid), 75)) {
-      return true;
-    }
+
     if(this.p.properties.points[channelid] >= amount) {
       this.p.properties.points[channelid] = this.p.properties.points[channelid] - amount;
+      return true;
+    }
+
+    if(settings.checkCommandPower(this.commandPower(channelid), 75)) {
       return true;
     }
 
@@ -104,10 +103,22 @@ User.prototype = {
   },
 
   receivePoints: function(channelid, amount) {
+    this.pointsCheck(channelid);
+    this.p.properties.points[channelid] = this.p.properties.points[channelid] + amount;
+  },
+
+  getPoints: function(channelid) {
+    this.pointsCheck(channelid);
+    return this.p.properties.points[channelid];
+  },
+
+  pointsCheck: function(channelid) {
     if(isNaN(this.p.properties.points[channelid])) {
+      this.p.properties.points[channelid] = this.p.properties.defaultPoints;
+    }
+    if(this.p.properties.points[channelid] < 0) {
       this.p.properties.points[channelid] = 0;
     }
-    this.p.properties.points[channelid] = this.p.properties.points[channelid] + amount;
   }
 }
 

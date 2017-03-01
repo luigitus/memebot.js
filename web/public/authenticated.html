@@ -3,15 +3,28 @@
     <head>
         <title>Memebot.js</title>
         <meta charset="utf-8">
-        <script src="./scripts/util.js"></script>
         <link rel="stylesheet" href="./css/style.css" />
         <script src="socket.io/socket.io.js"></script>
         <script src="./scripts/lib/jquery.min.js"></script>
+        <script src="./scripts/util.js"></script>
     </head>
     <body>
       <div id="header"></div> <script type="text/javascript"> $("#header").load("./header.html");</script>
         <div class="content">
-          mornin
+          <p id="message">
+            <script>
+            $(document).ready(function() {
+              var error = getParameterByName('error');
+              var errormessage = getParameterByName('error_description');
+              if(typeof error === 'string') {
+                $('#message').append(error + '</br>');
+                $('#message').append(errormessage);
+              } else {
+                $('#message').append('You are now logged in!');
+              }
+            });
+            </script>
+          </p>
         </div>
         <div id="sidebar"></div> <script type="text/javascript"> $("#sidebar").load("./sidebar.html");</script>
         <div id="footer"></div> <script type="text/javascript"> $("#footer").load("./footer.html");</script>

@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "bson-json-transform": "^1.0.3",
+    "cookie-parser": "^1.4.3",
     "express": "^4.10.2",
     "mathjs": "^3.9.3",
     "nedb": "^1.8.0",

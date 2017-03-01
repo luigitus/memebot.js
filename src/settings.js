@@ -165,6 +165,7 @@ module.exports = {
   },
 
   getUserByName: function(name) {
+    name = name.toLowerCase();
     for(var key in module.exports.users) {
       if(name == module.exports.users[key].p.properties.username) {
         return module.exports.users[key]

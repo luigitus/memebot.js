@@ -144,7 +144,7 @@ Channel.prototype = {
     }
   },
 
-  commandCallback: function(messages, channel, sender, command, data) {
+  commandCallback: function(messages, channel, sender, command, data, other) {
     for(message in messages) {
       channel.connection.sendMessage(messages[message], channel, sender, command, data, true);
     }

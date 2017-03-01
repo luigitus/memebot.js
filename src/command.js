@@ -140,10 +140,11 @@ Command.prototype = {
         callback(this.p.properties.helptext, channel, sender, this, data);
         return;
       }
-
+      // can be used to enable whispers, re-direct output to the website etc.
+      var other = {};
       for(var i = 0; i < this.scripts.length; i++) {
         if(this.scripts[i] != null && typeof this.scripts[i] !== 'undefined') {
-          callback(this.scripts[i].execute(data, channel, sender), channel, sender, this, data);
+          callback(this.scripts[i].execute(data, channel, sender), channel, sender, this, data, other);
         }
       }
 

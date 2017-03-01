@@ -1,9 +1,29 @@
 <!DOCTYPE html>
-<div class="sidebar">
+
+<script>
+$(document).ready(function(){
+  $.getJSON("api/v1/info", function(data) {
+    var appinfo = data.appinfo;
+    var twitchurl = 'https://api.twitch.tv/kraken/oauth2/authorize?response_type=code&client_id=' + appinfo.clientid + '&redirect_uri=' + appinfo.redirecturl + '&scope=' + appinfo.scopes;
+
+    if(typeof getCookieByName('login', document.cookie) === 'undefined') {
+      $('#sb').append(
+          '<a href="' + twitchurl + '">Log in with Twitch</a></br>'
+      );
+    } else {
+      var cookie = JSON.parse(getCookieByName('login', document.cookie));
+      $('#sb').append(
+          '<a href="./logout">' + cookie.username + ': Logout</a></br>'
+      );
+    }
+  })
+});
+</script>
+
+<div class="sidebar" id="sb">
   <a href="./">Home</a></br>
   <a href="./about">About Memebot</a></br>
   <a href="./getme">How to get Memebot</a></br>
-  <a href="./twitchlogin">Log in with Twitch</a></br>
   <a href="./channels">Channel List</a></br>
   <a href="./tutorial">How to use Memebot</a></br>
 </div>

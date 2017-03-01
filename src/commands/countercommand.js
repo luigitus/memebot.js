@@ -12,9 +12,11 @@ CounterCommand.prototype = {
     if(isNaN(amount)) {
       amount = 1;
     }
-    if(data[1] == '+') {
+    if(data[1] == '+' &&
+    this.p.p.properties.ownerChannelID == channel.p.properties._id) {
       this.p.p.properties.counter += amount;
-    } else if(data[1] == '-') {
+    } else if(data[1] == '-' &&
+    this.p.p.properties.ownerChannelID == channel.p.properties._id) {
       this.p.p.properties.counter -= amount;
     }
 

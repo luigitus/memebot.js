@@ -136,9 +136,8 @@ ConnectionHandler.prototype = {
 
     // check if user is in list, if not create it
     if(!(senderID in settings.users) && typeof(senderID) != 'undefined') {
-      var newUser = new user.User(senderID,
+      var newUser = settings.loadUser(senderID,
         {_id: senderID, username: senderName, displayName: ircTags['display-name']});
-      settings.users[senderID] = newUser;
       senderObject = newUser;
     } else if(typeof(senderID) != 'undefined'){
       senderObject = settings.users[senderID];

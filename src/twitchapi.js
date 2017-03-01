@@ -1,6 +1,7 @@
 var settings = require('./settings.js');
 var https = require('https');
 var log = require('./mlog.js');
+var querystring = require('querystring');
 
 var TwitchAPI = function() {
 
@@ -14,11 +15,71 @@ TwitchAPI.updateAll = function() {
   }
 }
 
+TwitchAPI.requestAccessToken = function(authcode, callback) {
+  var body = querystring.stringify({
+        client_id: settings.gs.clientid,
+        client_secret: settings.gs.clientsecret,
+        grant_type: 'authorization_code',
+        redirect_uri: settings.gs.url + settings.gs.redirecturl,
+        code: authcode
+      });
+  var options = {
+    host: 'api.twitch.tv',
+    method: 'POST',
+    path: '/kraken/oauth2/token',
+    headers: {
+    'Content-Length' : Buffer.byteLength(body)
+    },
+    json: true
+  };
+
+  var req = https.request(options, function(res) {
+    res.setEncoding('utf8');
+    res.on('data', function(data) {
+        callback(data);
+      });
+    res.on('error', function(err) {
+      log.log(err);
+      callback(err);
+    });
+  });
+  req.write(body);
+  req.end();
+}
+
+TwitchAPI.getChannelFromOauth = function(oauth, callback) {
+  var options = {
+    host: 'api.twitch.tv',
+    method: 'GET',
+    path: '/kraken/channel',
+    headers: {
+      'Content-Type' : 'application/json',
+      'Client-ID' : settings.gs.clientid,
+      'Accept' : 'application/vnd.twitchtv.v3+json',
+      'Authorization' : 'OAuth ' + oauth
+    },
+    json: true
+  };
+
+  var req = https.request(options, function(res) {
+    res.setEncoding('utf8');
+    res.on('data', function(data) {
+        callback(data);
+      });
+    res.on('error', function(err) {
+      log.log(err);
+      callback(err);
+    });
+  });
+  req.end();
+}
+
 TwitchAPI.getUserInformationFromName = function(username, datatopass, callback) {
   var options = {
     host: 'api.twitch.tv',
     method: 'GET',
-    headers: {'Content-Type' : 'application/json',
+    headers: {
+    'Content-Type' : 'application/json',
     'Client-ID' : settings.gs.clientid,
     'Accept' : 'application/vnd.twitchtv.v5+json'
     },
@@ -51,7 +112,8 @@ TwitchAPI.makeStreamsRequest = function(id, callback) {
     host: 'api.twitch.tv',
 
     method: 'GET',
-    headers: {'Content-Type' : 'application/json',
+    headers: {
+    'Content-Type' : 'application/json',
     'Client-ID' : settings.gs.clientid,
     'Accept' : 'application/vnd.twitchtv.v5+json'
     },

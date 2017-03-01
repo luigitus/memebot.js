@@ -3,17 +3,19 @@
     <head>
         <title>Memebot.js</title>
         <meta charset="utf-8">
-        <script src="./scripts/util.js"></script>
         <link rel="stylesheet" href="./css/style.css" />
+        <script src="./scripts/util.js"></script>
         <script src="socket.io/socket.io.js"></script>
         <script src="./scripts/lib/jquery.min.js"></script>
+        <script src="./scripts/commandquery.js"></script>
     </head>
     <body>
-        <div id="header"></div> <script type="text/javascript"> $("#header").load("./header.html");</script>
+      <div id="header"></div> <script type="text/javascript"> $("#header").load("./header.html");</script>
         <div class="content">
-          404, File not found
+          <ul id="clist">
+          </ul>
         </div>
-        <div id="sidebar"></div> <script type="text/javascript"> $("#sidebar" ).load("./sidebar.html");</script>
+        <div id="sidebar"></div> <script type="text/javascript"> $("#sidebar").load("./sidebar.html");</script>
         <div id="footer"></div> <script type="text/javascript"> $("#footer").load("./footer.html");</script>
     </body>
 </html>

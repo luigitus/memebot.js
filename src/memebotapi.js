@@ -4,6 +4,9 @@ var settings = require('./settings.js');
 var io = require('socket.io').listen(http);
 var log = require('./mlog.js');
 var express = require('express');
+var cookieParser = require('cookie-parser');
+var twitchapi = require('./twitchapi.js');
+var querystring = require('querystring');
 
 module.exports = {
   initweb: function() {
@@ -19,6 +22,7 @@ module.exports = {
 
     // deliver website
 	  app.use(express.static('./web/public'));
+    app.use(cookieParser()); // use this apps cookies like this JSON.parse(req.cookies.login);
 
     app.get('/test', function (req, res) {
     	res.sendfile('./web/public/test.html');
@@ -28,11 +32,40 @@ module.exports = {
       res.sendfile('./web/public/index.html');
     });
 
+    app.get('/commandlist', function (req, res) {
+      res.sendfile('./web/public/commandlist.html');
+    });
+
+    app.get('/authenticated', function (req, res) {
+      twitchapi.TwitchAPI.requestAccessToken(req.query.code, function(data) {
+        if(typeof data.error !== 'undefined') {
+          log.log(data);
+          res.sendfile('./web/public/authenticated.html');
+        }
+        var jsondata = JSON.parse(data);
+        twitchapi.TwitchAPI.getChannelFromOauth(jsondata.access_token, function(channeldata) {
+          var jsonChannelData = JSON.parse(channeldata);
+          jsondata._id = jsonChannelData._id;
+          jsondata.username = jsonChannelData.display_name;
+          res.cookie('login', JSON.stringify(jsondata));
+          res.sendfile('./web/public/authenticated.html');
+        });
+      });
+    });
+
+    app.get('/logout', function (req, res) {
+      res.clearCookie('login');
+      res.sendfile('./web/public/logout.html');
+    });
+
     // api calls are implemented here
 
     app.get('/api/v1/info', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
-      res.send({data: settings.build, links : {}});
+      res.send({data: settings.build, appinfo: {clientid: settings.gs.clientid,
+      redirecturl: settings.gs.url + settings.gs.redirecturl, baseurl: settings.gs.url,
+      scopes: settings.gs.scope
+      }, links : {}});
     });
 
     app.get('/api/v1/channel', function(req, res) {

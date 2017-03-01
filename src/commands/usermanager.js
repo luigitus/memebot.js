@@ -29,10 +29,7 @@ UserManager.prototype = {
         // special case for name of commands
         if(data[3] == 'autoGreetMessage') {
           if(option == 'set') {
-            var output = '';
-            for(var i = 5; i < data.length; i++) {
-              output = output + data[i] + ' ';
-            }
+            var output = data.slice(5).join(' ');
             user.p.properties.autoGreetMessage[channel.p.properties._id] = output;
             return ['{sender}: Autogreet set!'];
           } else {
