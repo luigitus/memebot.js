@@ -73,7 +73,8 @@ ListCommand.prototype = {
         return ['{sender}: Suggested item!'];
       }
     } else if(data[1] == 'list') {
-      return ['{sender}: Coming soon!'];
+      return ['{sender}: A list of all items can be found here: ' +
+      settings.gs.url + '/commandview?commandid=' + this.p.p.properties._id];
     } else {
       var id = parseInt(data[1]);
       if(isNaN(id)) {

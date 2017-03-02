@@ -127,6 +127,14 @@ module.exports = {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   },
 
+  getRandomToken: function() {
+    return require('crypto').randomBytes(64).toString('hex');
+  },
+
+  evalToken: function(token) {
+    return false;
+  },
+
   evalExpression: function(toEval) {
     var evaled = '';
     var retstatus = true;
@@ -220,7 +228,7 @@ module.exports = {
     var channel = require('./channel.js');
     var ch = new channel.Channel(channelID, settings);
     module.exports.joinedChannels[channelID] = ch;
-
+    log.log('Joined channel ' + channelID);
     return ch;
   },
 

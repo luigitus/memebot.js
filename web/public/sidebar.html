@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 
 <script>
-$(document).ready(function(){
-  $.getJSON("api/v1/info", function(data) {
-    var appinfo = data.appinfo;
+$(document).ready(function() {
+  getAppInfo(function(data, appinfo) {
     var twitchurl = 'https://api.twitch.tv/kraken/oauth2/authorize?response_type=code&client_id=' + appinfo.clientid + '&redirect_uri=' + appinfo.redirecturl + '&scope=' + appinfo.scopes;
 
     if(typeof getCookieByName('login', document.cookie) === 'undefined') {
@@ -16,7 +15,7 @@ $(document).ready(function(){
           '<a href="./logout">' + cookie.username + ': Logout</a></br>'
       );
     }
-  })
+  });
 });
 </script>
 
@@ -24,6 +23,6 @@ $(document).ready(function(){
   <a href="./">Home</a></br>
   <a href="./about">About Memebot</a></br>
   <a href="./getme">How to get Memebot</a></br>
-  <a href="./channels">Channel List</a></br>
-  <a href="./tutorial">How to use Memebot</a></br>
+  <a href="./channellist">Channel List</a></br>
+  <a href="./help">How to use Memebot</a></br>
 </div>

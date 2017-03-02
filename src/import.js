@@ -48,11 +48,12 @@ module.exports = {
   },
 
   importCommandCallback: function(username, data, commandData) {
+    log.log('Importing command ' + commandData._id + ' for user: ' + username);
     if(typeof data.users[0] === 'undefined') {
       log.log('Undefined user information for username: ' + username);
       return;
     }
-    var displayname = data.users[0].display_name;
+    var displayname = data.users[0].display_name.toLowerCase();
     var id = data.users[0]._id;
 
     if(username == displayname) {
@@ -60,7 +61,7 @@ module.exports = {
       var cs = {name: [], helptext: [], types: [], output: [], ownerChannelID: id, channelID: [id]};
       var ch = settings.getChannelByName(commandData.channel);
       if(ch == null) {
-        log.log('Cannot find channel ' + userData.channel + ' for user ' + editUser);
+        log.log('Cannot find channel ' + commandData.channel + ' for user ' + editUser);
         return;
       }
 
@@ -162,11 +163,12 @@ module.exports = {
   },
 
   importUserCallback: function(username, data, userData) {
+    log.log('Importing user ' + userData._id + ' for user: ' + username);
     if(typeof data.users[0] === 'undefined') {
       log.log('Undefined user information for username: ' + username);
       return;
     }
-    var displayname = data.users[0].display_name;
+    var displayname = data.users[0].display_name.toLowerCase();
     var id = data.users[0]._id;
 
     if(userData._id == displayname) {
@@ -227,13 +229,13 @@ module.exports = {
   },
 
   importChannelCallback: function(username, data, channelData) {
+    log.log('Importing channel ' + channelData._id + ' for user: ' + username);
     if(typeof data.users[0] === 'undefined') {
       log.log('Undefined user information for username: ' + username);
       return;
     }
-    var displayname = data.users[0].display_name;
+    var displayname = data.users[0].display_name.toLowerCase();
     var id = data.users[0]._id;
-
     if(channelData._id == ('#' + displayname)) {
       // check if channel already existsSync
       var ch = settings.getChannelByID(id);

@@ -7,9 +7,12 @@ var express = require('express');
 var cookieParser = require('cookie-parser');
 var twitchapi = require('./twitchapi.js');
 var querystring = require('querystring');
+var bodyParser = require('body-parser');
+var oauthserver = require('oauth2-server');
 
 module.exports = {
   initweb: function() {
+    var obj = this;
     // Websocket
     io.sockets.on('connection', function (socket) {
 	     socket.emit('chat', {time: new Date(), text: 'You are connected to the server!'});
@@ -23,6 +26,18 @@ module.exports = {
     // deliver website
 	  app.use(express.static('./web/public'));
     app.use(cookieParser()); // use this apps cookies like this JSON.parse(req.cookies.login);
+    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(bodyParser.json());
+
+    // oauth might be used in the future
+    app.oauth = oauthserver({
+      model: {}, // See below for specification
+      grants: ['password'],
+      debug: settings.gs.debug
+    });
+
+    app.all('/oauth/token', app.oauth.grant());
+    app.use(app.oauth.errorHandler());
 
     app.get('/test', function (req, res) {
     	res.sendfile('./web/public/test.html');
@@ -30,6 +45,26 @@ module.exports = {
 
     app.get('/', function (req, res) {
       res.sendfile('./web/public/index.html');
+    });
+
+    app.get('/about', function (req, res) {
+      res.sendfile('./web/public/about.html');
+    });
+
+    app.get('/getme', function (req, res) {
+      res.sendfile('./web/public/get.html');
+    });
+
+    app.get('/channellist', function (req, res) {
+      res.sendfile('./web/public/channellist.html');
+    });
+
+    app.get('/commandview', function (req, res) {
+      res.sendfile('./web/public/commandview.html');
+    });
+
+    app.get('/help', function (req, res) {
+      res.sendfile('./web/public/help.html');
     });
 
     app.get('/commandlist', function (req, res) {
@@ -180,12 +215,61 @@ module.exports = {
       res.send({data: resData, links : {}});
     });
 
+    // put
+    app.get('/api/v1/editcommand', function(req, res) {
+      res.setHeader('Content-Type', 'application/json');
+      obj.checkTwitchLogin(req.headers['Authorization'], req.query.channelid,
+      req.query.channelid, function(status, data) {
+        if(status) {
+          res.send({data : {}, links: {}});
+        } else {
+          res.send({status: 401, message: 'Unauthorized'});
+        }
+      });
+    }),
+
+    app.get('/api/v1/editchannel', function(req, res) {
+      res.setHeader('Content-Type', 'application/json');
+      obj.checkTwitchLogin(req.headers['Authorization'], req.query.channelid,
+      req.query.channelid, function(status, data) {
+        if(status) {
+          res.send({data : {}, links: {}});
+        } else {
+          res.send({status: 401, message: 'Unauthorized'});
+        }
+      });
+    }),
+
+    app.get('/api/v1/edituser', function(req, res) {
+      res.setHeader('Content-Type', 'application/json');
+      obj.checkTwitchLogin(req.headers['Authorization'], req.query.channelid,
+      req.query.channelid, function(status, data) {
+        if(status) {
+          res.send({data : {}, links: {}});
+        } else {
+          res.send({status: 401, message: 'Unauthorized'});
+        }
+      });
+    }),
+
     app.get('*', function(req, res){
       res.sendfile('./web/public/notfound.html');
     });
 
     http.listen(settings.gs.expressport, function(){
       log.log('listening on *:' + settings.gs.expressport);
+    });
+  },
+
+  checkTwitchLogin: function(oauth, channelid, requiredchannelid, callback) {
+    //var cookiejson = JSON.parse(req.cookies.login);
+    twitchapi.TwitchAPI.getChannelFromOauth(oauth, function(data) {
+      if(data._id == channelid && data._id == requiredchannelid &&
+      typeof data._id !== 'undefined') {
+        callback(true, data);
+      } else {
+        callback(false, data);
+      }
     });
   }
 }

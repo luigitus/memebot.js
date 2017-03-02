@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Memebot.js</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="./css/style.css" />
+        <script src="./scripts/util.js"></script>
+        <script src="socket.io/socket.io.js"></script>
+        <script src="./scripts/lib/jquery.min.js"></script>
+        <script src="./scripts/commandviewquery.js"></script>
+    </head>
+    <body>
+      <div id="header"></div> <script type="text/javascript"> $("#header").load("./header.html");</script>
+        <div class="content">
+          <ul id = 'ccontent'>
+          </ul>
+          <table style="height: 189px; width: 596px;" id = 'clist'>
+            <tr>
+              <td>List ID</td>
+              <td>List Content</td>
+            </tr>
+          </table>
+
+          </br></br>
+
+          <table style="height: 189px; width: 596px;" id = 'sclist'>
+            <tr>
+              <td>List ID</td>
+              <td>Suggested List Content</td>
+            </tr>
+          </table>
+        </div>
+        <div id="sidebar"></div> <script type="text/javascript"> $("#sidebar").load("./sidebar.html");</script>
+        <div id="footer"></div> <script type="text/javascript"> $("#footer").load("./footer.html");</script>
+    </body>
+</html>

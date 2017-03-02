@@ -21,3 +21,9 @@ function getCookieByName(cookiename, cookiedata) {
 
   return undefined;
 }
+
+function getAppInfo(callback) {
+  $.getJSON("api/v1/info", function(data) {
+    callback(data.data, data.appinfo);
+  })
+}

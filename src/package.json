@@ -9,12 +9,14 @@
   "author": "Lukas Myers",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.16.1",
     "bson-json-transform": "^1.0.3",
     "cookie-parser": "^1.4.3",
     "express": "^4.10.2",
     "mathjs": "^3.9.3",
     "nedb": "^1.8.0",
     "npid": "^0.4.0",
+    "oauth2-server": "^2.4.1",
     "socket.io": "^1.7.3",
     "sprintf-js": "^1.0.3"
   }
