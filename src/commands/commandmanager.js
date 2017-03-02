@@ -8,7 +8,22 @@ var CommandManager = function(base) {
 
 CommandManager.prototype = {
   execute: function(data, channel, sender) {
-    if(data[1] == 'lc') {
+    if(data[1] == 'toggleother' &&
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 100)) {
+      var cmd = settings.getCommandByID(data[2]);
+      if(cmd == null) {
+        return ['{sender}: This command does not exist'];
+      } else {
+        var index = cmd.p.properties.channelID.indexOf(channel.p.properties._id);
+        if(index == -1) {
+          cmd.p.properties.channelID.push(channel.p.properties._id);
+          return ['{sender}: Command added'];
+        } else {
+          cmd.p.properties.channelID.splice(index, 1);
+          return ['{sender}: Command removed'];
+        }
+      }
+    } else if(data[1] == 'lc') {
       var list = 0;
       if(typeof data[2] === 'number') {
         list = data[2];
