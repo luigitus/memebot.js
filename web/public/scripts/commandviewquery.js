@@ -19,20 +19,25 @@ $(document).ready(function() {
           );
         }
       });
-      $.each(data.data.listContent, function(key, val) {
-        $('#clist').append(
-          $('<tr></tr>').append(
-            '<td>' + key + '</td>' + '<td>' + val + '</td>'
-          )
-        );
-      });
-      $.each(data.data.suggestedList, function(key, val) {
-        $('#sclist').append(
-          $('<tr></tr>').append(
-            '<td>' + key + '</td>' + '<td>' + val + '</td>'
-          )
-        );
-      });
+      if(data.data.listContent.length != 0) {
+        $.each(data.data.listContent, function(key, val) {
+          $('#clist').append(
+            $('<tr></tr>').append(
+              '<td>' + key + '</td>' + '<td>' + val + '</td>'
+            )
+          );
+        });
+      }
+      if(data.data.suggestedList.length != 0) {
+        $.each(data.data.suggestedList, function(key, val) {
+          $('#sclist').append(
+            $('<tr></tr>').append(
+              '<td>' + key + '</td>' + '<td>' + val + '</td>'
+            )
+          );
+        });
+      }
+
     });
   });
 });

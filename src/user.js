@@ -49,8 +49,8 @@ var User = function(id, cs) {
           }
         }
         if(currentChannel.p.properties.isLive || currentChannel.p.properties.offlinepoints) {
-          this.pointsCheck(channelid);
-          this.receivePoints(obj.inChannels[c], currentChannel.p.properties.pointsperupdate);
+          obj.pointsCheck(currentChannel.p.properties._id);
+          obj.receivePoints(obj.inChannels[c], currentChannel.p.properties.pointsperupdate);
         }
       }
 
