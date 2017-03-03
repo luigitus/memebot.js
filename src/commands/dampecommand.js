@@ -5,7 +5,7 @@ var DampeCommand = function(base) {
   // inherit prototype
   this.p = base;
   // new dampe jackpot is shared accross channels (what could possibly go wrong JKStyle)
-  this.p.p.setDefaults({mincost : 5, jackpot : 0});
+  this.p.p.setDefaults({mincost : 5, jackpot : 0, winner: '@tgump ,', winamount: 0});
 }
 
 DampeCommand.prototype = {
@@ -15,6 +15,10 @@ DampeCommand.prototype = {
       this.p.p.success = false;
       return [sprintf('{sender}: Current Dampe jackpot: %d {currency}',
       this.p.p.properties.jackpot)];
+    } else if(data[1] == 'winner') {
+      this.p.p.properties.success = false;
+      return [sprintf('{sender}: The last person who won the jackpot was %s. They won %d {currency}.',
+      this.p.p.properties.winner, this.p.p.properties.winamount)];
     } else {
       var roll = settings.getRandomInt(0, 100);
       var amount = parseInt(data[1]);
@@ -26,6 +30,8 @@ DampeCommand.prototype = {
       }
 
       if(roll <= 1) {
+        this.p.p.properties.winner = sender.p.properties.displayName;
+        this.p.p.properties.winamount = this.p.properties.jackpot;
         sender.receivePoints(channel.p.properties._id, this.p.p.properties.jackpot)
         var buffer = this.p.p.properties.jackpot;
         channel.p.properties._id, this.p.p.properties.jackpot = 0;

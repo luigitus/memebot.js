@@ -62,6 +62,7 @@ module.exports = {
     message = this.replaceAll(message, '{git}', settings.build.git)
     message = this.replaceAll(message, '{time}', timeFormat);
     message = this.replaceAll(message, '{date}', dformat);
+    message = this.replaceAll(message, '{BUTT}', '💩');
 
     var randomUserName = '';
     message = this.replaceAll(message, '{randomuser}', randomUserName);

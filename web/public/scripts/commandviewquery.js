@@ -10,26 +10,15 @@ $(document).ready(function() {
             'Names: ' + data.data.name
           )
       );
-      $('#ccontent').append(
-          $('<li></li>').append(
-            'ID: ' + data.data._id
-          )
-      );
-      $('#ccontent').append(
-          $('<li></li>').append(
-            'Global Cooldown: ' + data.data.cooldownLength
-          )
-      );
-      $('#ccontent').append(
-          $('<li></li>').append(
-            'Cooldown per user: ' + data.data.userCooldownLenght
-          )
-      );
-      $('#ccontent').append(
-          $('<li></li>').append(
-            'Needed command power: ' + data.data.requriedCommandPower
-          )
-      );
+      $.each(data.data, function(key, val) {
+        if(key != 'listContent' && key != 'suggestedList' && key != 'name') {
+          $('#ccontent').append(
+              $('<li></li>').append(
+                key + ': ' + val
+              )
+          );
+        }
+      });
       $.each(data.data.listContent, function(key, val) {
         $('#clist').append(
           $('<tr></tr>').append(

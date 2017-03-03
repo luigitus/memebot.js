@@ -2,6 +2,7 @@ var settings = require('./settings.js');
 var fs = require('fs');
 var base = require('./baseobj.js');
 var log = require('./mlog.js');
+var automod = require('./messagefilters/automodfilter.js');
 
 var Channel = function(id, cs) {
   this.p = new base.BaseObject(id, 'channels', this);
@@ -30,7 +31,8 @@ var Channel = function(id, cs) {
     useDefaultLogin: true,
     botoauth: '',
     botName: '',
-    isLive: false
+    isLive: false,
+    automod: true
   }
 
   var obj = this;
@@ -113,6 +115,10 @@ Channel.prototype = {
   message: function(message) {
     // parse commands here and add them to the queue
     if(message.type == 'PRIVMSG') {
+      // apply automod filter if required
+      if(this.p.properties.automod) {
+        automod.executeFilter(message, this);
+      }
       // set last activity
       if(message.sender != null) {
         message.sender.lastActivity[this.p.properties._id] = Math.floor(Date.now() / 1000);

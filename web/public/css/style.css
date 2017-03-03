@@ -16,7 +16,6 @@ a:visited {
     color: #E5DFC5;
 }
 header, footer {
-	border-radius: 2.5em;
 	border: 0.1em solid #040404;
 
 	display: block;
@@ -57,7 +56,7 @@ input {
 	height:100%;
 }
 .sidebar {
-	border-radius: 2.5em;
+	border-radius: 1em;
 	border: 0.1em solid #040404;
 	position:fixed;
 	height:7em;

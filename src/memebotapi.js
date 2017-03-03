@@ -115,6 +115,11 @@ module.exports = {
       }, links : {}});
     });
 
+    app.get('/api/v1/automod', function(req, res) {
+      res.setHeader('Content-Type', 'application/json');
+      res.sendfile('./web/public/data/automod.json');
+    });
+
     app.get('/api/v1/channel', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
       var channel = settings.joinedChannels[req.query.id];
