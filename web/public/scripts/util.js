@@ -27,3 +27,7 @@ function getAppInfo(callback) {
     callback(data.data, data.appinfo);
   })
 }
+
+function sortString(a, b) {
+  return (a < b) ? -1 : (a > b) ? 1 : 0;
+}

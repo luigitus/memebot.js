@@ -46,7 +46,7 @@ var Channel = function(id, cs) {
         continue;
       }
       if(cmd.p.properties.channelID.indexOf(obj.p.properties._id) != -1) {
-        if(cmd.canExecuteTimer()) {
+        if(cmd.canExecuteTimer() && obj.p.properties.isLive) {
           obj.commandQueue.push({command: cmd, msg: {
             content: [],
             sender: new user.User('#internal#'),

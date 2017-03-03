@@ -71,6 +71,18 @@ module.exports = {
       res.sendfile('./web/public/commandlist.html');
     });
 
+    app.get('/privacy', function (req, res) {
+      res.sendfile('./web/public/privacy.html');
+    });
+
+    app.get('/license', function (req, res) {
+      res.sendfile('./web/public/license.html');
+    });
+
+    app.get('/contact', function (req, res) {
+      res.sendfile('./web/public/contact.html');
+    });
+
     app.get('/authenticated', function (req, res) {
       twitchapi.TwitchAPI.requestAccessToken(req.query.code, function(data) {
         if(typeof data.error !== 'undefined') {
@@ -264,11 +276,23 @@ module.exports = {
   checkTwitchLogin: function(oauth, channelid, requiredchannelid, callback) {
     //var cookiejson = JSON.parse(req.cookies.login);
     twitchapi.TwitchAPI.getChannelFromOauth(oauth, function(data) {
+      data = JSON.parse(data);
+      if(data.status >= 400) {
+        callback(false, data);
+        return;
+      }
+      if(settings.gs.admins.indexOf(data.display_name.toLowerCase()) != -1) {
+        log.log('Permitting login for admin ' + data.display_name);
+        callback(true, data);
+        return;
+      }
       if(data._id == channelid && data._id == requiredchannelid &&
       typeof data._id !== 'undefined') {
         callback(true, data);
+        return;
       } else {
         callback(false, data);
+        return;
       }
     });
   }

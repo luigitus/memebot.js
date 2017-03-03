@@ -25,7 +25,7 @@ module.exports = {
 
   formatList: function(output, item, id, prefix, suffix, channel, user, command, data) {
     var formatted = output;
-    if(typeof formatted !== 'undefined') {
+    if(typeof formatted !== 'undefined' && formatted.search('{list}') != -1) {
       formatted = this.replaceAll(formatted, '{number}', id.toString());
       formatted = this.replaceAll(formatted, '{list}', item);
       formatted = this.formatText(formatted, false, channel, user, command, data);

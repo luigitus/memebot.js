@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Memebot.js</title>
+        <meta charset="utf-8">
+        <script src="./scripts/util.js"></script>
+        <link rel="stylesheet" href="./css/style.css" />
+        <script src="socket.io/socket.io.js"></script>
+        <script src="./scripts/lib/jquery.min.js"></script>
+    </head>
+    <body>
+      <div id="header"></div> <script type="text/javascript"> $("#header").load("./header.html");</script>
+        <div class="content">
+          <p>
+            Memebot privacy guidelines (state 3/3/2017)</br></br>
+            Memebot allows login via Twitch.tv accounts.</br>
+            In no event shall Memebot services store login information on it's server
+            (Including, but not limited to oauth tokens, account information etc.)
+            provided by Twitch.tv apis unless one, or more of the following conditions are met:</br></br>
+
+            1. The user has entered login information for use as a bot account in chat.</br></br>
+            2. The user has been explicitly warned about the process beforehand and has agreed
+            to saving data.</br></br>
+
+            Memebot services do use cookies to locally store login information and other user</br></br>
+            information during your session. You can at any time revoke access tokens given
+            to Memebot services at <a href="https://www.twitch.tv/settings/connections">https://www.twitch.tv/settings/connections</a>.</br></br>
+
+            For further information please consult the <a href="./license">License</a>.
+          </p>
+        </div>
+        <div id="sidebar"></div> <script type="text/javascript"> $("#sidebar").load("./sidebar.html");</script>
+        <div id="footer"></div> <script type="text/javascript"> $("#footer").load("./footer.html");</script>
+    </body>
+</html>
