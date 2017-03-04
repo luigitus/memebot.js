@@ -83,11 +83,13 @@ Channel.prototype = {
     this.connected = true;
     this.p.properties.shouldJoin = true;
     log.log('Creating connection for channel ' + this.p.properties.channel);
-    if(this.p.properties.useDefaultLogin) {
+    if(this.p.properties.useDefaultLogin && this.p.botName == '' && this.p.botoauth == '') {
       this.connection = new tmi.ConnectionHandler(this);
-    } else {
+    } else if(this.p.botName != '' && this.p.botoauth != '') {
       this.connection = new tmi.ConnectionHandler(this, this.p.properties.botName,
       this.p.properties.botoauth);
+    } else {
+      this.connection = new tmi.ConnectionHandler(this);
     }
   },
 
@@ -126,6 +128,9 @@ Channel.prototype = {
 
       for(var key in settings.commands) {
         var cmd = settings.commands[key];
+        if(!cmd.p.isLoaded) {
+          continue;
+        }
 
         if((cmd.p.properties.channelID.indexOf(this.p.properties._id) == -1)
           && (cmd.p.properties.channelID.indexOf('#all#') == -1)) {

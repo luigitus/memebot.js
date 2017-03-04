@@ -41,6 +41,10 @@ BaseObject.prototype = {
   save: function(callback) {
     var obj = this;
 
+    if(!this.isLoaded) {
+      return;
+    }
+
     settings.db[this.path].update({_id: this.properties._id}, this.properties, {}, function(err, numReplaced) {
       if(err != null) {
         log.log(err);

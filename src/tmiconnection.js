@@ -9,7 +9,7 @@ var ConnectionHandler = function(cb, username, password) {
   var obj = this; // bind parrent object so that it can be access
 
   this.client.connect(settings.gs.ircPort, settings.gs.ircServer, function() {
-    if(typeof username === 'undefined' || typeof password === 'undefined') {
+    if(typeof username === 'undefined' || typeof password === 'undefined' || username == '' || password == '') {
       log.log('Connected: logging in as ' + settings.gs.botName + ' on ' +
       settings.gs.ircServer + ":" + settings.gs.ircPort);
       obj.writeBytes('PASS ' + settings.gs.botPassword);

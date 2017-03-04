@@ -91,7 +91,7 @@ module.exports = {
     }
 
     for(var i in this.gs.paths) {
-      var newdb = new Datastore({filename: this.gs.paths[i], autoload: true,
+      var newdb = new Datastore({filename: this.gs.paths[i], autoload: true, corruptAlertThreshold: 0,
         onload: function(err) {
           if(err != null) {
             log.log(err);
@@ -192,7 +192,11 @@ module.exports = {
   },
 
   getCommandByName: function(name, channelID) {
+    console.log(name);
     for(var key in module.exports.commands) {
+      if(typeof module.exports.commands[key].p.properties.name === 'undefined') {
+        return null
+      }
       if(module.exports.commands[key].p.properties.name.indexOf(name) != -1) {
         if(typeof channelID === 'undefined'
         || module.exports.commands[key].p.properties.ownerChannelID == channelID) {

@@ -61,7 +61,7 @@ module.exports = {
       var cs = {name: [], helptext: [], types: [], output: [], ownerChannelID: id, channelID: [id]};
       var ch = settings.getChannelByName(commandData.channel);
       if(ch == null) {
-        log.log('Cannot find channel ' + commandData.channel + ' for user ' + editUser);
+        log.log('Cannot find channel ' + commandData.channel + ' for user ' + username);
         return;
       }
 
@@ -79,7 +79,8 @@ module.exports = {
           if(commandData[key] == 'timer') {
             cs.isTimer = true;
           }
-          if(commandData[key] != 'default' && commandData[key] != 'list' && commandData[key] != 'counter') {
+          if(commandData[key] != 'default' && commandData[key] != 'list'
+          && commandData[key] != 'counter') {
             commandData[key] = 'default';
           }
           if(commandData[key] == 'default') {
@@ -159,7 +160,7 @@ module.exports = {
           contents[i], obj.importCommandCallback);
         }
         i++;
-    }, 1000);
+    }, 100);
   },
 
   importUserCallback: function(username, data, userData) {
@@ -206,6 +207,7 @@ module.exports = {
   },
 
   importUserFromLegacyDB: function(fileToImport) {
+    console.log(fileToImport);
     var contents = JSON.parse(fs.readFileSync(fileToImport, 'utf8'));
     var i = 0;
     var obj = this;
@@ -225,7 +227,7 @@ module.exports = {
           contents[i], obj.importUserCallback);
         }
         i++;
-    }, 1000);
+    }, 100);
   },
 
   importChannelCallback: function(username, data, channelData) {
@@ -288,7 +290,7 @@ module.exports = {
         contents[i], obj.importChannelCallback);
       }
       i++;
-    }, 1000);
+    }, 100);
   },
 
   bsonToJson: function(input, output) {
