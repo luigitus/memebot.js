@@ -20,32 +20,41 @@ DampeCommand.prototype = {
       return [sprintf('{sender}: The last person who won the jackpot was %s. They won %d {currency}.',
       this.p.p.properties.winner, this.p.p.properties.winamount)];
     } else {
-      var roll = settings.getRandomInt(0, 100);
+      var roll = settings.getRandomInt(0, 1000);
       var amount = parseInt(data[1]);
-      if(isNaN(amount)) {
-        amount = 1;
+      if(isNaN(amount) || amount < 2) {
+        amount = 2;
       }
       if(!sender.payPoints(channel.p.properties._id, amount)) {
         return ['{sender}: Sorry, you do not have enough {currency}!'];
       }
 
-      if(roll <= 1) {
+      if(roll <= 10 && channel.p.properties.isLive) {
         this.p.p.properties.winner = sender.p.properties.displayName;
-        this.p.p.properties.winamount = this.p.properties.jackpot;
+        this.p.p.properties.winamount = this.p.p.properties.jackpot;
         sender.receivePoints(channel.p.properties._id, this.p.p.properties.jackpot)
         var buffer = this.p.p.properties.jackpot;
         channel.p.properties._id, this.p.p.properties.jackpot = 0;
-        return [sprintf('{sender}: Dampe found the Jackpot of %d {currency}! Damn, you\'re good',
+        return [sprintf('{sender}: Dampé found the Jackpot of %d {currency}! Damn, you\'re good',
         buffer)]
-      } else if(roll < 20) {
+      } else if(roll < 60) {
         sender.receivePoints(channel.p.properties._id, amount * 4)
-        return [sprintf('{sender}: Dampe found the a lot cash! He quadrupled your bet and gave you a hookshot!')]
-      } else if(roll < 45) {
+        return [sprintf('{sender}: Dampé found the a lot cash! He quadrupled your bet and gave you a hookshot!')]
+      } else if(roll < 210) {
         sender.receivePoints(channel.p.properties._id, amount * 2)
-        return [sprintf('{sender}: Dampe found the a lot cash! He doubled your bet!')]
-      } else {
+        return [sprintf('{sender}: Dampé found the a lot cash! He doubled your bet!')]
+      } else if(roll < 499) {
+        sender.receivePoints(channel.p.properties._id, (amount / 2) * -1)
+        this.p.p.properties.jackpot = this.p.p.properties.jackpot + (amount / 2);
+        return [sprintf('{sender}: Dampé stole half of your bet and burnt you with his flame! What a dingus!')]
+      } else if(roll < 995) {
+        sender.receivePoints(channel.p.properties._id, amount * -1)
         this.p.p.properties.jackpot = this.p.p.properties.jackpot + amount;
-        return ['{sender}: Dampe is being a dick and stole all of your {currency}!'];
+        return ['{sender}: Dampé is being a dick and stole all of your {currency}!'];
+      } else {
+        sender.receivePoints(channel.p.properties._id, (amount * 2) * -1)
+        this.p.p.properties.jackpot = this.p.p.properties.jackpot + (amount * 2);
+        return ['{sender}: Dampé is not having any of your crap today and dug up a rupoor, he stole TWICE the amount you bet!'];
       }
     }
   }

@@ -208,8 +208,16 @@ ConnectionHandler.prototype = {
     }
 
     if(format || typeof(format) === 'undefined') {
-      var bannedStrings = ['.ban', '!ban'];
-      // todo check for banned strings
+      var bannedStrings = ['.ban', '!ban', '.timeout', '/timeout', '/color', '.color'];
+      if(!whisper) {
+        bannedStrings.push('/w');
+        bannedStrings.push('.w');
+      }
+      for(var i = 0; i < bannedStrings.length; i++) {
+        if(message.startsWith(bannedStrings[i])) {
+          message = message.replace(bannedStrings[i], '[]');
+        }
+      }
 
       message = text.formatText(message, false, channel, sender, command, data);
     }

@@ -109,9 +109,8 @@ module.exports = {
       toEval = toEval.replace('}', '');
 
       var result = settings.evalExpression(toEval);
-
       if(result.status) {
-        message = this.replaceAll(message,found[i], result.e);
+        message = message.replace(found[i], result.e);
       }
     }
 

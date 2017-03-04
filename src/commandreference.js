@@ -23,5 +23,8 @@ module.exports = {
   dampe: require('./commands/dampecommand.js').DampeCommand,
   name: require('./commands/filenamecommand.js').FilenameCommand,
   sm: require('./commands/sendmessagecommand.js').SendMessageCommand,
-  calc: require('./commands/calculatorcommand.js').CalculatorCommand
+  calc: require('./commands/calculatorcommand.js').CalculatorCommand,
+  echo: require('./commands/echocommand.js').EchoCommand,
+  race: require('./commands/racecommand.js').RaceCommand,
+  pyramid: require('./commands/pyramidcommand.js').PyramidCommand
 }
