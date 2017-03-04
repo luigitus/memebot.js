@@ -3,6 +3,7 @@ $(document).ready(function() {
   if(typeof commandid === 'undefined') {
     page = 1;
   }
+  
   getAppInfo(function(data, appinfo) {
     $.getJSON("api/v1/command?id=" + encodeURIComponent(commandid), function(data) {
       $('#ccontent').append(

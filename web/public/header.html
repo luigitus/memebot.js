@@ -1,4 +1,14 @@
 <!DOCTYPE html>
+<script>
+$(document).ready(function() {
+  var splashMessage = ['', 'Try the Contra Code!', 'I love Dampe!', 'miniOven',
+  'AnimeBoy', 'WrongDong', '@tgump ,', 'Streamer, when is Memebot420_?', 'Stay tuned!',
+  'I\'m glad you asked!'];
+  $('header').append(
+    '<div id="splash">' + splashMessage[getRandomInt(0, splashMessage.length - 1)] + '</div>'
+  );
+});
+</script>
 <header>
-  Memebot - an open source chat bot for twitch
+  Memebot - an open source chat bot for twitch</br>
 </header>
