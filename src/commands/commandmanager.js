@@ -77,11 +77,13 @@ CommandManager.prototype = {
       // check if command exists for this channel; only first name is valid in this case
       for(var i in settings.commands) {
         var cmd = settings.commands[i];
-        if(cmd.p.properties.name[0] == data[2] && cmd.p.properties.ownerChannelID == channel.p.properties._id) {
+        if((cmd.p.properties.name[0] == data[2] || cmd.p.properties._id == data[2])
+         && cmd.p.properties.ownerChannelID == channel.p.properties._id) {
           log.log(sender.p.properties.username + '(' + sender.p.properties._id + ')' +
           ' removed command ' + cmd.p.properties.name + '(' +
           cmd.p.properties._id + ') from channel ' + channel.p.properties.channel + '(' +
           cmd.p.properties._id + ')');
+
           settings.commands[i].p.remove();
           delete settings.commands[i];
         }
@@ -90,17 +92,21 @@ CommandManager.prototype = {
       return ['{sender}: Removed command(s)'];
     } else if(data[1] == 'edit' &&
     settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25)) {
-      // check if command exists for this channel; only first name is valid in this case
-      var cmd = settings.getCommandByName(data[2], channel.p.properties._id);
+      // check if command exists for this channel; only first name or id is valid in this case
+      var cmd = settings.getCommandByID(data[2], channel.p.properties._id);
+      if(cmd == null) {
+        cmd = settings.getCommandByName(data[2], channel.p.properties._id);
+        if(cmd == null) {
+          return ['{sender}: Could not find command!'];
+        }
+      }
+
       var constantSettings = ['channelID', 'timesExecuted', 'ownerChannelID', 'channelID', '_id',
       'pointsperupdate'];
       if(constantSettings.indexOf(data[3]) != -1) {
         return ['{sender}: You cannot edit this setting!'];
       }
 
-      if(cmd == null) {
-        return ['{sender}: Could not find command!'];
-      }
       var obj = cmd.p.properties[data[3]];
       if(typeof obj === 'undefined') {
         return ['{sender}: Invalid setting!'];
@@ -185,7 +191,7 @@ CommandManager.prototype = {
             return ['{sender}: Could not edit output!'];
           } else {
             var output = '';
-            for(var i = 5; i < data.length; i++) {
+            for(var i = 4; i < data.length; i++) {
               output = output + data[i] + ' ';
             }
             if(output === '' || output === ' ') {
@@ -288,10 +294,13 @@ CommandManager.prototype = {
       }
     } else if(data[1] == 'get' &&
     settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25)) {
-      // check if command exists for this channel; only first name is valid in this case
-      var cmd = settings.getCommandByName(data[2], channel.p.properties._id);
+      // check if command exists for this channel; only first name and id is valid in this case
+      var cmd = settings.getCommandByID(data[2], channel.p.properties._id);
       if(cmd == null) {
-        return ['{sender}: Could not find command!'];
+        cmd = settings.getCommandByName(data[2], channel.p.properties._id);
+        if(cmd == null) {
+          return ['{sender}: Could not find command!'];
+        }
       }
       var output = JSON.stringify(cmd.p.properties[data[3]]);
       if(typeof output === 'undefined') {

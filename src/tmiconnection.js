@@ -183,6 +183,8 @@ ConnectionHandler.prototype = {
         this.writeBytes('PONG :tmi.twitch.tv');
       } else if(messageType == 'JOIN') {
       } else if(messageType == 'PART') {
+      } else if(messageType == 'CLEARCHAT') {
+        
       }
       // todo handle other events here
     } else {

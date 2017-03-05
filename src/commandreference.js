@@ -26,5 +26,6 @@ module.exports = {
   calc: require('./commands/calculatorcommand.js').CalculatorCommand,
   echo: require('./commands/echocommand.js').EchoCommand,
   race: require('./commands/racecommand.js').RaceCommand,
-  pyramid: require('./commands/pyramidcommand.js').PyramidCommand
+  pyramid: require('./commands/pyramidcommand.js').PyramidCommand,
+  websocket: require('./commands/websocketcommand.js').WebsocketCommand
 }

@@ -77,10 +77,23 @@ ListCommand.prototype = {
       settings.gs.url + '/commandview?commandid=' + this.p.p.properties._id];
     } else {
       var id = parseInt(data[1]);
-      if(isNaN(id)) {
+      if(typeof data[1] === 'undefined') {
         var random = settings.getRandomInt(0, this.p.p.properties.listContent.length - 1);
         return [text.formatList(this.p.p.properties.output[0], this.p.p.properties.listContent[random], random,
           this.p.p.properties.prefix, this.p.p.properties.suffix, channel, sender, this.p, data)];
+      } else if(isNaN(id)) {
+        var searchString = data.slice(1).join(' ');
+        var foundContet = [];
+        for(var i in this.p.p.properties.listContent) {
+          if(this.p.p.properties.listContent[i].toLowerCase().search(searchString.toLowerCase()) != -1) {
+            foundContet.push(this.p.p.properties.listContent[i]);
+          }
+        }
+
+        var random = settings.getRandomInt(0, foundContet.length - 1);
+        return [text.formatList(this.p.p.properties.output[0], foundContet[random], random,
+          this.p.p.properties.prefix, this.p.p.properties.suffix, channel, sender, this.p, data)];
+
       } else {
         return [text.formatList(this.p.p.properties.output[0], this.p.p.properties.listContent[id], id,
           this.p.p.properties.prefix, this.p.p.properties.suffix, channel, sender, this.p, data)];

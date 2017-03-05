@@ -48,6 +48,9 @@ BaseObject.prototype = {
     settings.db[this.path].update({_id: this.properties._id}, this.properties, {}, function(err, numReplaced) {
       if(err != null) {
         log.log(err);
+        if(err.errorType == 'uniqueViolated') {
+          // todo make sure to change id! (this should never happen anyway!)
+        }
       }
 
       if(numReplaced == 0) {

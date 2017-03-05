@@ -11,14 +11,17 @@ var bodyParser = require('body-parser');
 var oauthserver = require('oauth2-server');
 
 module.exports = {
+  emitWSEvent: function(eventtype, eventdata) {
+    io.sockets.emit(eventtype, eventdata);
+  },
+
   initweb: function() {
     var obj = this;
     // Websocket
     io.sockets.on('connection', function (socket) {
-	     socket.emit('chat', {time: new Date(), text: 'You are connected to the server!'});
-	     socket.on('chat', function (data) {
-
-		   io.sockets.emit('chat', {time: new Date(), name: data.name || 'null', text: data.text});
+	    socket.emit('chat', {time: new Date(), text: 'You are connected to the server!'});
+	    socket.on('chat', function (data) {
+		      io.sockets.emit('chat', {time: new Date(), name: data.name || 'null', text: data.text});
 	    });
     });
 
@@ -57,6 +60,10 @@ module.exports = {
 
     app.get('/channellist', function (req, res) {
       res.sendfile('./web/public/channellist.html');
+    });
+
+    app.get('/wscmd', function (req, res) {
+      res.sendfile('./web/public/wscommand.html');
     });
 
     app.get('/commandview', function (req, res) {

@@ -10,13 +10,16 @@ UserManager.prototype = {
     if(data[1] == 'edit' &&
     settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25)) {
       // check if command exists for this channel; only first name is valid in this case
-      var user = settings.getUserByName(data[2]);
+      var user = settings.getUserByID(data[2]);
+      if(user == null) {
+        user = settings.getUserByName(data[2]);
+        if(user == null) {
+          return ['{sender}: Could not find that user!'];
+        }
+      }
       var constantSettings = ['points', 'timeouts', 'joined_t', 'commandpower', '_id'];
       if(constantSettings.indexOf(data[3]) != -1) {
         return ['{sender}: You cannot edit this setting!'];
-      }
-      if(user == null) {
-        return ['{sender}: Could not find that user!'];
       }
       var obj = user.p.properties[data[3]];
       if(typeof obj === 'undefined') {
@@ -56,9 +59,12 @@ UserManager.prototype = {
     } else if(data[1] == 'get' &&
     settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25)) {
       // check if command exists for this channel; only first name is valid in this case
-      var user = settings.getUserByName(data[2]);
+      var user = settings.getUserByID(data[2]);
       if(user == null) {
-        return ['{sender}: Could not find that user!'];
+        user = settings.getUserByName(data[2]);
+        if(user == null) {
+          return ['{sender}: Could not find that user!'];
+        }
       }
       var output = JSON.stringify(user.p.properties[data[3]]);
       if(typeof output === 'undefined') {
