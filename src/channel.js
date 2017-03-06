@@ -27,6 +27,7 @@ var Channel = function(id, cs) {
     _id: id,
     title: '',
     game: '',
+    gameid: '0',
     uptime_t: 0,
     useDefaultLogin: true,
     botoauth: '',

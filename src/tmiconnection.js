@@ -184,7 +184,7 @@ ConnectionHandler.prototype = {
       } else if(messageType == 'JOIN') {
       } else if(messageType == 'PART') {
       } else if(messageType == 'CLEARCHAT') {
-        
+
       }
       // todo handle other events here
     } else {
@@ -203,6 +203,16 @@ ConnectionHandler.prototype = {
     };
   },
 
+
+  sendCommand: function(message, channel) {
+    if(this.messageCount > settings.gs.messageLimit) {
+      return;
+    }
+
+    this.messageCount++;
+
+    this.writeBytes('PRIVMSG ' + channel + " : " + message);
+  },
 
   sendMessage: function(message, channel, sender, command, data, format, whisper) {
     if(message == '' || channel.p.properties.silent) {

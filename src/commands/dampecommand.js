@@ -39,10 +39,10 @@ DampeCommand.prototype = {
         buffer)]
       } else if(roll < 60) {
         sender.receivePoints(channel.p.properties._id, amount * 4)
-        return [sprintf('{sender}: Dampé found a lot cash! He quadrupled your bet and gave you a hookshot!')]
+        return [sprintf('{sender}: Dampé found a lot of cash! He quadrupled your bet and gave you a hookshot!')]
       } else if(roll < 210) {
         sender.receivePoints(channel.p.properties._id, amount * 2)
-        return [sprintf('{sender}: Dampé found a lot cash! He doubled your bet!')]
+        return [sprintf('{sender}: Dampé found a lot of cash! He doubled your bet!')]
       } else if(roll < 499) {
         sender.receivePoints(channel.p.properties._id, (amount / 2) * -1)
         this.p.p.properties.jackpot = this.p.p.properties.jackpot + (amount / 2);

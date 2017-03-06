@@ -24,6 +24,12 @@ module.exports = {
     moderator: 75,
     admin: 100
   },
+  dberrors: 0,
+
+  quit: function(code) {
+    log.log('Exiting with code: ' + code);
+    process.exit();
+  },
 
   readSettings: function(file) {
     var contents;

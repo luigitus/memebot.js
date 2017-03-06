@@ -51,6 +51,12 @@ BaseObject.prototype = {
         if(err.errorType == 'uniqueViolated') {
           // todo make sure to change id! (this should never happen anyway!)
         }
+
+        settings.dberrors++;
+        if(settings.dberrors > settings.gs.maxdberrors) {
+          log.log('Max db errors reached! Exiting.');
+          settings.quit(1);
+        }
       }
 
       if(numReplaced == 0) {

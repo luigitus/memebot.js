@@ -7,7 +7,7 @@ var WebsocketCommand = function(base) {
 
 WebsocketCommand.prototype = {
   execute: function(data, channel, sender) {
-    memebotapi.emitWSEvent('executed', this.p.p.properties);
+    memebotapi.emitWSEvent(this.p.p.properties.wscommand, this.p.p.properties);
     return [''];
   }
 }

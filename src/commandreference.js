@@ -27,5 +27,7 @@ module.exports = {
   echo: require('./commands/echocommand.js').EchoCommand,
   race: require('./commands/racecommand.js').RaceCommand,
   pyramid: require('./commands/pyramidcommand.js').PyramidCommand,
-  websocket: require('./commands/websocketcommand.js').WebsocketCommand
+  websocket: require('./commands/websocketcommand.js').WebsocketCommand,
+  timeout: require('./commands/timeoutcommand.js').TimeoutCommand,
+  ban: require('./commands/bancommand.js').BanCommand
 }

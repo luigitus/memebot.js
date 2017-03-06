@@ -10,7 +10,7 @@ QuitCommand.prototype = {
     if(!settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 100)) {
       return ['{sender}: Unauthorized!']
     }
-    process.exit();
+    settings.quit(0);
   }
 }
 

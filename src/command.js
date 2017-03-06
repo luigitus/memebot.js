@@ -42,7 +42,8 @@ var Command = function(id, cs) {
     timer: 100,
     chance: 100,
     cooldownbypasspower: settings.commandPower.broadcaster,
-    parametres: 0
+    parametres: 0,
+    wscommand: 'executed'
   }
 
   this.p.load(this.afterLoad);

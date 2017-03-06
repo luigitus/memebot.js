@@ -44,8 +44,8 @@ var User = function(id, cs) {
         if(obj.shouldSendGreet[obj.inChannels[c]]) {
           obj.shouldSendGreet[obj.inChannels[c]] = false;
           if(typeof obj.p.properties.autoGreetMessage[obj.inChannels[c]] !== 'undefined') {
-            currentChannel.connection.writeBytes('PRIVMSG ' + currentChannel.p.properties.channel +
-            ' : ' + obj.p.properties.autoGreetMessage[obj.inChannels[c]]);
+            currentChannel.connection.sendCommand(obj.p.properties.autoGreetMessage[obj.inChannels[c]],
+              currentChannel.p.properties.channel);
           }
         }
         if(currentChannel.p.properties.isLive || currentChannel.p.properties.offlinepoints) {
