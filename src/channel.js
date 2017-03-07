@@ -171,7 +171,11 @@ Channel.prototype = {
   discordCommandCallback: function(messages, channel, sender, command, data, other) {
     var text = require('./text.js');
     for(message in messages) {
-      other.reply(text.formatText(messages[message], false, channel, sender, command, data));
+      try {
+        other.reply(text.formatText(messages[message], false, channel, sender, command, data));
+      } catch(err) {
+        log.log(err);
+      }
     }
   },
 

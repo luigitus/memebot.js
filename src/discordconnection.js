@@ -35,7 +35,6 @@ ConnectionHandler.prototype = {
 
   parseDiscord: function(rawmessage) {
     for(var i in settings.joinedChannels) {
-      console.log(settings.joinedChannels[i].p.properties.discordguildid);
       if(settings.joinedChannels[i].p.properties.discordguildid == rawmessage.member.guild.id) {
         settings.joinedChannels[i].message({
           content: rawmessage.content.split(' '),

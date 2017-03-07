@@ -128,9 +128,9 @@ module.exports = {
       }
 
       if(cmd == null) {
-        var newID = settings.getRandomInt(1000);
+        var newID = settings.generateUUID();
         while(newID in settings.commands) {
-          newID = settings.getRandomInt(1000);
+          newID = settings.generateUUID();
         }
         cs._id = newID;
         settings.loadCommand(newID, cs);

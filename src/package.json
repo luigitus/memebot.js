@@ -16,6 +16,7 @@
     "express": "^4.10.2",
     "mathjs": "^3.9.3",
     "nedb": "^1.8.0",
+    "node-uuid": "^1.4.7",
     "npid": "^0.4.0",
     "oauth2-server": "^2.4.1",
     "socket.io": "^1.7.3",

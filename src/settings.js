@@ -50,12 +50,14 @@ module.exports = {
     this.commands = fs.readdirSync(this.gs.paths.commands);*/
     var obj = this;
 
-    this.db['commands'].find({_id : {$gt: 1000}}, function(err, doc) {
-      if(err != null) {
+    this.db['commands'].find({}, function(err, doc) {
+      if(err) {
         log.log(err);
       }
       for(var command in doc) {
-        obj.loadCommand(doc[command]._id);
+        if(parseInt(doc[command]._id) > 1000 || isNaN(doc[command]._id)) {
+          obj.loadCommand(doc[command]._id);
+        }
       }
     });
 
@@ -97,10 +99,11 @@ module.exports = {
     }
 
     for(var i in this.gs.paths) {
-      var newdb = new Datastore({filename: this.gs.paths[i], autoload: true, corruptAlertThreshold: 0,
+      var newdb = new Datastore({filename: this.gs.paths[i], timestampData: true, autoload: true, corruptAlertThreshold: 0,
         onload: function(err) {
           if(err != null) {
             log.log(err);
+            this.quit(1);
           }
         }
       });
@@ -131,6 +134,11 @@ module.exports = {
       max = Number.MAX_SAFE_INTEGER
     }
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  },
+
+  generateUUID: function() {
+    var uuid = require('node-uuid');
+    return uuid.v1();
   },
 
   getRandomToken: function() {

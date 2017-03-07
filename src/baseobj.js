@@ -45,7 +45,7 @@ BaseObject.prototype = {
       return;
     }
 
-    settings.db[this.path].update({_id: this.properties._id}, this.properties, {}, function(err, numReplaced) {
+    settings.db[this.path].update({_id: this.properties._id}, this.properties, {upsert: true}, function(err, numReplaced, upsert) {
       if(err != null) {
         log.log(err);
         if(err.errorType == 'uniqueViolated') {
@@ -59,13 +59,8 @@ BaseObject.prototype = {
         }
       }
 
-      if(numReplaced == 0) {
-        settings.db[obj.path].insert(obj.properties, function(err, newDoc) {
-          if(err != null) {
-            log.log(err);
-          }
-          obj.wasLoaded = true;
-        });
+      if(upsert) {
+        log.log('Inserted new document upon saving!');
       }
     });
   },

@@ -1,5 +1,6 @@
 var settings = require('../settings.js');
 var log = require('../mlog.js');
+var http = require('http');
 
 var CommandManager = function(base) {
   // inherit prototype
@@ -54,9 +55,9 @@ CommandManager.prototype = {
       settings.gs.url + '/commandlist?page=0&channelid=' + channel.p.properties._id];
     } else if(data[1] == 'add' &&
     settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25)) {
-      var newID = settings.getRandomInt(1000);
+      var newID = settings.generateUUID();
       while(newID in settings.commands) {
-        newID = settings.getRandomInt(1000);
+        newID = settings.generateUUID();
       }
       var output = '';
       for(var i = 3; i < data.length; i++) {
@@ -71,6 +72,38 @@ CommandManager.prototype = {
       channelID: [channel.p.properties._id], output: [output]});
 
       return ['{sender}: Added command'];
+    } else if(data[1] == 'importjson' &&
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 50)) {
+      var options = {
+        host: data[2],
+        path: data[3],
+        method: 'GET',
+        headers: {
+        },
+        json: true
+      };
+      var obj = this;
+      var req = http.request(options, function(res) {
+        res.setEncoding('utf8');
+        res.on('data', function(data) {
+          var newID = settings.generateUUID();
+          while(newID in settings.commands) {
+            newID = settings.generateUUID();
+          }
+
+          var imported = JSON.parse(data);
+          data.ownerChannelID = channel.p.properties._id;
+          data.channelID = [channel.p.properties._id];
+          data._id = newID;
+
+          settings.loadCommand(newID, imported);
+          });
+        res.on('error', function(err) {
+          log.log(err);
+        });
+      });
+      req.end();
+      return ['Imported scheduled!'];
     } else if(data[1] == 'remove' &&
     settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25)) {
       var exists = false;
