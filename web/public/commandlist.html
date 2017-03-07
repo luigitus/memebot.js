@@ -18,18 +18,19 @@
           </ul>
           <script>
             var page = parseInt(getParameterByName('page'));
+            var channelid = getParameterByName('channelid');
             if(isNaN(page) || page == null) {page = 0;}
 
             $('#container').append(
             $('<a></a>').append(
-              'Previous').attr('href', './commandlist?page=' + (page-1).toString()));
+              'Previous').attr('href', './commandlist?page=' + (page-1).toString() + '&channelid=' + channelid));
 
 
             $('#container').append('     ');
 
             $('#container').append(
             $('<a></a>').append(
-              'Next').attr('href', './commandlist?page=' + (page+1).toString()));
+              'Next').attr('href', './commandlist?page=' + (page+1).toString() + '&channelid=' + channelid));
           </script>
         </div>
         <div id="sidebar"></div> <script type="text/javascript"> $("#sidebar").load("./sidebar.html");</script>

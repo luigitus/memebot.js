@@ -33,7 +33,8 @@ var Channel = function(id, cs) {
     botoauth: '',
     botName: '',
     isLive: false,
-    automod: true
+    automod: true,
+    discordguildid: '83814260886474752'
   }
 
   var obj = this;
@@ -116,8 +117,13 @@ Channel.prototype = {
   },
 
   message: function(message) {
+    var callback = this.commandCallback;
+
+    if(message.service == 'discord') {
+      callback = this.discordCommandCallback;
+    }
     // parse commands here and add them to the queue
-    if(message.type == 'PRIVMSG') {
+    if((message.type == 'PRIVMSG' && message.service == 'twitch') || (message.service == 'discord')) {
       // apply automod filter if required
       if(this.p.properties.automod) {
         automod.executeFilter(message, this);
@@ -140,13 +146,13 @@ Channel.prototype = {
         if(!cmd.p.properties.textTrigger) {
           if(cmd.p.properties.name.indexOf(message.content[0]) != -1) {
             this.commandQueue.push({command: cmd, msg: message,
-            channel: this});
+            channel: this, callback: callback, other: message.other});
           }
         } else {
           for(var i in message.content) {
             if(cmd.p.properties.name.indexOf(message.content[i]) != -1) {
               this.commandQueue.push({command: cmd, msg: message,
-              channel: this});
+              channel: this, callback: callback, other: message.other});
             }
           }
         }
@@ -159,6 +165,13 @@ Channel.prototype = {
   commandCallback: function(messages, channel, sender, command, data, other) {
     for(message in messages) {
       channel.connection.sendMessage(messages[message], channel, sender, command, data, true);
+    }
+  },
+
+  discordCommandCallback: function(messages, channel, sender, command, data, other) {
+    var text = require('./text.js');
+    for(message in messages) {
+      other.reply(text.formatText(messages[message], false, channel, sender, command, data));
     }
   },
 

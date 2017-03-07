@@ -90,7 +90,7 @@ Command.prototype = {
     return false;
   },
 
-  execute: function(data, channel, sender, callback) {
+  execute: function(data, channel, sender, callback, other) {
     // assume command was successful; scripts can cahnge that during execution
     this.success = true;
     if(!settings.checkCommandPower(sender.commandPower(channel.p.properties._id),
@@ -142,7 +142,6 @@ Command.prototype = {
         return;
       }
       // can be used to enable whispers, re-direct output to the website etc.
-      var other = {};
       for(var i = 0; i < this.scripts.length; i++) {
         if(this.scripts[i] != null && typeof this.scripts[i] !== 'undefined') {
           callback(this.scripts[i].execute(data, channel, sender), channel, sender, this, data, other);

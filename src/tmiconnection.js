@@ -199,7 +199,8 @@ ConnectionHandler.prototype = {
       type: messageType,
       channeName: channel,
       id: messageID,
-      tags: ircTags
+      tags: ircTags,
+      service: 'twitch'
     };
   },
 

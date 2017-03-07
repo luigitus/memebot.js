@@ -12,6 +12,7 @@ var twitchapi = require('./twitchapi.js');
 var srcapi = require('./srcapi.js');
 var fs = require('fs');
 var importer = require('./import.js');
+var discordconnection = require('./discordconnection.js');
 
 // read settings.json
 settings.readSettings('./config/settings.json');
@@ -20,6 +21,9 @@ settings.minit();
 settings.readIDs();
 memebotapi.initweb();
 importer.checkImport();
+
+// setup discord
+this.discord = new discordconnection.ConnectionHandler();
 
 // shutdown hook
 process.on('exit', function() {
@@ -35,7 +39,7 @@ setInterval(function() {
     for(var item in channel.commandQueue) {
       var next = channel.commandQueue[item];
       if(next.msg.sender.p.isLoaded) {
-        next.command.execute(next.msg.content, next.channel, next.msg.sender, next.channel.commandCallback);
+        next.command.execute(next.msg.content, next.channel, next.msg.sender, next.callback, next.other);
         delete channel.commandQueue[item];
       }
     }
