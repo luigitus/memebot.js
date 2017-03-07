@@ -45,7 +45,6 @@ ConnectionHandler.prototype = {
           tags: [],
           service: 'discord',
           other: rawmessage});
-        break;
       }
     }
   },

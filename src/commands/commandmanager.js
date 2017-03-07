@@ -73,7 +73,7 @@ CommandManager.prototype = {
 
       return ['{sender}: Added command'];
     } else if(data[1] == 'importjson' &&
-    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 50)) {
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 100)) {
       var options = {
         host: data[2],
         path: data[3],
@@ -92,9 +92,9 @@ CommandManager.prototype = {
           }
 
           var imported = JSON.parse(data);
-          data.ownerChannelID = channel.p.properties._id;
-          data.channelID = [channel.p.properties._id];
-          data._id = newID;
+          imported.ownerChannelID = channel.p.properties._id;
+          imported.channelID = [channel.p.properties._id];
+          imported._id = newID;
 
           settings.loadCommand(newID, imported);
           });
@@ -340,6 +340,24 @@ CommandManager.prototype = {
         return ['{sender}: Could not find this item!'];
       }
       return [output];
+    } else if(data[1] == 'removeother'  &&
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 100)) {
+      var exists = false;
+      // check if command exists for this channel; only first name is valid in this case
+      for(var i in settings.commands) {
+        var cmd = settings.commands[i];
+        if((cmd.p.properties._id == data[2])) {
+          log.log(sender.p.properties.username + '(' + sender.p.properties._id + ')' +
+          ' removed command ' + cmd.p.properties.name + '(' +
+          cmd.p.properties._id + ') from channel ' + channel.p.properties.channel + '(' +
+          cmd.p.properties._id + ')');
+
+          settings.commands[i].p.remove();
+          delete settings.commands[i];
+        }
+      }
+
+      return ['{sender}: Remove command!'];
     } else {
       return ['{sender}: Syntax - !command list/edit/add/remove/get'];
     }
