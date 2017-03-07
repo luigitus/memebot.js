@@ -6,7 +6,7 @@ $(document).ready(function() {
       $.each(data.data, function(key, val) {
         $('#clist').append(
             $('<li></li>').append(
-              '<a href=./commandview?commandid=' + key + '>' + val.name[0] + '</a>'
+              '<a href=./commandview?commandid=' + val._id + '>' + val.name[0] + '</a>'
             )
         );
       });
@@ -16,7 +16,7 @@ $(document).ready(function() {
     $.each(data.data, function(key, val) {
       $('#clist').append(
           $('<li></li>').append(
-            '<a href=./commandview?commandid=' + key + '>' + val.name[0] + '</a>'
+            '<a href=./commandview?commandid=' + val._id + '>' + val.name[0] + '</a>'
           )
       );
     });

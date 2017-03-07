@@ -13,9 +13,24 @@
     </head>
     <body>
       <div id="header"></div> <script type="text/javascript"> $("#header").load("./header.html");</script>
-        <div class="content">
+        <div id="container" class="content">
           <ul id="clist">
           </ul>
+          <script>
+            var page = parseInt(getParameterByName('page'));
+            if(isNaN(page) || page == null) {page = 0;}
+
+            $('#container').append(
+            $('<a></a>').append(
+              'Previous').attr('href', './commandlist?page=' + (page-1).toString()));
+
+
+            $('#container').append('     ');
+
+            $('#container').append(
+            $('<a></a>').append(
+              'Next').attr('href', './commandlist?page=' + (page+1).toString()));
+          </script>
         </div>
         <div id="sidebar"></div> <script type="text/javascript"> $("#sidebar").load("./sidebar.html");</script>
         <div id="footer"></div> <script type="text/javascript"> $("#footer").load("./footer.html");</script>

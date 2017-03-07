@@ -8,7 +8,7 @@ $(document).ready(function() {
       $.each(data.data, function(key, val) {
         $('#clist').append(
             $('<li></li>').append(
-              '<a href=./commandlist?page=0&channelid=' + key + '>' +
+              '<a href=./commandlist?page=0&channelid=' + val._id + '>' +
               val.name + '</a>'
             )
         );

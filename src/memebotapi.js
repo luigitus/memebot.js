@@ -149,13 +149,20 @@ module.exports = {
       var startAt = page * 100;
       var itemsPerPage = startAt + 100;
       var counter = 0;
-      var resData = {};
-      for(var i in settings.joinedChannels) {
+      var resData = [];
+      var sortedObj = Object.keys(settings.joinedChannels).sort(
+      function(a, b) {
+        return settings.joinedChannels[a].p.properties.channel > settings.joinedChannels[b].p.properties.channel ? 1 : -1;
+      });
+
+      for(var j in sortedObj) {
+        var i = sortedObj[j];
         if(counter >= startAt && counter < itemsPerPage) {
-          resData[i] = {links : {channel : settings.gs.url + '/api/v1/channel?id=' +
+          resData.push({links : {channel : settings.gs.url + '/api/v1/channel?id=' +
           settings.joinedChannels[i].p.properties._id},
-          name : settings.joinedChannels[i].p.properties.channel
-          };
+          name : settings.joinedChannels[i].p.properties.channel,
+          _id : settings.joinedChannels[i].p.properties._id,
+          });
         }
 
         counter++;
@@ -183,13 +190,20 @@ module.exports = {
       var startAt = page * 100;
       var itemsPerPage = startAt + 100;
       var counter = 0;
-      var resData = {};
-      for(var i in settings.users) {
+      var resData = [];
+      var sortedObj = Object.keys(settings.users).sort(
+      function(a, b) {
+        return settings.users[a].p.properties.username > settings.commands[b].p.properties.username ? 1 : -1;
+      });
+
+      for(var j in sortedObj) {
+        var i = sortedObj[j];
         if(counter >= startAt && counter < itemsPerPage) {
-          resData[i] = {links : {user : settings.gs.url + '/api/v1/user?id=' +
+          resData.push({links : {user : settings.gs.url + '/api/v1/user?id=' +
           settings.users[i].p.properties._id},
-          name : settings.users[i].p.properties.username
-          };
+          name : settings.users[i].p.properties.username,
+          id : settings.users[i].p.properties._id
+          });
         }
 
         counter++;
@@ -220,18 +234,25 @@ module.exports = {
       var startAt = page * 100;
       var itemsPerPage = startAt + 100;
       var counter = 0;
-      var resData = {};
-      for(var i in settings.commands) {
+      var resData = [];
+      var sortedObj = Object.keys(settings.commands).sort(
+      function(a, b) {
+        return settings.commands[a].p.properties.name[0] > settings.commands[b].p.properties.name[0] ? 1 : -1;
+      });
+
+      for(var j in sortedObj) {
+        var i = sortedObj[j];
         if(counter >= startAt && counter < itemsPerPage) {
           if(typeof channelID != 'undefined') {
             if(channelID != settings.commands[i].p.properties.ownerChannelID) {
               continue;
             }
           }
-          resData[i] = {links : {command : settings.gs.url + '/api/v1/command?id=' +
+          resData.push({links : {command : settings.gs.url + '/api/v1/command?id=' +
           settings.commands[i].p.properties._id},
-          name: settings.commands[i].p.properties.name
-          };
+          name: settings.commands[i].p.properties.name,
+          _id: settings.commands[i].p.properties._id
+          });
         }
 
         counter++;
