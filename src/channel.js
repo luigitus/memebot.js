@@ -57,9 +57,10 @@ var Channel = function(id, cs) {
             type: 'PRIVMSG',
             channeName: obj.p.properties.channel,
             id: '#internal#',
-            tags: {}
+            tags: {},
+            service: 'twitch'
           },
-          channel: obj});
+          channel: obj, callback: obj.commandCallback, other: {}});
         }
       }
     }

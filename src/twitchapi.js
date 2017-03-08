@@ -47,6 +47,32 @@ TwitchAPI.requestAccessToken = function(authcode, callback) {
   req.end();
 }
 
+TwitchAPI.getInfoFromOauth = function(oauth, callback) {
+  var options = {
+    host: 'api.twitch.tv',
+    method: 'GET',
+    path: '/kraken?oauth_token=' + encodeURIComponent(oauth),
+    headers: {
+      'Content-Type' : 'application/json',
+      'Client-ID' : settings.gs.clientid,
+      'Accept' : 'application/vnd.twitchtv.v5+json',
+    },
+    json: true
+  };
+
+  var req = https.request(options, function(res) {
+    res.setEncoding('utf8');
+    res.on('data', function(data) {
+        callback(data);
+      });
+    res.on('error', function(err) {
+      log.log(err);
+      callback(err);
+    });
+  });
+  req.end();
+}
+
 TwitchAPI.getChannelFromOauth = function(oauth, callback) {
   var options = {
     host: 'api.twitch.tv',
