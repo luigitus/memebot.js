@@ -187,6 +187,7 @@ module.exports = {
   },
 
   getUserByName: function(name) {
+    if(typeof name === 'undefined') {return null;}
     name = name.toLowerCase();
     for(var key in module.exports.users) {
       if(name == module.exports.users[key].p.properties.username) {

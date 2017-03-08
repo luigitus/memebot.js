@@ -263,7 +263,11 @@ module.exports = {
     // put
     app.get('/api/v1/editcommand', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
-      obj.checkTwitchLogin(req.headers['Authorization'], req.query.channelid,
+      var token = req.headers['Authorization']
+      if(typeof token === 'undefined') {
+        token = req.query.oauth_token;
+      }
+      obj.checkTwitchLogin(token, req.query.channelid,
       req.query.channelid, function(status, data) {
         if(status) {
           res.send({data : {}, links: {}});
@@ -275,7 +279,11 @@ module.exports = {
 
     app.get('/api/v1/editchannel', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
-      obj.checkTwitchLogin(req.headers['Authorization'], req.query.channelid,
+      var token = req.headers['Authorization']
+      if(typeof token === 'undefined') {
+        token = req.query.oauth_token;
+      }
+      obj.checkTwitchLogin(token, req.query.channelid,
       req.query.channelid, function(status, data) {
         if(status) {
           res.send({data : {}, links: {}});
@@ -287,7 +295,11 @@ module.exports = {
 
     app.get('/api/v1/edituser', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
-      obj.checkTwitchLogin(req.headers['Authorization'], req.query.channelid,
+      var token = req.headers['Authorization']
+      if(typeof token === 'undefined') {
+        token = req.query.oauth_token;
+      }
+      obj.checkTwitchLogin(token, req.query.channelid,
       req.query.channelid, function(status, data) {
         if(status) {
           res.send({data : {}, links: {}});
@@ -308,19 +320,20 @@ module.exports = {
 
   checkTwitchLogin: function(oauth, channelid, requiredchannelid, callback) {
     //var cookiejson = JSON.parse(req.cookies.login);
-    twitchapi.TwitchAPI.getChannelFromOauth(oauth, function(data) {
+    twitchapi.TwitchAPI.getInfoFromOauth(oauth, function(data) {
       data = JSON.parse(data);
-      if(data.status >= 400) {
+      if(data.status >= 400 || !data.token.valid) {
         callback(false, data);
         return;
       }
-      if(settings.gs.admins.indexOf(data.display_name.toLowerCase()) != -1) {
-        log.log('Permitting login for admin ' + data.display_name);
+
+      if(settings.gs.admins.indexOf(data.token.user_name.toLowerCase()) != -1) {
+        log.log('Permitting login for admin ' + data.token.user_name);
         callback(true, data);
         return;
       }
-      if(data._id == channelid && data._id == requiredchannelid &&
-      typeof data._id !== 'undefined') {
+      if(data.token.user_id == channelid && data.token.user_id == requiredchannelid &&
+      data.token.valid) {
         callback(true, data);
         return;
       } else {

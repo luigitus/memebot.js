@@ -157,6 +157,7 @@ Command.prototype = {
           this.globalCooldown = new cd.Cooldown(this.p.properties.cooldownLength);
         }
         this.globalCooldown.startCooldown();
+        this.timercooldown.startCooldown();
       }
 
       this.p.save();

@@ -1,0 +1,35 @@
+{
+  "ircServer" : "irc.twitch.tv",
+  "ircPort" : 6667,
+  "botName" : "",
+  "botPassword" : "",
+  "debug" : true,
+  "greetmessage" : true,
+  "messageLimit" : 19,
+  "local" : "engb",
+  "defaultchannel" : "#memebot__",
+  "defaultchannelid" : "96841458",
+  "paths" : {
+    "channels" : "./config/channels.db",
+    "commands" : "./config/commands.db",
+    "users" : "./config/users.db"
+  },
+  "admins" : [
+    "unlink2"
+  ],
+  "moderators" : [
+
+  ],
+  "dbmode" : "json",
+  "url" : "http://localhost:3000",
+  "redirecturl" : "/authenticated",
+  "scope" : "channel_editor+chat_login",
+  "clientid" : "",
+  "clientsecret" : "",
+  "allowBackups" : true,
+  "backupInterval" : 21600,
+  "websocketport" : 3001,
+  "expressport" : 3000,
+  "maxdberrors" : 10,
+  "discordtoken" : ""
+}
