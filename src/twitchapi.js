@@ -10,7 +10,7 @@ var TwitchAPI = function() {
 TwitchAPI.updateAll = function() {
   for(var i in settings.joinedChannels) {
     var channel = settings.joinedChannels[i];
-    this.makeChannelRequest(channel.p.properties._id, this.channelCallback);
+    //this.makeChannelRequest(channel.p.properties._id, this.channelCallback);
     this.makeStreamsRequest(channel.p.properties._id, this.streamsCallback);
   }
 }
@@ -173,9 +173,23 @@ TwitchAPI.streamsCallback = function(id, data) {
   if(data._total == 0) {
     var channel = settings.getChannelByID(id);
     channel.p.properties.isLive = false;
+    // channel is not live. SAD. Get the data from the channel endpoint instead.
+    TwitchAPI.makeChannelRequest(id, TwitchAPI.channelCallback);
   } else {
     var channel = settings.getChannelByID(id);
     channel.p.properties.isLive = true;
+    // One great thing about Twitchs Stream endpoint is that we also get the
+    // channel data when the channel is live. Lets use that data instead of
+    // making another API call!
+    channel.p.properties.title = data.stream.channel.status;
+    channel.p.properties.game = data.stream.channel.game;
+
+    // check if name still matches #namechange
+    if(channel.p.properties.channel != ('#' + data.stream.channel.name)) {
+      channel.p.properties.channel = ('#' + data.stream.channel.name);
+      channel.part();
+      channel.reJoin();
+    }
   }
 }
 
@@ -186,8 +200,8 @@ TwitchAPI.channelCallback = function(id, data) {
     channel.p.properties.game = data.game;
 
     // check if name still matches #namechange
-    if(channel.p.properties.channel != ('#' + data.display_name.toLowerCase())) {
-      channel.p.properties.channel = ('#' + data.display_name.toLowerCase());
+    if(channel.p.properties.channel != ('#' + data.name)) {
+      channel.p.properties.channel = ('#' + data.name);
       channel.part();
       channel.reJoin();
     }
