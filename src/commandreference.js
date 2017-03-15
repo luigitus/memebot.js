@@ -29,5 +29,6 @@ module.exports = {
   pyramid: require('./commands/pyramidcommand.js').PyramidCommand,
   websocket: require('./commands/websocketcommand.js').WebsocketCommand,
   timeout: require('./commands/timeoutcommand.js').TimeoutCommand,
-  ban: require('./commands/bancommand.js').BanCommand
+  ban: require('./commands/bancommand.js').BanCommand,
+  dograce: require('./commands/dogracecommand.js').DogRaceCommand
 }

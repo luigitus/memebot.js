@@ -130,7 +130,15 @@ CommandManager.prototype = {
       if(cmd == null) {
         cmd = settings.getCommandByName(data[2], channel.p.properties._id);
         if(cmd == null) {
-          return ['{sender}: Could not find command!'];
+          // if admin allow to edit internal commands
+          if(!settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 100)) {
+            return ['{sender}: Could not find command!'];
+          } else {
+            cmd = settings.getCommandByID(data[2], '#internal#');
+            if(cmd == null) {
+              return ['{sender}: Could not find command!'];
+            }
+          }
         }
       }
 

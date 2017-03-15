@@ -60,7 +60,7 @@ BaseObject.prototype = {
       }
 
       if(upsert) {
-        log.log('Inserted new document upon saving!');
+        log.log('Inserted new document upon saving! ' + obj.path + ' ' + obj.properties._id);
       }
     });
   },

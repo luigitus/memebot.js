@@ -4,8 +4,11 @@ var base = require('./baseobj.js');
 var log = require('./mlog.js');
 var automod = require('./messagefilters/automodfilter.js');
 
-var Channel = function(id, cs) {
-  this.p = new base.BaseObject(id, 'channels', this);
+var Channel = function(id, cs, path) {
+  if(typeof path === 'undefined') {
+    path = 'channels'
+  }
+  this.p = new base.BaseObject(id, path, this);
   this.connected = false;
   this.connection = null;
   this.cs = cs;

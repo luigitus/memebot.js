@@ -209,7 +209,6 @@ ConnectionHandler.prototype = {
     if(this.messageCount > settings.gs.messageLimit) {
       return;
     }
-
     this.messageCount++;
 
     this.writeBytes('PRIVMSG ' + channel + " : " + message);

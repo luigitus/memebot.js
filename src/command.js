@@ -6,8 +6,11 @@ var cr = require('./commandreference.js');
 var sprintf = require("sprintf-js").sprintf;
 var text = require('./text.js');
 
-var Command = function(id, cs) {
-  this.p = new base.BaseObject(id, 'commands', this);
+var Command = function(id, cs, path) {
+  if(typeof path === 'undefined') {
+    path = 'commands'
+  }
+  this.p = new base.BaseObject(id, path, this);
   var obj = this;
   this.cs = cs;
   this.globalCooldown = new cd.Cooldown(0);
@@ -43,7 +46,8 @@ var Command = function(id, cs) {
     chance: 100,
     cooldownbypasspower: settings.commandPower.broadcaster,
     parametres: 0,
-    wscommand: 'executed'
+    wscommand: 'executed',
+    defaultCooldownHandler: true
   }
 
   this.p.load(this.afterLoad);
@@ -66,6 +70,10 @@ Command.prototype = {
     // create command type objects
     p.scripts = [];
     for(var i = 0; i < p.p.properties.types.length; i++) {
+      // check if reference actually includes the script
+      if(typeof cr[p.p.properties.types[i]] === 'undefined') {
+        continue;
+      }
       var newScript = new cr[p.p.properties.types[i]](p);
       p.scripts.push(newScript);
     }
@@ -104,21 +112,9 @@ Command.prototype = {
       return;
     }
 
-    // check global cooldown
-    if(!this.globalCooldown.canContinue()) {
-      if(!settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.properties.cooldownbypasspower)) {
+    if(this.p.properties.defaultCooldownHandler) {
+      if(!this.checkCooldown(channel, sender)) {
         return;
-      }
-    }
-
-    // check for user cooldown
-    if(typeof this.userCooldowns[sender.p.properties._id] !== 'undefined') {
-      if(!this.userCooldowns[sender.p.properties._id].canContinue()) {
-        if(!settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.properties.cooldownbypasspower)) {
-          return;
-        }
-      } else {
-        delete this.userCooldowns[sender.p.properties._id];
       }
     }
 
@@ -149,18 +145,57 @@ Command.prototype = {
       }
 
       this.p.properties.timesExecuted++;
-      // cooldowns are only invoked if the command executed successfully
-      if(this.success) {
-        this.userCooldowns[sender.p.properties._id] = new cd.Cooldown(this.p.properties.userCooldownLenght);
-        this.userCooldowns[sender.p.properties._id].startCooldown();
-        if(this.p.properties.cooldownLength != this.globalCooldown.cooldownLength) {
-          this.globalCooldown = new cd.Cooldown(this.p.properties.cooldownLength);
-        }
-        this.globalCooldown.startCooldown();
-        this.timercooldown.startCooldown();
+      if(this.p.properties.defaultCooldownHandler) {
+        this.setCooldown(channel, sender);
       }
 
       this.p.save();
+    }
+  },
+
+  checkCooldown: function(channel, sender) {
+    // check global cooldown
+    if(!this.globalCooldown.canContinue()) {
+      if(!settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.properties.cooldownbypasspower)) {
+        return false;
+      }
+    }
+
+    // check for user cooldown
+    if(typeof this.userCooldowns[sender.p.properties._id] !== 'undefined') {
+      if(!this.userCooldowns[sender.p.properties._id].canContinue()) {
+        if(!settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.properties.cooldownbypasspower)) {
+          return false;
+        }
+      } else {
+        delete this.userCooldowns[sender.p.properties._id];
+      }
+    }
+
+    return true;
+  },
+
+  setCooldown: function(channel, sender) {
+    // cooldowns are only invoked if the command executed successfully
+    if(this.success) {
+      this.userCooldowns[sender.p.properties._id] = new cd.Cooldown(this.p.properties.userCooldownLenght);
+      this.userCooldowns[sender.p.properties._id].startCooldown();
+      if(this.p.properties.cooldownLength != this.globalCooldown.cooldownLength) {
+        this.globalCooldown = new cd.Cooldown(this.p.properties.cooldownLength);
+      }
+      this.globalCooldown.startCooldown();
+      this.timercooldown.startCooldown();
+    }
+  },
+
+  // optional finished callback for special features (e.g. used for webscoket callback)
+  finishedCallback: function(data) {
+    for(var i = 0; i < this.scripts.length; i++) {
+      if(this.scripts[i] != null && typeof this.scripts[i] !== 'undefined') {
+        if(typeof this.scripts[i].finishedCallback !== 'undefined') {
+          this.scripts[i].finishedCallback(data);
+        }
+      }
     }
   }
 }

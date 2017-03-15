@@ -12,7 +12,7 @@ module.exports = [
   {types: ['help'], name: ['!help'], _id: 8, requriedCommandPower: 0},
   {types: ['user'], name: ['!user'], _id: 9, requriedCommandPower: 0},
   {types: ['channel'], name: ['!channel'], _id: 10, requriedCommandPower: 0},
-  {types: ['dampe'], name: ['!dampe'], _id: 11, requriedCommandPower: 0, userCooldownLenght: 90},
+  {types: ['dampe'], name: ['!dampe', '!gamble'], _id: 11, requriedCommandPower: 0, userCooldownLenght: 90},
   {types: ['name'], name: ['!name'], _id: 12, requriedCommandPower: 0},
 
   {types: ['default'], name: ['!mehug'], _id: 13, requriedCommandPower: 0,

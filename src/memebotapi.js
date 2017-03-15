@@ -23,6 +23,11 @@ module.exports = {
 	    socket.on('chat', function (data) {
 		      io.sockets.emit('chat', {time: new Date(), name: data.name || 'null', text: data.text});
 	    });
+      socket.on('doggy_finished', function(data) {
+        var cmd = settings.getCommandByID(data._id);
+        if(cmd == null) {return;}
+        cmd.finishedCallback(data);
+      });
     });
 
 
@@ -97,12 +102,16 @@ module.exports = {
           res.sendfile('./web/public/authenticated.html');
         }
         var jsondata = JSON.parse(data);
-        twitchapi.TwitchAPI.getChannelFromOauth(jsondata.access_token, function(channeldata) {
+        twitchapi.TwitchAPI.getInfoFromOauth(jsondata.access_token, function(channeldata) {
           var jsonChannelData = JSON.parse(channeldata);
-          jsondata._id = jsonChannelData._id;
-          jsondata.username = jsonChannelData.display_name;
-          res.cookie('login', JSON.stringify(jsondata));
-          res.sendfile('./web/public/authenticated.html');
+          if(!jsonChannelData.token.valid) {
+            res.sendfile('./web/public/authenticated.html');
+          } else {
+            jsondata._id = jsonChannelData.token.user_id;
+            jsondata.username = jsonChannelData.token.user_name;
+            res.cookie('login', JSON.stringify(jsondata));
+            res.sendfile('./web/public/authenticated.html');
+          }
         });
       });
     });
