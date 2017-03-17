@@ -212,7 +212,8 @@ TwitchAPI.channelCallback = function(id, data) {
     channel.p.properties.game = data.game;
 
     // check if name still matches #namechange
-    if(channel.p.properties.channel != ('#' + data.name.toLowerCase())) {
+    if(channel.p.properties.channel != ('#' + data.name.toLowerCase())
+    && typeof data.name.toLowerCase() !== 'undefined') {
       channel.p.properties.channel = ('#' + data.name.toLowerCase());
       channel.part();
       channel.reJoin();

@@ -16,26 +16,44 @@ var BaseObject = function(id, path, _p) {
   this.isLoaded = false;
 }
 
-BaseObject.prototype = {
-  load: function(callback) {
-    var obj = this;
-    settings.db[this.path].find({_id: this.properties._id}, function(err, doc) {
-      if(err != null) {
-        log.log(err);
-      }
-      if(doc != null) {
-        obj.setDefaults(doc[0], true);
+BaseObject.searchObjects = function(path, searchQuery, callback) {
+  settings.db[path].find({_id: this.properties._id}, function(err, doc) {
+    if(err != null) {
+      log.log(err);
+    }
+    if(doc != null) {
+    }
+    callback(doc);
+  });
+}
 
-        obj.wasLoaded = true;
-      }
-      obj.isLoaded = true;
-      obj.setDefaults(obj.defaults);
-      callback(obj.p);
-    });
-    /*try {
-      data = fs.readFileSync(this.path, 'utf8');
-      this.properties = JSON.parse(data);
-    } catch(err) {}*/
+BaseObject.prototype = {
+  load: function(callback, doc) {
+    // if doc is undefined just load from database
+    if(typeof doc === 'undefined') {
+      log.log(this.path + '>> Loading from database: ' +  + this.properties._id.toString())
+      var obj = this;
+      settings.db[this.path].find({_id: this.properties._id}, function(err, doc) {
+        if(err != null) {
+          log.log(err);
+        }
+        if(doc != null) {
+          obj.setDefaults(doc[0], true);
+
+          obj.wasLoaded = true;
+        }
+        obj.isLoaded = true;
+        obj.setDefaults(obj.defaults);
+        callback(obj.p);
+      });
+    } else {
+      // set the doc instead
+      log.log(this.path + '>> Loading overwritten by doc: ' + this.properties._id.toString());
+      this.isLoaded = true;
+      obj.wasLoaded = true;
+      this.setDefaults(doc, true);
+      callback(this.p);
+    }
   },
 
   save: function(callback) {
