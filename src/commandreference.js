@@ -29,5 +29,7 @@ module.exports = {
   pyramid: require('./commands/pyramidcommand.js').PyramidCommand,
   websocket: require('./commands/websocketcommand.js').WebsocketCommand,
   timeout: require('./commands/timeoutcommand.js').TimeoutCommand,
-  ban: require('./commands/bancommand.js').BanCommand
+  ban: require('./commands/bancommand.js').BanCommand,
+  wr: require('./commands/wrcommand.js').WorldRecordCommand,
+  src: require('./commands/srccommand.js').SrcCommand
 }

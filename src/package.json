@@ -21,6 +21,7 @@
     "oauth2-server": "^2.4.1",
     "socket.io": "^1.7.3",
     "sort-object": "^3.0.2",
-    "sprintf-js": "^1.0.3"
+    "sprintf-js": "^1.0.3",
+    "request": "^2.81.0"
   }
 }

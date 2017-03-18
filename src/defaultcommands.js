@@ -24,4 +24,6 @@ module.exports = [
   {types: ['echo'], name: ['@memebot'], _id: 16, requriedCommandPower: 0, userCooldownLenght: 100},
   {types: ['race'], name: ['!race'], _id: 17, requriedCommandPower: 0},
   {types: ['pyramid'], name: ['!pyramid'], _id: 18, requriedCommandPower: 100},
+  {types: ['wr'], name: ['!wr'], _id: 19, requriedCommandPower: 0},
+  {types: ['src'], name: ['!src'], _id: 20, requriedCommandPower: 0},
 ]

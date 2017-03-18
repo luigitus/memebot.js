@@ -3,6 +3,7 @@ var fs = require('fs');
 var base = require('./baseobj.js');
 var log = require('./mlog.js');
 var automod = require('./messagefilters/automodfilter.js');
+var srcapi = require('./srcapi.js');
 
 var Channel = function(id, cs) {
   this.p = new base.BaseObject(id, 'channels', this);
@@ -34,7 +35,9 @@ var Channel = function(id, cs) {
     botName: '',
     isLive: false,
     automod: true,
-    discordguildid: '83814260886474752'
+    discordguildid: '83814260886474752',
+    srcuserid: '',
+    srcgameid: ''
   }
 
   var obj = this;
@@ -78,6 +81,13 @@ Channel.prototype = {
     p.p.setDefaults(p.defaults);
     if(p.p.properties.shouldJoin) {
       p.join();
+    }
+
+    if (p.p.properties.srcuserid === '') {
+      log.log('[SrcAPI] No User ID for this channel, trying to get one')
+      srcapi.SrcAPI.getUser(p.p.properties._id, p.p.properties.channel.substring(1))
+    } else {
+      log.log('[SrcAPI] ' + p.p.properties.channel + '\'s id is ' + p.p.properties.srcuserid)
     }
   },
 

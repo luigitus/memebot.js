@@ -23,7 +23,9 @@ memebotapi.initweb();
 importer.checkImport();
 
 // setup discord
-this.discord = new discordconnection.ConnectionHandler();
+if (settings.gs.discordtoken !== '') {
+  this.discord = new discordconnection.ConnectionHandler();
+}
 
 // shutdown hook
 process.on('exit', function() {
@@ -50,6 +52,11 @@ setInterval(function() {
 setInterval(function() {
   twitchapi.TwitchAPI.updateAll();
 }, 1800 * 100);
+
+// speedrun.com api update
+setInterval(function() {
+  //srcapi.SrcAPI.updateAll();
+}, 3600 * 100);
 
 // database backup
 setInterval(function() {

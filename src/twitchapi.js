@@ -2,12 +2,23 @@ var settings = require('./settings.js');
 var https = require('https');
 var log = require('./mlog.js');
 var querystring = require('querystring');
+var req = require('request');
+var request = req.defaults({
+  baseUrl: 'https://api.twitch.tv',
+  headers: {
+    'Content-Type': 'application/json',
+    'Client-ID': settings.gs.clientid,
+    'Accept': 'application/vnd.twitchtv.v5+json'
+  },
+  json: true
+});
 
 var TwitchAPI = function() {
 
 }
 
 TwitchAPI.updateAll = function() {
+  log.log(settings.gs.clientid);
   for(var i in settings.joinedChannels) {
     var channel = settings.joinedChannels[i];
     //this.makeChannelRequest(channel.p.properties._id, this.channelCallback);
@@ -101,102 +112,56 @@ TwitchAPI.getChannelFromOauth = function(oauth, callback) {
 }
 
 TwitchAPI.getUserInformationFromName = function(username, datatopass, callback) {
-  var options = {
-    host: 'api.twitch.tv',
-    method: 'GET',
-    headers: {
-    'Content-Type' : 'application/json',
-    'Client-ID' : settings.gs.clientid,
-    'Accept' : 'application/vnd.twitchtv.v5+json'
-    },
-    json: true
-  };
+  var path;
   if(typeof username === 'string') {
-    options.path = '/kraken/users?login=' + username;
+    path = '/kraken/users?login=' + username;
   } else {
-    options.path = '/kraken/users?login=' + username.join(',');
+    path = '/kraken/users?login=' + username.join(',');
   }
-
-  var req = https.request(options, function(res) {
-    res.setEncoding('utf8');
-    res.on('data', function(data) {
-        try {
-          callback(username, JSON.parse(data), datatopass);
-        } catch(err) {
-          log.log(err + ' ' + data);
-        }
-      });
-      res.on('error', function(err) {
-        log.log(err);
-      });
+  request(path, function(error, response, body) {
+    if (error !== null) {
+      log.log('[TwitchAPI] error: ' + error);
+    }
+    try {
+      callback(username, body, datatopass);
+    } catch(err) {
+      log.log(err + ' ' + data);
+    }
   });
-  req.end();
-},
+}
 
 TwitchAPI.makeStreamsRequest = function(id, callback) {
-  var options = {
-    host: 'api.twitch.tv',
-
-    method: 'GET',
-    headers: {
-    'Content-Type' : 'application/json',
-    'Client-ID' : settings.gs.clientid,
-    'Accept' : 'application/vnd.twitchtv.v5+json'
-    },
-    json: true
-  };
-
-  if(typeof id === 'string') {
-    options.path = '/kraken/streams/?channel=' + id;
-  } else {
-    options.path = '/kraken/streams/?channel=' + id.join(',');
-  }
-
-  var req = https.request(options, function(res) {
-    res.setEncoding('utf8');
-    res.on('data', function(data) {
-        try {
-          callback(id, JSON.parse(data));
-        } catch(err) {
-          log.log(err + ' ' + data);
-        }
-      });
-      res.on('error', function(err) {
-        log.log(err);
-      });
+  var options = baseRequest.defaults({
+    headers: {special: 'special value'}
   });
-  req.end();
+  request('/kraken/streams/' + id, function(error, response, body) {
+    if (error !== null) {
+      log.log('[TwitchAPI] error: ' + error);
+    }
+    try {
+      callback(id, body);
+    } catch(err) {
+      log.log(err + ' ' + data);
+    }
+  });
 }
 
 TwitchAPI.makeChannelRequest = function(id, callback) {
-  var options = {
-    host: 'api.twitch.tv',
-    path: '/kraken/channels/' + id,
-    method: 'GET',
-    headers: {'Content-Type' : 'application/json',
-    'Client-ID' : settings.gs.clientid,
-    'Accept' : 'application/vnd.twitchtv.v5+json'
-    },
-    json: true
-  };
-  var req = https.request(options, function(res) {
-    res.setEncoding('utf8');
-    res.on('data', function(data) {
-        try {
-          callback(id, JSON.parse(data));
-        } catch(err) {
-          log.log(err + ' ' + data);
-        }
-      });
-      res.on('error', function(err) {
-        log.log(err);
-      });
+  request('/kraken/channels/' + id, function(error, response, body) {
+    if (error !== null) {
+      log.log('[TwitchAPI] error: ' + error);
+    }
+    try {
+      callback(id, body);
+    } catch(err) {
+      log.log(err + ' ' + data);
+    }
   });
-  req.end();
 }
 
 TwitchAPI.streamsCallback = function(id, data) {
-  if(data._total == 0) {
+  log.log('streamsCallback ' + JSON.stringify(data));
+  if(data.stream == null) {
     var channel = settings.getChannelByID(id);
     channel.p.properties.isLive = false;
     // channel is not live. SAD. Get the data from the channel endpoint instead.
@@ -221,6 +186,7 @@ TwitchAPI.streamsCallback = function(id, data) {
 
 TwitchAPI.channelCallback = function(id, data) {
   var channel = settings.getChannelByID(id);
+  log.log('channelCallback ' + JSON.stringify(data));
   if(channel) {
     channel.p.properties.title = data.status;
     channel.p.properties.game = data.game;
