@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 var cr = require('./commandreference.js');
 
 // the first 10000 ids are reserved for internal commands

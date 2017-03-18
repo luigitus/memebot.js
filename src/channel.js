@@ -3,10 +3,12 @@ var fs = require('fs');
 var base = require('./baseobj.js');
 var log = require('./mlog.js');
 var automod = require('./messagefilters/automodfilter.js');
-var srcapi = require('./srcapi.js');
 
-var Channel = function(id, cs) {
-  this.p = new base.BaseObject(id, 'channels', this);
+var Channel = function(id, cs, path) {
+  if(typeof path === 'undefined') {
+    path = 'channels'
+  }
+  this.p = new base.BaseObject(id, path, this);
   this.connected = false;
   this.connection = null;
   this.cs = cs;
@@ -36,8 +38,6 @@ var Channel = function(id, cs) {
     isLive: false,
     automod: true,
     discordguildid: '83814260886474752',
-    srcuserid: '',
-    srcgameid: ''
   }
 
   var obj = this;

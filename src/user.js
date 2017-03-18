@@ -2,14 +2,16 @@ var base = require('./baseobj.js');
 var settings = require('./settings.js');
 var util = settings;
 
-var User = function(id, cs) {
-  this.path = '';
+var User = function(id, cs, path) {
+  if(typeof path === 'undefined') {
+    path = 'users'
+  }
   this.inChannels = [];
   this.lastActivity = {};
   this.shouldSendGreet = {};
   this.cooldowns = {};
   this.cs = cs;
-  this.p = new base.BaseObject(id, 'users', this);
+  this.p = new base.BaseObject(id, path, this);
   var obj = this;
 
   this.p.defaults = {

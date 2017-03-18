@@ -80,28 +80,36 @@ CommandManager.prototype = {
         method: 'GET',
         headers: {
         },
-        json: true
+        json: true,
+        port: 80
       };
-      var obj = this;
-      var req = http.request(options, function(res) {
-        res.setEncoding('utf8');
-        res.on('data', function(data) {
-          var newID = settings.generateUUID();
-          while(newID in settings.commands) {
-            newID = settings.generateUUID();
-          }
+      try {
+        var obj = this;
+        var req = http.request(options, function(res) {
+          res.setEncoding('utf8');
+          res.on('data', function(data) {
+            var newID = settings.generateUUID();
+            while(newID in settings.commands) {
+              newID = settings.generateUUID();
+            }
+            try {
+              var imported = JSON.parse(data);
+              imported.ownerChannelID = channel.p.properties._id;
+              imported.channelID = [channel.p.properties._id];
+              imported._id = newID;
 
-          var imported = JSON.parse(data);
-          imported.ownerChannelID = channel.p.properties._id;
-          imported.channelID = [channel.p.properties._id];
-          imported._id = newID;
-
-          settings.loadCommand(newID, imported);
+              settings.loadCommand(newID, imported);
+            } catch(err) {
+              log.log(err);
+            }
           });
-        res.on('error', function(err) {
-          log.log(err);
+          res.on('error', function(err) {
+            log.log(err);
+          });
         });
-      });
+      } catch(err) {
+        log.log(err);
+      }
       req.end();
       return ['Imported scheduled!'];
     } else if(data[1] == 'remove' &&
@@ -116,9 +124,11 @@ CommandManager.prototype = {
           ' removed command ' + cmd.p.properties.name + '(' +
           cmd.p.properties._id + ') from channel ' + channel.p.properties.channel + '(' +
           cmd.p.properties._id + ')');
+          settings.commands[i].p.remove(function(id) {
+            log.log('Removed id: ' + id + ' from command object!');
+            delete settings.commands[id];
+          });
 
-          settings.commands[i].p.remove();
-          delete settings.commands[i];
         }
       }
 
@@ -130,7 +140,15 @@ CommandManager.prototype = {
       if(cmd == null) {
         cmd = settings.getCommandByName(data[2], channel.p.properties._id);
         if(cmd == null) {
-          return ['{sender}: Could not find command!'];
+          // if admin allow to edit internal commands
+          if(!settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 100)) {
+            return ['{sender}: Could not find command!'];
+          } else {
+            cmd = settings.getCommandByID(data[2], '#internal#');
+            if(cmd == null) {
+              return ['{sender}: Could not find command!'];
+            }
+          }
         }
       }
 

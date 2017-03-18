@@ -14,31 +14,55 @@ var BaseObject = function(id, path, _p) {
   this.defaults = {};
   this.wasLoaded = false;
   this.isLoaded = false;
+  this.wasRemoved = false;
+}
+
+BaseObject.searchObjects = function(path, searchQuery, callback) {
+  settings.db[path].find({_id: this.properties._id}, function(err, doc) {
+    if(err != null) {
+      log.log(err);
+    }
+    if(doc != null) {
+    }
+    callback(doc);
+  });
 }
 
 BaseObject.prototype = {
-  load: function(callback) {
-    var obj = this;
-    settings.db[this.path].find({_id: this.properties._id}, function(err, doc) {
-      if(err != null) {
-        log.log(err);
-      }
-      if(doc != null) {
-        obj.setDefaults(doc[0], true);
+  load: function(callback, doc) {
+    // if doc is undefined just load from database
+    if(typeof doc === 'undefined') {
+      log.log(this.path + '>> Loading from database: ' + this.properties._id.toString())
+      var obj = this;
+      settings.db[this.path].find({_id: this.properties._id}, function(err, doc) {
+        if(err != null) {
+          log.log(err);
+        }
+        if(doc != null) {
+          obj.setDefaults(doc[0], true);
 
-        obj.wasLoaded = true;
-      }
-      obj.isLoaded = true;
-      obj.setDefaults(obj.defaults);
-      callback(obj.p);
-    });
-    /*try {
-      data = fs.readFileSync(this.path, 'utf8');
-      this.properties = JSON.parse(data);
-    } catch(err) {}*/
+          obj.wasLoaded = true;
+        }
+        obj.isLoaded = true;
+        obj.setDefaults(obj.defaults);
+        callback(obj.p);
+      });
+    } else {
+      // set the doc instead
+      log.log(this.path + '>> Loading overwritten by doc: ' + this.properties._id.toString());
+      this.isLoaded = true;
+      obj.wasLoaded = true;
+      this.setDefaults(doc, true);
+      callback(this.p);
+    }
   },
 
   save: function(callback) {
+    // if command was removed do not save!
+    if(this.wasRemoved) {
+      log.log('Skipping save of command: ' + this.properties._id + ' because it was deleted!');
+      return;
+    }
     var obj = this;
 
     if(!this.isLoaded) {
@@ -60,15 +84,20 @@ BaseObject.prototype = {
       }
 
       if(upsert) {
-        log.log('Inserted new document upon saving!');
+        log.log('Inserted new document upon saving! ' + obj.path + ' ' + obj.properties._id);
       }
     });
   },
 
-  remove: function() {
+  remove: function(callback) {
+    var obj = this;
     settings.db[this.path].remove({_id: this.properties._id}, {}, function(err, numRemoved) {
+      log.log('Removed ' + numRemoved + ' id: ' + obj.properties._id);
       if(err != null) {
         log.log(err);
+      } else {
+        obj.wasRemoved = true;
+        callback(obj.properties._id);
       }
     });
   },

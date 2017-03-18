@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 var command = require('./commands/defaultcommand.js');
 var aboutc = require('./commands/aboutcommand.js');
 var manager = require('./commands/commandmanager.js');
@@ -30,6 +31,7 @@ module.exports = {
   websocket: require('./commands/websocketcommand.js').WebsocketCommand,
   timeout: require('./commands/timeoutcommand.js').TimeoutCommand,
   ban: require('./commands/bancommand.js').BanCommand,
+  dograce: require('./commands/dogracecommand.js').DogRaceCommand
   wr: require('./commands/wrcommand.js').WorldRecordCommand,
   src: require('./commands/srccommand.js').SrcCommand
 }

@@ -1,0 +1,21 @@
+{
+  "name": "memebot.js_web",
+  "version": "1.0.0",
+  "homepage": "https://github.com/unlink2/memebot.js",
+  "authors": [
+    "Lukas Myers <lukaskrickl@gmail.com>"
+  ],
+  "description": "Memebot.js website",
+  "main": "index.html",
+  "license": "BSD",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+	"sounds/private",
+	"images/private",
+	"scripts/lib"
+  ]
+}

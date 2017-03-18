@@ -16,6 +16,10 @@ var SrcAPI = function() {
 
 }
 
+SrcAPI.getRun = function(query, callback) {
+
+}
+
 SrcAPI.updateAll = function() {
   for(var i in settings.joinedChannels) {
     var channel = settings.joinedChannels[i];
@@ -144,10 +148,6 @@ SrcAPI.getUser = function(id, query) {
     });
   });
   req.end();
-}
-
-SrcAPI.getRun = function(query, callback) {
-
 }
 
 SrcAPI.getRecord = function(channel, callback) {

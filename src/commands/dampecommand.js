@@ -13,7 +13,7 @@ DampeCommand.prototype = {
     if(data[1] == 'jackpot') {
       // set success to false so cooldown won't trigger #hacky
       this.p.p.success = false;
-      return [sprintf('{sender}: Current Dampe jackpot: %d {currency}',
+      return [sprintf('{sender}: Current jackpot: %d {currency}',
       this.p.p.properties.jackpot)];
     } else if(data[1] == 'winner') {
       this.p.p.properties.success = false;

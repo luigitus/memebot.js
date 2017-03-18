@@ -87,6 +87,7 @@ module.exports = {
 
   // note to self; require may be needed at bottom
   minit: function() {
+    var obj = this;
     // write pid file
     try {
       var pid = npid.create('./config/process.pid');
@@ -94,7 +95,7 @@ module.exports = {
     } catch (err) {
       log.log(err);
       if(!this.gs.debug) {
-        process.exit(1);
+        obj.quit(1);
       }
     }
 
@@ -103,7 +104,7 @@ module.exports = {
         onload: function(err) {
           if(err != null) {
             log.log(err);
-            this.quit(1);
+            obj.quit(1);
           }
         }
       });

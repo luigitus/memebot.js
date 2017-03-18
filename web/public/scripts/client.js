@@ -23,6 +23,8 @@ $(document).ready(function(){
       // scroll down
       $('body').scrollTop($('body')[0].scrollHeight);
     });
+
+    // generic command execute (test)
     socket.on('executed', function (data) {
       // do stuff
       if(data._id == getParameterByName('id')) {
@@ -41,8 +43,73 @@ $(document).ready(function(){
         }
       }
     });
+
+    // doggy race script
+    socket.on('doggy_started', function (data) {
+      var finishedCounter = 0;
+      if(data._id == getParameterByName('id')) {
+        if(data.playBeginning) {
+          var audio = new Audio('./sounds/private/doggo_start.wav');
+          audio.play();
+          audio.addEventListener('ended', function() {
+            if(data.playLoop) {
+              audio = new Audio('./sounds/private/doggo_loop.wav');
+              audio.play();
+              audio.addEventListener('ended', function() {
+                audio.play();
+              })
+            }
+          })
+        }
+        for(var key in data.dogList) {
+          var dog = data.dogList[key];
+          $('#content').append($('<div></div>').attr('id', key).append($('<figure></figure>').append(
+              '<img id=' + key + '_img ' + 'src="./images/private/' + key + '_doggo.png" style="position:absolute;background-color:transparent;"></img>'
+              + '<figcaption>' + dog.name[getRandomInt(0, name.length)] + '</figcaption>' + '</br></br>'
+              )
+            )
+          );
+          var index = data.nextResult.indexOf(key)
+          var speed = index * 8000;
+          if(isNaN(speed) || speed < 8000 || index == -1) {
+            speed = 8000;
+          }
+          console.log(data.nextResult);
+          console.log(speed, data.nextResult.indexOf(key));
+
+          var moveMod = 1;
+
+          $("#" + key).css({'padding-bottom' : '1em', 'position' : 'relative', 'height' : '100%', 'width' : '100%'});
+          $("#" + key + '_img').css({'transform': 'scaleX(-1)', 'height' : '80%', 'width' : '5%'});
+          $( "#" + key ).animate({
+            left: '+=' + $(document).width() + 'px'
+          },{duration : speed,
+            step : function() {
+              //$(this).animate({top: '+=' + (1000 * moveMod) + 'px'}, 10);
+              //moveMod = moveMod * -1;
+          },
+          complete: function() {
+            finishedCounter++;
+            if(finishedCounter >= data.nextResult.length) {
+              socket.emit('doggy_finished', data);
+              if(typeof audio !== 'undefined') {
+                audio.pause();
+              }
+              if(data.playEnd) {
+                var end_audio = new Audio('./sounds/private/doggy_end.mp3');
+                end_audio.play();
+              }
+              $('#content').empty();
+            }
+          }});
+        }
+        // tell bot race animation has finished
+      }
+    }),
+
+
     // send message
-    function send(){
+    function send() {
       // read input
       var name = $('#name').val();
       var text = $('#text').val();
