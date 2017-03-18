@@ -14,6 +14,7 @@ var BaseObject = function(id, path, _p) {
   this.defaults = {};
   this.wasLoaded = false;
   this.isLoaded = false;
+  this.wasRemoved = false;
 }
 
 BaseObject.searchObjects = function(path, searchQuery, callback) {
@@ -31,7 +32,7 @@ BaseObject.prototype = {
   load: function(callback, doc) {
     // if doc is undefined just load from database
     if(typeof doc === 'undefined') {
-      log.log(this.path + '>> Loading from database: ' +  + this.properties._id.toString())
+      log.log(this.path + '>> Loading from database: ' + this.properties._id.toString())
       var obj = this;
       settings.db[this.path].find({_id: this.properties._id}, function(err, doc) {
         if(err != null) {
@@ -57,6 +58,11 @@ BaseObject.prototype = {
   },
 
   save: function(callback) {
+    // if command was removed do not save!
+    if(this.wasRemoved) {
+      log.log('Skipping save of command: ' + this.properties._id + ' because it was deleted!');
+      return;
+    }
     var obj = this;
 
     if(!this.isLoaded) {
@@ -83,10 +89,15 @@ BaseObject.prototype = {
     });
   },
 
-  remove: function() {
+  remove: function(callback) {
+    var obj = this;
     settings.db[this.path].remove({_id: this.properties._id}, {}, function(err, numRemoved) {
+      log.log('Removed ' + numRemoved + ' id: ' + obj.properties._id);
       if(err != null) {
         log.log(err);
+      } else {
+        obj.wasRemoved = true;
+        callback(obj.properties._id);
       }
     });
   },

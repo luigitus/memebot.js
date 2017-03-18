@@ -28,7 +28,6 @@ this.discord = new discordconnection.ConnectionHandler();
 // shutdown hook
 process.on('exit', function() {
   log.log('About to exit.');
-  settings.saveAll();
 });
 
 // general update function
