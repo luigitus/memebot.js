@@ -163,12 +163,53 @@ Channel.prototype = {
 
       }
 
+    } else if((message.type == 'WHISPER' && message.service == 'twitch')) {
+      // handle whispers
+      var wChannel = message.content[0];
+      message.content = message.content.splice(1);
+      if(wChannel == this.p.properties.channel.replace('#', '')) {
+        // make sure commadn power is 0 unless it's a botadmin
+        if(message.sender.p.isLoaded) {
+          message.sender.p.properties.commandpower[this.p.properties._id] = 0;
+          // global mods/admins
+          for(var i in settings.gs.admins) {
+            if(settings.gs.admins[i] == message.sender.p.properties.username) {
+              message.sender.p.properties.commandpower[this.p.properties._id] = settings.commandPower.admin;
+            }
+          }
+        }
+
+
+        for(var key in settings.commands) {
+          var cmd = settings.commands[key];
+          if(!cmd.p.isLoaded) {
+            continue;
+          }
+
+          if((cmd.p.properties.channelID.indexOf(this.p.properties._id) == -1)
+            && (cmd.p.properties.channelID.indexOf('#all#') == -1)) {
+              continue;
+          }
+          if(!cmd.p.properties.textTrigger) {
+            if(cmd.p.properties.name.indexOf(message.content[0]) != -1) {
+              this.commandQueue.push({command: cmd, msg: message,
+              channel: this, callback: this.whisperCallback, other: message.other});
+            }
+          }
+        }
+      }
     }
   },
 
   commandCallback: function(messages, channel, sender, command, data, other) {
     for(message in messages) {
-      channel.connection.sendMessage(messages[message], channel, sender, command, data, true);
+      channel.connection.sendMessage(messages[message], channel, sender, command, data, true, false);
+    }
+  },
+
+  whisperCallback: function(messages, channel, sender, command, data, other) {
+    for(message in messages) {
+      channel.connection.sendMessage(messages[message], channel, sender, command, data, true, true);
     }
   },
 

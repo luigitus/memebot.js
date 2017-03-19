@@ -63,6 +63,7 @@ module.exports = {
     message = this.replaceAll(message, '{time}', timeFormat);
     message = this.replaceAll(message, '{date}', dformat);
     message = this.replaceAll(message, '{BUTT}', '💩');
+    message = this.replaceAll(message, '{url}', settings.gs.url);
 
     var randomUserName = '';
     message = this.replaceAll(message, '{randomuser}', randomUserName);
@@ -77,6 +78,10 @@ module.exports = {
 
     if(!(typeof(command) === 'undefined')) {
       message = this.replaceAll(message, '{counter}', command.p.properties.counter);
+      message = this.replaceAll(message, '{first}', 0);
+      message = this.replaceAll(message, '{last}', command.p.properties.listContent.length - 1);
+      message = this.replaceAll(message, '{suggestedFirst}', 0);
+      message = this.replaceAll(message, '{suggestedLast}', command.p.properties.suggestedList.length - 1);
     }
 
     if(!(typeof(user) === 'undefined')) {

@@ -147,13 +147,15 @@ ConnectionHandler.prototype = {
 
     if(senderObject != null) {
       // check if user is marked as being in this channel
-      if(senderObject.inChannels.indexOf(settings.getChannelByName(channel).p.properties._id) == -1) {
-        senderObject.inChannels.push(settings.getChannelByName(channel).p.properties._id);
-        senderObject.shouldSendGreet[settings.getChannelByName(channel).p.properties._id] = true;
+      if(settings.getChannelByName(channel) != null) {
+        if(senderObject.inChannels.indexOf(settings.getChannelByName(channel).p.properties._id) == -1) {
+          senderObject.inChannels.push(settings.getChannelByName(channel).p.properties._id);
+          senderObject.shouldSendGreet[settings.getChannelByName(channel).p.properties._id] = true;
+        }
       }
       senderObject.p.properties.displayName = ircTags['display-name'];
       senderObject.p.properties.username = senderName;
-      if(senderObject.p.isLoaded) {
+      if(senderObject.p.isLoaded && settings.getChannelByName(channel) != null) {
         if(ircTags['user-type'] == 'mod') {
           senderObject.p.properties.commandpower[settings.getChannelByName(channel).p.properties._id] = settings.commandPower.mod;
         } else if('#' + senderObject.p.properties.username == channel) {
@@ -239,8 +241,11 @@ ConnectionHandler.prototype = {
     }
 
     this.messageCount++;
-
-    this.writeBytes('PRIVMSG ' + channel.p.properties.channel + " : " + message);
+    if(!whisper) {
+      this.writeBytes('PRIVMSG ' + channel.p.properties.channel + " : " + message);
+    } else {
+      this.writeBytes('PRIVMSG ' + channel.p.properties.channel + " : /w " + sender.p.properties.username + ' ' + message);
+    }
   }
 }
 

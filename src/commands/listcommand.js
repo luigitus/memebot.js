@@ -32,7 +32,7 @@ ListCommand.prototype = {
     } else if(data[1] == 'edit' &&
     settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25) &&
     this.p.p.properties.ownerChannelID == channel.p.properties._id) {
-      var inputString = data.slice(2).join(' ');
+      var inputString = data.slice(3).join(' ');
       var id = parseInt(data[2]);
       if(isNaN(id) || id >= this.p.p.properties.listContent.length) {
         return ['{sender}: Please specify a valid list id!'];
@@ -64,7 +64,7 @@ ListCommand.prototype = {
       this.p.p.properties.suggestedList.splice(id, 1);
       return ['{sender}: Denied suggested item!'];
     } else if(data[1] == 'suggest') {
-      var inputString = data.slice(1).join(' ');
+      var inputString = data.slice(2).join(' ');
       if(inputString == '' || inputString == ' ') {
         return ['{sender}: List content cannot be empty!'];
       } else {
@@ -75,6 +75,9 @@ ListCommand.prototype = {
     } else if(data[1] == 'list') {
       return ['{sender}: A list of all items can be found here: ' +
       settings.gs.url + '/commandview?commandid=' + this.p.p.properties._id];
+    } else if(data[1] == 'count') {
+      return ['{sender}: List Count = ' + this.p.p.properties.listContent.length + ' Suggested List Count = ' +
+      this.p.p.properties.suggestedList.length];
     } else {
       var id = parseInt(data[1]);
       if(typeof data[1] === 'undefined') {

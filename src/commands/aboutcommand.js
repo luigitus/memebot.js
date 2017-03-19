@@ -6,7 +6,7 @@ var AboutCommand = function(base) {
 
 AboutCommand.prototype = {
   execute: function(data, channel, sender) {
-    return ['@{sender}: {appname} {version} developed by {dev}. Fork me on github: {git}'];
+    return ['@{sender}: {appname} {version} developed by {dev}. Website: {url}'];
   }
 }
 

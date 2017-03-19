@@ -1,0 +1,3 @@
+function removeCommandButton() {
+  location.reload();
+}

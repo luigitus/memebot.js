@@ -83,6 +83,10 @@ module.exports = {
       res.sendfile('./web/public/commandlist.html');
     });
 
+    app.get('/newcommand', function (req, res) {
+      res.sendfile('./web/public/newcommand.html');
+    });
+
     app.get('/privacy', function (req, res) {
       res.sendfile('./web/public/privacy.html');
     });
@@ -269,7 +273,39 @@ module.exports = {
       res.send({data: resData, links : {}});
     });
 
-    // put
+    // api calls with auth
+    app.get('/api/v1/removecommand', function(req, res) {
+      res.setHeader('Content-Type', 'application/json');
+      var token = req.headers['Authorization']
+      if(typeof token === 'undefined') {
+        token = req.query.oauth_token;
+      }
+      obj.checkTwitchLogin(token, req.query.channelid,
+      req.query.channelid, function(status, data) {
+        if(status) {
+          res.send({data : {}, links: {}});
+        } else {
+          res.send({status: 401, message: 'Unauthorized'});
+        }
+      });
+    });
+
+    app.get('/api/v1/addcommand', function(req, res) {
+      res.setHeader('Content-Type', 'application/json');
+      var token = req.headers['Authorization']
+      if(typeof token === 'undefined') {
+        token = req.query.oauth_token;
+      }
+      obj.checkTwitchLogin(token, req.query.channelid,
+      req.query.channelid, function(status, data) {
+        if(status) {
+          res.send({data : {}, links: {}});
+        } else {
+          res.send({status: 401, message: 'Unauthorized'});
+        }
+      });
+    });
+
     app.get('/api/v1/editcommand', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
       var token = req.headers['Authorization']
@@ -284,7 +320,7 @@ module.exports = {
           res.send({status: 401, message: 'Unauthorized'});
         }
       });
-    }),
+    });
 
     app.get('/api/v1/editchannel', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
@@ -300,7 +336,7 @@ module.exports = {
           res.send({status: 401, message: 'Unauthorized'});
         }
       });
-    }),
+    });
 
     app.get('/api/v1/edituser', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
@@ -316,7 +352,7 @@ module.exports = {
           res.send({status: 401, message: 'Unauthorized'});
         }
       });
-    }),
+    });
 
     app.get('*', function(req, res){
       res.sendfile('./web/public/notfound.html');

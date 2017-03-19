@@ -57,6 +57,8 @@ DogRaceCommand.prototype = {
       this.p.p.properties.contestants = {};
       this.p.p.properties.isRacing = false;
       return ['Doggy race reset! CorgiDerp'];
+    } else if(data[1] == 'time') {
+      return ['Remaining cooldown: ' + (this.p.globalCooldown.cooldownEnd - this.p.p.properties.cooldownLength).toString()];
     } else {
       return ['{sender}: Syntax join <dog> <amount> FrankerZ'];
     }
