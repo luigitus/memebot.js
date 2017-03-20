@@ -122,7 +122,7 @@ Channel.prototype = {
 
   message: function(message) {
     var callback = this.commandCallback;
-
+    var numberofCommandsExecuted = 0;
     if(message.service == 'discord') {
       callback = this.discordCommandCallback;
     } else if(message.service == 'webui') {
@@ -153,12 +153,14 @@ Channel.prototype = {
           if(cmd.p.properties.name.indexOf(message.content[0]) != -1) {
             this.commandQueue.push({command: cmd, msg: message,
             channel: this, callback: callback, other: message.other});
+            numberofCommandsExecuted++;
           }
         } else {
           for(var i in message.content) {
             if(cmd.p.properties.name.indexOf(message.content[i]) != -1) {
               this.commandQueue.push({command: cmd, msg: message,
               channel: this, callback: callback, other: message.other});
+              numberofCommandsExecuted++;
             }
           }
         }
@@ -196,10 +198,16 @@ Channel.prototype = {
             if(cmd.p.properties.name.indexOf(message.content[0]) != -1) {
               this.commandQueue.push({command: cmd, msg: message,
               channel: this, callback: this.whisperCallback, other: message.other});
+              numberofCommandsExecuted++;
             }
           }
         }
       }
+    }
+
+    if(numberofCommandsExecuted < 1 && message.service == 'webui') {
+      // callback for 404
+      message.other(['404']);
     }
   },
 

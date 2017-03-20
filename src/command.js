@@ -103,7 +103,7 @@ Command.prototype = {
     this.success = true;
     if(!settings.checkCommandPower(sender.commandPower(channel.p.properties._id),
     this.p.properties.requriedCommandPower)) {
-      callback(['{sender}: You do not have sufficient permission to run this command!'], channel, sender);
+      callback(['{sender}: You do not have sufficient permission to run this command!'], channel, sender, this, data, other);
       return;
     }
 
@@ -134,7 +134,7 @@ Command.prototype = {
       // if parametres do not match return helptext
       if(data.length <= this.p.properties.parametres && this.p.properties.parametres != 0) {
         this.success = false;
-        callback(this.p.properties.helptext, channel, sender, this, data);
+        callback(this.p.properties.helptext, channel, sender, this, data, other);
         return;
       }
       // can be used to enable whispers, re-direct output to the website etc.

@@ -273,7 +273,34 @@ module.exports = {
       res.send({data: resData, links : {}});
     });
 
+
+
     // api calls with auth
+    app.get('/api/v1/executecommand', function(req, res) {
+      res.setHeader('Content-Type', 'application/json');
+      var token = req.headers['Authorization']
+      if(typeof token === 'undefined') {
+        token = req.query.oauth_token;
+      }
+      var channelid = req.query.channelid;
+      var channel = settings.getChannelByID(channelid);
+      var msg = decodeURIComponent(req.query.message).split(' ');
+      obj.checkTwitchLogin(token, req.query.channelid, function(status, data, cp) {
+        if(status) {
+          if(channel == null) { res.send({status: 404, message: 'Channel Not Found'}); } else {
+            var message = obj.createWebMessage(msg, channel, function(message) {
+              if(!res.headersSent) {
+                res.send({status: 200, data : message, links: {}});
+              }
+            }, data);
+            channel.message(message);
+          }
+        } else {
+          res.send({status: 401, message: 'Unauthorized'});
+        }
+      });
+    });
+
     app.get('/api/v1/removecommand', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
       var token = req.headers['Authorization']
@@ -283,8 +310,7 @@ module.exports = {
       var channelid = req.query.channelid;
       var channel = settings.getChannelByID(channelid);
       var commandid = req.query.commandid;
-      obj.checkTwitchLogin(token, req.query.channelid,
-      req.query.channelid, function(status, data) {
+      obj.checkTwitchLogin(token, req.query.channelid, function(status, data, cp) {
         if(status) {
           if(channel == null) { res.send({status: 404, message: 'Channel Not Found'}); } else {
             var message = obj.createWebMessage([
@@ -293,8 +319,7 @@ module.exports = {
               commandid
             ], channel, function(message) {
               res.send({status: 200, data : message, links: {}});
-            });
-
+            }, data);
             channel.message(message);
           }
         } else {
@@ -313,8 +338,7 @@ module.exports = {
       var channel = settings.getChannelByID(channelid);
       var name = req.query.name;
       var output = req.query.output;
-      obj.checkTwitchLogin(token, req.query.channelid,
-      req.query.channelid, function(status, data) {
+      obj.checkTwitchLogin(token, req.query.channelid, function(status, data, cp) {
         if(status) {
           if(channel == null) { res.send({status: 404, message: 'Channel Not Found'}); } else {
             var message = obj.createWebMessage([
@@ -324,7 +348,7 @@ module.exports = {
               output,
             ], channel, function(message) {
               res.send({status: 200, data : message, links: {}});
-            });
+            }, data);
             channel.message(message);
           }
         } else {
@@ -345,8 +369,7 @@ module.exports = {
       var option = req.query.option;
       var newvalue = req.query.newvalue;
       var editoption = req.query.editoption;
-      obj.checkTwitchLogin(token, req.query.channelid,
-      req.query.channelid, function(status, data) {
+      obj.checkTwitchLogin(token, req.query.channelid, function(status, data, cp) {
         if(status) {
           if(channel == null) { res.send({status: 404, message: 'Channel Not Found'}); } else {
             var payload = [
@@ -355,7 +378,7 @@ module.exports = {
               commandid,
               option,
             ];
-            if(option == 'output' || option == 'name' || option == 'types') {
+            if(option == 'output' || option == 'name' || option == 'types' || option == 'helptext') {
               payload.push(editoption);
             }
 
@@ -363,7 +386,7 @@ module.exports = {
 
             var message = obj.createWebMessage(payload, channel, function(message) {
               res.send({status: 200, data : message, links: {}});
-            });
+            }, data);
             channel.message(message);
           }
         } else {
@@ -385,8 +408,7 @@ module.exports = {
       var newvalue = req.query.newvalue;
       var listid = req.query.listid;
       var command = settings.getCommandByID(commandid);
-      obj.checkTwitchLogin(token, req.query.channelid,
-      req.query.channelid, function(status, data) {
+      obj.checkTwitchLogin(token, req.query.channelid, function(status, data, cp) {
         if(status) {
           if(command == null) { res.send({status: 404, message: 'Command Not Found'}); }
           else if(channel == null) { res.send({status: 404, message: 'Channel Not Found'}); } else {
@@ -404,7 +426,7 @@ module.exports = {
               if(!res.headersSent) {
                 res.send({status: 200, data : message, links: {}});
               }
-            });
+            }, data);
             channel.message(message);
           }
         } else {
@@ -424,8 +446,7 @@ module.exports = {
       var option = req.query.option;
       var newvalue = req.query.newvalue;
       var editoption = req.query.editoption;
-      obj.checkTwitchLogin(token, req.query.channelid,
-      req.query.channelid, function(status, data) {
+      obj.checkTwitchLogin(token, req.query.channelid, function(status, data, cp) {
         if(status) {
           if(channel == null) { res.send({status: 404, message: 'Channel Not Found'}); } else {
             var payload = [
@@ -441,7 +462,7 @@ module.exports = {
 
             var message = obj.createWebMessage(payload, channel, function(message) {
               res.send({status: 200, data : message, links: {}});
-            });
+            }, data);
             channel.message(message);
           }
         } else {
@@ -462,8 +483,7 @@ module.exports = {
       var newvalue = req.query.newvalue;
       var editoption = req.query.editoption;
       var userid = req.query.userid;
-      obj.checkTwitchLogin(token, req.query.channelid,
-      req.query.channelid, function(status, data) {
+      obj.checkTwitchLogin(token, req.query.channelid, function(status, data, cp) {
         if(status) {
           if(channel == null) { res.send({status: 404, message: 'Channel Not Found'}); } else {
             var payload = [
@@ -480,7 +500,7 @@ module.exports = {
 
             var message = obj.createWebMessage(payload, channel, function(message) {
               res.send({status: 200, data : message, links: {}});
-            });
+            }, data);
             channel.message(message);
           }
         } else {
@@ -498,7 +518,7 @@ module.exports = {
     });
   },
 
-  checkTwitchLogin: function(oauth, channelid, requiredchannelid, callback) {
+  checkTwitchLogin: function(oauth, channelid, callback) {
     //var cookiejson = JSON.parse(req.cookies.login);
     twitchapi.TwitchAPI.getInfoFromOauth(oauth, function(data) {
       data = JSON.parse(data);
@@ -509,25 +529,39 @@ module.exports = {
 
       if(settings.gs.admins.indexOf(data.token.user_name.toLowerCase()) != -1) {
         log.log('Permitting login for admin ' + data.token.user_name);
-        callback(true, data);
+        callback(true, data, 100);
         return;
       }
-      if(data.token.user_id == channelid && data.token.user_id == requiredchannelid &&
-      data.token.valid) {
-        callback(true, data);
+      if(data.token.user_id == channelid && data.token.valid) {
+        callback(true, data, 50);
         return;
       } else {
-        callback(false, data);
+        callback(true, data, 0);
         return;
       }
     });
   },
 
-  createWebMessage(message, channel, callback) {
+  createWebMessage(message, channel, callback, data) {
+    // todo use data from login check to load apropriate user and give proper command power
     var user = require('./user');
+
     var cp = {};
-    cp[channel.p.properties._id] = 50;
-    var tempSender = new user.User('#web#', {commandpower: cp});
+    cp[channel.p.properties._id] = 0;
+    if(data.token.user_id == channel.p.properties._id) {
+      cp[channel.p.properties._id] = 50;
+    }
+    if(settings.gs.admins.indexOf(data.token.user_name.toLowerCase()) != -1) {
+      cp[channel.p.properties._id] = 100;
+    }
+
+    var tempSender = settings.getUserByID(data.token.user_id);
+    if(tempSender != null) {
+      tempSender.p.properties.commandpower[channel.p.properties._id] = cp[channel.p.properties._id]
+    } else {
+      tempSender = settings.loadUser(data.token.user_id, {commandpower: cp});
+    }
+
     return {
       content: message,
       sender: tempSender,
