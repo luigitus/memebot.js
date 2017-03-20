@@ -280,10 +280,23 @@ module.exports = {
       if(typeof token === 'undefined') {
         token = req.query.oauth_token;
       }
+      var channelid = req.query.channelid;
+      var channel = settings.getChannelByID(channelid);
+      var commandid = req.query.commandid;
       obj.checkTwitchLogin(token, req.query.channelid,
       req.query.channelid, function(status, data) {
         if(status) {
-          res.send({data : {}, links: {}});
+          if(channel == null) { res.send({status: 404, message: 'Channel Not Found'}); } else {
+            var message = obj.createWebMessage([
+              '!command',
+              'remove',
+              commandid
+            ], channel, function(message) {
+              res.send({status: 200, data : message, links: {}});
+            });
+
+            channel.message(message);
+          }
         } else {
           res.send({status: 401, message: 'Unauthorized'});
         }
@@ -296,10 +309,24 @@ module.exports = {
       if(typeof token === 'undefined') {
         token = req.query.oauth_token;
       }
+      var channelid = req.query.channelid;
+      var channel = settings.getChannelByID(channelid);
+      var name = req.query.name;
+      var output = req.query.output;
       obj.checkTwitchLogin(token, req.query.channelid,
       req.query.channelid, function(status, data) {
         if(status) {
-          res.send({data : {}, links: {}});
+          if(channel == null) { res.send({status: 404, message: 'Channel Not Found'}); } else {
+            var message = obj.createWebMessage([
+              '!command',
+              'add',
+              name,
+              output,
+            ], channel, function(message) {
+              res.send({status: 200, data : message, links: {}});
+            });
+            channel.message(message);
+          }
         } else {
           res.send({status: 401, message: 'Unauthorized'});
         }
@@ -312,10 +339,74 @@ module.exports = {
       if(typeof token === 'undefined') {
         token = req.query.oauth_token;
       }
+      var channelid = req.query.channelid;
+      var channel = settings.getChannelByID(channelid);
+      var commandid = req.query.commandid;
+      var option = req.query.option;
+      var newvalue = req.query.newvalue;
+      var editoption = req.query.editoption;
       obj.checkTwitchLogin(token, req.query.channelid,
       req.query.channelid, function(status, data) {
         if(status) {
-          res.send({data : {}, links: {}});
+          if(channel == null) { res.send({status: 404, message: 'Channel Not Found'}); } else {
+            var payload = [
+              '!command',
+              'edit',
+              commandid,
+              option,
+            ];
+            if(option == 'output' || option == 'name' || option == 'types') {
+              payload.push(editoption);
+            }
+
+            payload.push(newvalue);
+
+            var message = obj.createWebMessage(payload, channel, function(message) {
+              res.send({status: 200, data : message, links: {}});
+            });
+            channel.message(message);
+          }
+        } else {
+          res.send({status: 401, message: 'Unauthorized'});
+        }
+      });
+    });
+
+    app.get('/api/v1/listcall', function(req, res) {
+      res.setHeader('Content-Type', 'application/json');
+      var token = req.headers['Authorization']
+      if(typeof token === 'undefined') {
+        token = req.query.oauth_token;
+      }
+      var channelid = req.query.channelid;
+      var channel = settings.getChannelByID(channelid);
+      var commandid = req.query.commandid;
+      var option = req.query.option;
+      var newvalue = req.query.newvalue;
+      var listid = req.query.listid;
+      var command = settings.getCommandByID(commandid);
+      obj.checkTwitchLogin(token, req.query.channelid,
+      req.query.channelid, function(status, data) {
+        if(status) {
+          if(command == null) { res.send({status: 404, message: 'Command Not Found'}); }
+          else if(channel == null) { res.send({status: 404, message: 'Channel Not Found'}); } else {
+            var payload = [
+              command.p.properties.name[0],
+              option,
+            ];
+
+            if(option == 'edit' || option == 'remove' || option == 'approve' || option == 'deny') {
+              payload.push(listid);
+            }
+            payload.push(newvalue);
+
+            var message = obj.createWebMessage(payload, channel, function(message) {
+              if(!res.headersSent) {
+                res.send({status: 200, data : message, links: {}});
+              }
+            });
+            channel.message(message);
+          }
         } else {
           res.send({status: 401, message: 'Unauthorized'});
         }
@@ -328,10 +419,31 @@ module.exports = {
       if(typeof token === 'undefined') {
         token = req.query.oauth_token;
       }
+      var channelid = req.query.channelid;
+      var channel = settings.getChannelByID(channelid);
+      var option = req.query.option;
+      var newvalue = req.query.newvalue;
+      var editoption = req.query.editoption;
       obj.checkTwitchLogin(token, req.query.channelid,
       req.query.channelid, function(status, data) {
         if(status) {
-          res.send({data : {}, links: {}});
+          if(channel == null) { res.send({status: 404, message: 'Channel Not Found'}); } else {
+            var payload = [
+              '!channel',
+              'edit',
+              option,
+            ];
+            if(option == 'undefined') {
+              payload.push(editoption);
+            }
+
+            payload.push(newvalue);
+
+            var message = obj.createWebMessage(payload, channel, function(message) {
+              res.send({status: 200, data : message, links: {}});
+            });
+            channel.message(message);
+          }
         } else {
           res.send({status: 401, message: 'Unauthorized'});
         }
@@ -341,13 +453,36 @@ module.exports = {
     app.get('/api/v1/edituser', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
       var token = req.headers['Authorization']
-      if(typeof token === 'undefined') {
+      if(typeof token === 'autoGreetMessage') {
         token = req.query.oauth_token;
       }
+      var channelid = req.query.channelid;
+      var channel = settings.getChannelByID(channelid);
+      var option = req.query.option;
+      var newvalue = req.query.newvalue;
+      var editoption = req.query.editoption;
+      var userid = req.query.userid;
       obj.checkTwitchLogin(token, req.query.channelid,
       req.query.channelid, function(status, data) {
         if(status) {
-          res.send({data : {}, links: {}});
+          if(channel == null) { res.send({status: 404, message: 'Channel Not Found'}); } else {
+            var payload = [
+              '!user',
+              'edit',
+              userid,
+              option,
+            ];
+            if(option == 'undefined') {
+              payload.push(editoption);
+            }
+
+            payload.push(newvalue);
+
+            var message = obj.createWebMessage(payload, channel, function(message) {
+              res.send({status: 200, data : message, links: {}});
+            });
+            channel.message(message);
+          }
         } else {
           res.send({status: 401, message: 'Unauthorized'});
         }
@@ -386,5 +521,22 @@ module.exports = {
         return;
       }
     });
+  },
+
+  createWebMessage(message, channel, callback) {
+    var user = require('./user');
+    var cp = {};
+    cp[channel.p.properties._id] = 50;
+    var tempSender = new user.User('#web#', {commandpower: cp});
+    return {
+      content: message,
+      sender: tempSender,
+      type: undefined,
+      channelName: undefined,
+      id: undefined,
+      tags: [],
+      service: 'webui',
+      other: callback
+    };
   }
 }

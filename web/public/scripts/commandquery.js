@@ -1,6 +1,11 @@
 $(document).ready(function() {
   var channelid = getParameterByName('channelid');
-  var cookie = JSON.parse(getCookieByName('login', document.cookie)); // get channel id saved in cookie
+  var cookie = {};
+  try {
+    cookie = JSON.parse(getCookieByName('login', document.cookie)); // get channel id saved in cookie
+  } catch(err) {
+    console.log(err);
+  }
   var page = getParameterByName('page');
 
   // add new command button is id is 0

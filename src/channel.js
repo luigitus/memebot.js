@@ -125,9 +125,11 @@ Channel.prototype = {
 
     if(message.service == 'discord') {
       callback = this.discordCommandCallback;
+    } else if(message.service == 'webui') {
+      callback = this.webCallback;
     }
     // parse commands here and add them to the queue
-    if((message.type == 'PRIVMSG' && message.service == 'twitch') || (message.service == 'discord')) {
+    if((message.type == 'PRIVMSG' && message.service == 'twitch') || (message.service == 'discord') || message.service == 'webui') {
       // apply automod filter if required
       if(this.p.properties.automod) {
         automod.executeFilter(message, this);
@@ -222,6 +224,15 @@ Channel.prototype = {
         log.log(err);
       }
     }
+  },
+
+  webCallback: function(messages, channel, sender, command, data, other) {
+    var text = require('./text.js');
+
+    for(message in messages) {
+      messages[message] = text.formatText(messages[message], false, channel, sender, command, data)
+    }
+    other(messages);
   },
 
   disconnect: function() {
