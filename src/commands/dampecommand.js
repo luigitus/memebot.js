@@ -45,7 +45,7 @@ DampeCommand.prototype = {
         sender.receivePoints(channel.p.properties._id, amount * 2)
         return [sprintf('{sender}: Dampé found a lot of cash! He doubled your bet!')]
       } else if(roll < 499) {
-        sender.receivePoints(channel.p.properties._id, (amount / 2) * -1)
+        sender.receivePoints(channel.p.properties._id, (amount / 2))
         this.p.p.properties.jackpot = this.p.p.properties.jackpot + (amount / 2);
         return [sprintf('{sender}: Dampé stole half of your bet and burnt you with his flame! What a dingus!')]
       } else if(roll < 995) {

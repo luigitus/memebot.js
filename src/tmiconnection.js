@@ -163,18 +163,7 @@ ConnectionHandler.prototype = {
         } else {
           senderObject.p.properties.commandpower[settings.getChannelByName(channel).p.properties._id] = settings.commandPower.user;
         }
-
-        // global mods/admins
-        for(var i in settings.gs.moderators) {
-          if(settings.gs.moderators[i] == senderObject.p.properties.username) {
-            senderObject.p.properties.commandpower[settings.getChannelByName(channel).p.properties._id] = settings.commandPower.moderator;
-          }
-        }
-        for(var i in settings.gs.admins) {
-          if(settings.gs.admins[i] == senderObject.p.properties.username) {
-            senderObject.p.properties.commandpower[settings.getChannelByName(channel).p.properties._id] = settings.commandPower.admin;
-          }
-        }
+        settings.setAdminPower(senderObject, settings.getChannelByName(channel).p.properties._id);
       }
 
 

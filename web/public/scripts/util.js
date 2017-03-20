@@ -43,6 +43,23 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function checkAuth(callback) {
+  var cookie = {};
+  if(getCookieByName('login', document.cookie)) {
+    cookie = JSON.parse(getCookieByName('login', document.cookie));
+  }
+  $.getJSON('api/v1/checkauth?oauth_token=' + cookie.access_token, function(data) {
+    callback(data);
+  })
+}
+
+function checkCommandPower(cp, neededcp) {
+  if(typeof cp == 'undefined') {
+    cp = 0;
+  }
+  return cp >= neededcp;
+}
+
 // memes
 window.onkeyup = function(e) {
    var key = e.keyCode ? e.keyCode : e.which;

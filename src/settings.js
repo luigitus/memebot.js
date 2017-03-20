@@ -268,6 +268,39 @@ module.exports = {
     return usr;
   },
 
+  setAdminPower(senderObject, channelid) {
+    // global mods/admins
+    for(var i in this.gs.moderators) {
+      if(this.gs.moderators[i] == senderObject.p.properties.username) {
+        senderObject.p.properties.commandpower[channelid] = this.commandPower.moderator;
+      }
+    }
+    for(var i in this.gs.admins) {
+      if(this.gs.admins[i] == senderObject.p.properties.username) {
+        senderObject.p.properties.commandpower[channelid] = this.commandPower.admin;
+      }
+    }
+  },
+
+  isModerator(id) {
+    for(var i in this.gs.moderators) {
+      if(this.gs.moderators[i] == id) {
+        return true;
+      }
+    }
+    return false;
+  },
+
+  isAdmin(id) {
+    for(var i in this.gs.admins) {
+      if(this.gs.admins[i] == id) {
+        return true;
+      }
+    }
+
+    return false;
+  },
+
   saveAll: function() {
     for(var key in module.exports.commands) {
       module.exports.commands[key].p.save();

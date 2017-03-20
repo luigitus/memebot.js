@@ -174,13 +174,9 @@ Channel.prototype = {
       if(wChannel == this.p.properties.channel.replace('#', '')) {
         // make sure commadn power is 0 unless it's a botadmin
         if(message.sender.p.isLoaded) {
-          message.sender.p.properties.commandpower[this.p.properties._id] = 0;
+          message.sender.p.properties.commandpower[this.p.properties._id] = settings.commandPower.user;
           // global mods/admins
-          for(var i in settings.gs.admins) {
-            if(settings.gs.admins[i] == message.sender.p.properties.username) {
-              message.sender.p.properties.commandpower[this.p.properties._id] = settings.commandPower.admin;
-            }
-          }
+          settings.setAdminPower(message.sender, this.p.properties._id);
         }
 
 

@@ -9,6 +9,7 @@ var twitchapi = require('./twitchapi.js');
 var querystring = require('querystring');
 var bodyParser = require('body-parser');
 var oauthserver = require('oauth2-server');
+var RateLimit = require('express-rate-limit');
 
 module.exports = {
   emitWSEvent: function(eventtype, eventdata) {
@@ -30,12 +31,17 @@ module.exports = {
       });
     });
 
-
+    var limiter = new RateLimit({
+      windowMs: 15*60*1000, // 15 minutes
+      max: 1000, // limit each IP to 1000 requests per windowMs
+      delayMs: 0 // disable delaying - full speed until the max limit is reached
+    });
     // deliver website
 	  app.use(express.static('./web/public'));
     app.use(cookieParser()); // use this apps cookies like this JSON.parse(req.cookies.login);
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
+    app.use(limiter);
 
     // oauth might be used in the future
     app.oauth = oauthserver({
@@ -125,6 +131,10 @@ module.exports = {
       res.sendfile('./web/public/logout.html');
     });
 
+    app.get('/admin', function (req, res) {
+      res.sendfile('./web/public/admin.html');
+    });
+
     // api calls are implemented here
 
     app.get('/api/v1/info', function(req, res) {
@@ -133,6 +143,21 @@ module.exports = {
       redirecturl: settings.gs.url + settings.gs.redirecturl, baseurl: settings.gs.url,
       scopes: settings.gs.scope
       }, links : {}});
+    });
+
+    app.get('/api/v1/checkauth', function(req, res) {
+      res.setHeader('Content-Type', 'application/json');
+      var token = req.headers['Authorization']
+      if(typeof token === 'undefined') {
+        token = req.query.oauth_token;
+      }
+      obj.checkTwitchLogin(token, req.query.channelid, function(status, data, cp) {
+        if(status) {
+          res.send({status: 200, message: 'Authorized', commandpower: cp})
+        } else {
+          res.send({status: 401, message: 'Unauthorized'});
+        }
+      });
     });
 
     app.get('/api/v1/automod', function(req, res) {
@@ -527,16 +552,16 @@ module.exports = {
         return;
       }
 
-      if(settings.gs.admins.indexOf(data.token.user_name.toLowerCase()) != -1) {
+      if(settings.isAdmin(data.token.user_name.toLowerCase())) {
         log.log('Permitting login for admin ' + data.token.user_name);
-        callback(true, data, 100);
+        callback(true, data, settings.commandPower.admin);
         return;
       }
       if(data.token.user_id == channelid && data.token.valid) {
-        callback(true, data, 50);
+        callback(true, data, settings.commandPower.broadcaster);
         return;
       } else {
-        callback(true, data, 0);
+        callback(true, data, settings.commandPower.user);
         return;
       }
     });
@@ -547,12 +572,12 @@ module.exports = {
     var user = require('./user');
 
     var cp = {};
-    cp[channel.p.properties._id] = 0;
+    cp[channel.p.properties._id] = settings.commandPower.user;
     if(data.token.user_id == channel.p.properties._id) {
-      cp[channel.p.properties._id] = 50;
+      cp[channel.p.properties._id] = settings.commandPower.broadcaster;
     }
-    if(settings.gs.admins.indexOf(data.token.user_name.toLowerCase()) != -1) {
-      cp[channel.p.properties._id] = 100;
+    if(settings.isAdmin(data.token.user_name.toLowerCase())) {
+      cp[channel.p.properties._id] = settings.commandPower.Admin;
     }
 
     var tempSender = settings.getUserByID(data.token.user_id);
