@@ -15,12 +15,16 @@ a {
 a:visited {
     color: #E5DFC5;
 }
+table {
+  border-collapse: collapse;
+	table-layout: fixed;
+}
 
-td {
-	border: 1px solid;
-	display: table-cell;
-	word-wrap: auto;
-	page-break-inside:auto;
+td, th {
+  border: 1px solid #999;
+  padding: 0.5rem;
+  text-align: left;
+	word-wrap:break-word;
 }
 header, footer {
 	border: 0.1em solid #040404;
@@ -98,15 +102,15 @@ input {
 
 .remove_button {
 	height: 2.5em;
-  background: #d9344f;
-  background-image: -webkit-linear-gradient(top, #d9344f, #b82b63);
-  background-image: -moz-linear-gradient(top, #d9344f, #b82b63);
-  background-image: -ms-linear-gradient(top, #d9344f, #b82b63);
-  background-image: -o-linear-gradient(top, #d9344f, #b82b63);
-  background-image: linear-gradient(to bottom, #d9344f, #b82b63);
+  background: #E46A6B;
+  background-image: -webkit-linear-gradient(top, #E46A6B, #E46A6B);
+  background-image: -moz-linear-gradient(top, #E46A6B, #E46A6B);
+  background-image: -ms-linear-gradient(top, #E46A6B, #E46A6B);
+  background-image: -o-linear-gradient(top, #E46A6B, #E46A6B);
+  background-image: linear-gradient(to bottom, #E46A6B, #E46A6B);
   -webkit-border-radius: 16;
   -moz-border-radius: 16;
-  border-radius: 28px;
+  border-radius: 10px;
   color: #ffffff;
   font-size: 15px;
   padding: 10px 20px 10px 20px;

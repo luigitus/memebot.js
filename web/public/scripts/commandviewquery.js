@@ -18,6 +18,7 @@ function commandviewquery() {
 
   getAppInfo(function(data, appinfo) {
     $.getJSON("api/v1/command?id=" + encodeURIComponent(commandid), function(data) {
+      channelid = data.data.ownerChannelID;
       checkAuth(function(data2) {
         authResponse = data2;
         parseQueryData(data);

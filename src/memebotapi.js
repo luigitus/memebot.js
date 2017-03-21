@@ -551,27 +551,42 @@ module.exports = {
     //var cookiejson = JSON.parse(req.cookies.login);
     twitchapi.TwitchAPI.getInfoFromOauth(oauth, function(data) {
       data = JSON.parse(data);
-      if(data.status >= 400 || !data.token.valid) {
-        callback(false, data, -1);
-        return;
-      }
+      twitchapi.TwitchAPI.getUserInfromationForChannel(channelid, data.token.user_id, function(channelid, userid, userdata) {
+        if(typeof userdata.badges === 'undefined') {
+          userdata.badges = [{id: ''}];
+        }
+        if(typeof userdata.badges[0] === 'undefined') {
+          userdata.badges[0] = {id: ''};
+        }
 
-      if(settings.isAdmin(data.token.user_name.toLowerCase()) && data.token.valid) {
-        log.log('Permitting login for admin ' + data.token.user_name);
-        callback(true, data, settings.commandPower.admin);
-        return;
-      }
+        data.userinformation = userdata;
 
-      if(data.token.user_id == channelid && data.token.valid) {
-        callback(true, data, settings.commandPower.broadcaster);
-        return;
-      } else if(data.token.valid) {
-        callback(true, data, settings.commandPower.user);
-        return;
-      } else {
+        if(data.status >= 400 || !data.token.valid) {
+          callback(false, data, -1);
+          return;
+        }
+        if(settings.isAdmin(data.token.user_name.toLowerCase()) && data.token.valid) {
+          log.log('Permitting login for admin ' + data.token.user_name);
+          callback(true, data, settings.commandPower.admin);
+          return;
+        }
+        
+        if(data.token.user_id == channelid && data.token.valid) {
+          callback(true, data, settings.commandPower.broadcaster);
+          return;
+        } else if(data.token.valid && data.userinformation.badges[0].id == 'moderator') {
+          callback(true, data, settings.commandPower.mod);
+          return;
+        } else if(data.token.valid) {
+          callback(true, data, settings.commandPower.user);
+          return;
+        } else {
+          callback(false, data, -1);
+          return;
+        }
+
         callback(false, data, -1);
-        return;
-      }
+      });
     });
   },
 
@@ -581,10 +596,13 @@ module.exports = {
 
     var cp = {};
     cp[channel.p.properties._id] = settings.commandPower.user;
-    if(data.token.user_id == channel.p.properties._id) {
+    if(data.token.valid && data.userinformation.badges[0].id == 'moderator') {
+      cp[channel.p.properties._id] = settings.commandPower.mod;
+    }
+    if(data.token.user_id == channel.p.properties._id && data.token.valid) {
       cp[channel.p.properties._id] = settings.commandPower.broadcaster;
     }
-    if(settings.isAdmin(data.token.user_name.toLowerCase())) {
+    if(settings.isAdmin(data.token.user_name.toLowerCase()) && data.token.valid) {
       cp[channel.p.properties._id] = settings.commandPower.admin;
     }
 

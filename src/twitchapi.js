@@ -195,6 +195,33 @@ TwitchAPI.makeChannelRequest = function(id, callback) {
   req.end();
 }
 
+TwitchAPI.getUserInfromationForChannel = function(channelid, userid, callback) {
+  var options = {
+    host: 'api.twitch.tv',
+    path: '/kraken/users/' + userid + '/chat/channels/' + channelid + '?api_version=5',
+    method: 'GET',
+    headers: {'Content-Type' : 'application/json',
+    'Client-ID' : settings.gs.clientid,
+    'Accept' : 'application/vnd.twitchtv.v5+json'
+    },
+    json: true
+  };
+  var req = https.request(options, function(res) {
+    res.setEncoding('utf8');
+    res.on('data', function(data) {
+        try {
+          callback(channelid, userid, JSON.parse(data));
+        } catch(err) {
+          log.log(err + ' ' + data);
+        }
+      });
+      res.on('error', function(err) {
+        log.log(err);
+      });
+  });
+  req.end();
+}
+
 TwitchAPI.streamsCallback = function(id, data) {
   if(data._total == 0) {
     var channel = settings.getChannelByID(id);
