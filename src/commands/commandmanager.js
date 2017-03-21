@@ -153,7 +153,7 @@ CommandManager.prototype = {
       }
 
       var constantSettings = ['channelID', 'timesExecuted', 'ownerChannelID', 'channelID', '_id',
-      'pointsperupdate'];
+      'pointsperupdate', 'createdAt', 'updatedAt'];
       if(constantSettings.indexOf(data[3]) != -1) {
         return ['{sender}: You cannot edit this setting!'];
       }
@@ -311,6 +311,18 @@ CommandManager.prototype = {
               cmd.p.properties.types.push(data[5]);
               cmd.scripts.push(new cr[data[5]](cmd));
               return ['{sender}: Type added!'];
+            }
+          } else if(option == 'edit') {
+            var id = parseInt(data[5]);
+            if(isNaN(id)) {
+              return ['{sender}: Please specify a valid id!'];
+            }
+            if(!(data[6] in cr)) {
+              return ['{sender}: This command type does not exist!'];
+            } else {
+              cmd.p.properties.types[id] = data[6];
+              cmd.scripts[id] = new cr[data[6]](cmd);
+              return ['{sender}: Type edited!'];
             }
           } else if(option == 'remove') {
             if(cmd.p.properties.types.length == 1) {

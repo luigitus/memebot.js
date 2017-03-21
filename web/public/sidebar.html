@@ -18,7 +18,6 @@ $(document).ready(function() {
   });
 
   checkAuth(function(data) {
-    console.log(data);
     if(checkCommandPower(data.commandpower, 100)) {
       $('#sb').append(
           '<a href="./admin">Admin Controll Panel</a></br>'

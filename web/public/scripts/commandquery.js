@@ -1,4 +1,16 @@
+var authResponse = {};
+
 $(document).ready(function() {
+  checkAuth(function(data) {
+    authResponse = data;
+    commandquery();
+  }, getParameterByName('channelid'));
+});
+
+function commandquery() {
+  $('#clist').empty();
+  $('#status').empty();
+  $('#addcommand').remove();
   var channelid = getParameterByName('channelid');
   var cookie = {};
   try {
@@ -9,38 +21,45 @@ $(document).ready(function() {
   var page = getParameterByName('page');
 
   // add new command button is id is 0
-  if(cookie._id == channelid) {
-    $('#container').append(
-      '<a href="./newcommand"><h4>New Command</h4></a>'
-    );
+  if(checkCommandPower(authResponse.commandpower, 25)) {
+    $('#status').append(
+      '<input class="remove_button" id=addcommand type="button" value="New Command" onclick="newCommandPromt();" />'
+    ).append('</br>');
+  }
+  if(checkCommandPower(authResponse.commandpower, 25)) {
+    $('#clist').append($('<tr></tr>').append('<td>Command Name</td>').append('<td>Remove Command</td>'));
+  } else {
+    $('#clist').append($('<tr></tr>').append('<td>Command Name</td>'));
   }
 
   if(page == 0) {
     $.getJSON("api/v1/commandlist?page=" + encodeURIComponent(page) + "&channelid=" + encodeURIComponent('#internal#'), function(data) {
       $.each(data.data, function(key, val) {
-        $('#clist').append(
-            $('<li></li>').append(
+        $('#clist').append('<tr></tr>').append(
+            $('<td></td>').append(
               '<a href=./commandview?commandid=' + val._id + '>' + val.name[0] + '</a>'
             )
         );
+        if(checkCommandPower(authResponse.commandpower, 25)) {
+          $('#clist').append($('<td></td>')
+          .append('This Command Cannot Be Removed'));
+        }
       });
     });
   }
+
   $.getJSON("api/v1/commandlist?page=" + encodeURIComponent(page) + "&channelid=" + encodeURIComponent(channelid), function(data) {
     $.each(data.data, function(key, val) {
-      if(cookie._id == channelid) {
-        $('#clist').append(
-            $('<li></li>').append(
-              '<a href=./commandview?commandid=' + val._id + '>' + val.name[0] + '</a>'
-            ).append('  <input class="remove_button" id="' + val._id + '" type="button" value="Remove" onclick="removeCommandButton();" />')
-        );
-      } else {
-        $('#clist').append(
-            $('<li></li>').append(
-              '<a href=./commandview?commandid=' + val._id + '>' + val.name[0] + '</a>'
-            )
-        );
+
+      $('#clist').append('<tr></tr>').append(
+          $('<td></td>').append(
+            '<a href=./commandview?commandid=' + val._id + '>' + val.name[0] + '</a>'
+          )
+      );
+      if(checkCommandPower(authResponse.commandpower, 25)) {
+        $('#clist').append($('<td></td>')
+        .append('<input class="remove_button" id="' + val._id + '" type="button" value="Remove" onclick="removeCommandPopup(this.id);" />'));
       }
     });
   });
-});
+}

@@ -393,7 +393,8 @@ module.exports = {
       var commandid = req.query.commandid;
       var option = req.query.option;
       var newvalue = req.query.newvalue;
-      var editoption = req.query.editoption;
+      var editoption = decodeURIComponent(req.query.editoption);
+      var optionid = req.query.optionid;
       obj.checkTwitchLogin(token, req.query.channelid, function(status, data, cp) {
         if(status) {
           if(channel == null) { res.send({status: 404, message: 'Channel Not Found'}); } else {
@@ -405,6 +406,9 @@ module.exports = {
             ];
             if(option == 'output' || option == 'name' || option == 'types' || option == 'helptext') {
               payload.push(editoption);
+              if(editoption == 'edit' || editoption == 'remove') {
+                payload.push(optionid);
+              }
             }
 
             payload.push(newvalue);
@@ -548,20 +552,24 @@ module.exports = {
     twitchapi.TwitchAPI.getInfoFromOauth(oauth, function(data) {
       data = JSON.parse(data);
       if(data.status >= 400 || !data.token.valid) {
-        callback(false, data);
+        callback(false, data, -1);
         return;
       }
 
-      if(settings.isAdmin(data.token.user_name.toLowerCase())) {
+      if(settings.isAdmin(data.token.user_name.toLowerCase()) && data.token.valid) {
         log.log('Permitting login for admin ' + data.token.user_name);
         callback(true, data, settings.commandPower.admin);
         return;
       }
+
       if(data.token.user_id == channelid && data.token.valid) {
         callback(true, data, settings.commandPower.broadcaster);
         return;
-      } else {
+      } else if(data.token.valid) {
         callback(true, data, settings.commandPower.user);
+        return;
+      } else {
+        callback(false, data, -1);
         return;
       }
     });
@@ -577,7 +585,7 @@ module.exports = {
       cp[channel.p.properties._id] = settings.commandPower.broadcaster;
     }
     if(settings.isAdmin(data.token.user_name.toLowerCase())) {
-      cp[channel.p.properties._id] = settings.commandPower.Admin;
+      cp[channel.p.properties._id] = settings.commandPower.admin;
     }
 
     var tempSender = settings.getUserByID(data.token.user_id);

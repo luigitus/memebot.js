@@ -5,9 +5,13 @@ module.exports = {
   local: {},
 
   replaceAll: function(input, toReplace, data) {
+    if(typeof input === 'undefined') {
+      input = '';
+    }
     var formatted = input;
     // counter just in case
     var counter = 0;
+
     while(input.search(toReplace) != -1) {
       formatted = formatted.replace(toReplace, data);
       if(counter > 50) {

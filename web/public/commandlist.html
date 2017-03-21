@@ -13,8 +13,11 @@
     <body>
       <div id="header"></div> <script type="text/javascript"> $("#header").load("./header.html");</script>
         <div id="container" class="content">
-          <ul id="clist">
-          </ul>
+          <p id="status"> </p>
+          <table style="height: 189px; width: 596px;" id = 'clist'>
+          </table>
+
+          </br></br>
           <script>
             var page = parseInt(getParameterByName('page'));
             var channelid = getParameterByName('channelid');
