@@ -1,5 +1,5 @@
 {
-  "text" : "This is an example post",
+  "text" : ["This is an example"],
   "title" : "SampleTitle_",
-  "time" : "3/22/2017"
+  "time" : "3/22/2017 08:01 AM CEST"
 }

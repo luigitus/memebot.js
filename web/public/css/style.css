@@ -26,6 +26,9 @@ td, th {
   text-align: left;
 	word-wrap:break-word;
 }
+li {
+	margin: 2em;
+}
 header, footer {
 	border: 0.1em solid #040404;
 
@@ -76,13 +79,17 @@ input {
 	border-radius: 1em;
 	border: 0.1em solid #040404;
 	position:fixed;
-	height:7em;
-	width:11em;
+	max-height:100%;
+	max-width:15em;
+	width: auto;
+	height: auto;
 	top:10;
 	left:0;
 	background:#E46A6B;
-	padding-top: 2em;
+	padding-top: 1em;
 	padding-left: 1em;
+	padding-right: 1em;
+	padding-bottom: 1em;
 	overflow: auto;
 }
 .content, .sidebar {
@@ -126,4 +133,22 @@ input {
   background-image: -o-linear-gradient(top, #fc3c3c, #d93434);
   background-image: linear-gradient(to bottom, #fc3c3c, #d93434);
   text-decoration: none;
+}
+
+.login_button {
+	position:auto;
+	max-width: 7.5em;
+	max-height: 3em;
+	background-color: transparent;
+	width: auto;
+	height: auto;
+}
+
+#channelimg {
+	position:auto;
+	max-width: 7.5em;
+	max-height: 3em;
+	background-color: transparent;
+	width: auto;
+	height: auto;
 }

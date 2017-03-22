@@ -7,12 +7,17 @@ $(document).ready(function() {
 
     if(typeof getCookieByName('login', document.cookie) === 'undefined') {
       $('#sb').append(
-          '<a href="' + twitchurl + '">Log in with Twitch</a></br>'
+          '<a href="' + twitchurl + '">' +
+          '<img class="login_button" border="0" alt="Log in with Twitch"'
+          + '" src="./images/private/login_with_twitch_button.png"></a></br>'
       );
     } else {
       var cookie = JSON.parse(getCookieByName('login', document.cookie));
       $('#sb').append(
-          '<a href="./logout">' + cookie.username + ': Logout</a></br>'
+          '<a href="./logout">' +
+          '<img class="login_button" border="0" alt="' + cookie.username + ': Logout'
+          + '" src="./images/private/logout_of_twitch_button.png">' +
+          '</a></br>'
       );
     }
   });
@@ -20,7 +25,7 @@ $(document).ready(function() {
   checkAuth(function(data) {
     if(checkCommandPower(data.commandpower, 100)) {
       $('#sb').append(
-          '<a href="./admin">Admin Controll Panel</a></br>'
+          '<a href="./admin">Admin Control Panel</a></br>'
       );
     }
   });

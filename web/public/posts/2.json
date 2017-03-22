@@ -1,5 +1,5 @@
 {
-  "text" : "This is another sample",
+  "text" : ["This is another sample", "With 2 lines!"],
   "title" : "TitlePerson",
   "time" : "3/22/2017"
 }

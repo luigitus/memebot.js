@@ -11,6 +11,15 @@ function commandquery() {
   $('#clist').empty();
   $('#status').empty();
   $('#addcommand').remove();
+
+  $.getJSON('api/v1/getchannel?channelid=' + getParameterByName('channelid'), function(cd) {
+    $('#status').append(
+      '<img id=channelimg src=' + cd.logo + '>'
+    ).append(
+      '<figcaption>' + cd.name + '</figcaption>' 
+    )
+  });
+
   var channelid = getParameterByName('channelid');
   var cookie = {};
   try {

@@ -112,7 +112,12 @@ module.exports = {
           log.log(data);
           res.sendfile('./web/public/authenticated.html');
         }
-        var jsondata = JSON.parse(data);
+        try {
+          var jsondata = JSON.parse(data);
+        } catch(err) {
+          res.send('500: Internal Server Error');
+          return;
+        }
         twitchapi.TwitchAPI.getInfoFromOauth(jsondata.access_token, function(channeldata) {
           var jsonChannelData = JSON.parse(channeldata);
           if(!jsonChannelData.token.valid) {
@@ -166,6 +171,15 @@ module.exports = {
       res.sendfile('./web/public/data/automod.json');
     });
 
+    // just a twitch api passthrough
+    app.get('/api/v1/getchannel', function(req, res) {
+      res.setHeader('Content-Type', 'application/json');
+      var channelid = req.query.channelid;
+      twitchapi.TwitchAPI.makeChannelRequest(channelid, function(id, data) {
+        res.send(data);
+      });
+    });
+
     app.get('/api/v1/blog', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
 
@@ -182,9 +196,9 @@ module.exports = {
       var resData = [];
       var sortedObj = dirList.sort(
       function(a, b) {
-        a > b ? 1 : -1;
+        return parseInt(b) - parseInt(a);
       });
-      sortedObj = sortedObj.reverse();
+      //sortedObj = sortedObj.reverse();
 
       for(var j in sortedObj) {
         var i = sortedObj[j];

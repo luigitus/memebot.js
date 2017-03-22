@@ -13,8 +13,10 @@
       $(document).ready(function() {
         getBlog(function(data) {
           for(var i in data.data) {
-            $('#blog').append('<p></p>').append('<h2>' + data.data[i].title + '</h2>')
-            .append('<p>' + data.data[i].text + '</p>');
+            $('#blog').append('<p></p>').append('<h2>' + data.data[i].title + '</h2>');
+            for(var j in data.data[i].text) {
+              $('#blog').append('<p>' + data.data[i].text[j] + '</p>');
+            }
           }
         })
       });
