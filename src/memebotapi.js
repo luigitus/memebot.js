@@ -10,6 +10,7 @@ var querystring = require('querystring');
 var bodyParser = require('body-parser');
 var oauthserver = require('oauth2-server');
 var RateLimit = require('express-rate-limit');
+var fs = require('fs');
 
 module.exports = {
   emitWSEvent: function(eventtype, eventdata) {
@@ -165,6 +166,38 @@ module.exports = {
       res.sendfile('./web/public/data/automod.json');
     });
 
+    app.get('/api/v1/blog', function(req, res) {
+      res.setHeader('Content-Type', 'application/json');
+
+      var page = parseInt(req.query.page);
+      if(typeof page === 'undefined' || isNaN(page)) {
+        page = 0;
+      }
+
+      var dirList = fs.readdirSync('./web/public/posts');
+
+      var startAt = page * 10;
+      var itemsPerPage = startAt + 10;
+      var counter = 0;
+      var resData = [];
+      var sortedObj = dirList.sort(
+      function(a, b) {
+        a > b ? 1 : -1;
+      });
+      sortedObj = sortedObj.reverse();
+
+      for(var j in sortedObj) {
+        var i = sortedObj[j];
+        if(counter >= startAt && counter < itemsPerPage) {
+          var fileParsed = JSON.parse(fs.readFileSync('./web/public/posts/' + i));
+          resData.push(fileParsed);
+        }
+
+        counter++;
+      }
+      res.send({total: sortedObj.length, data: resData, links : {}});
+    });
+
     app.get('/api/v1/channel', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
       var channel = settings.joinedChannels[req.query.id];
@@ -205,7 +238,7 @@ module.exports = {
 
         counter++;
       }
-      res.send({data: resData, links : {}});
+      res.send({total: sortedObj.length, data: resData, links : {}});
     });
 
     app.get('/api/v1/user', function(req, res) {
@@ -229,10 +262,7 @@ module.exports = {
       var itemsPerPage = startAt + 100;
       var counter = 0;
       var resData = [];
-      var sortedObj = Object.keys(settings.users).sort(
-      function(a, b) {
-        return settings.users[a].p.properties.username > settings.commands[b].p.properties.username ? 1 : -1;
-      });
+      var sortedObj = Object.keys(settings.users);
 
       for(var j in sortedObj) {
         var i = sortedObj[j];
@@ -246,7 +276,7 @@ module.exports = {
 
         counter++;
       }
-      res.send({data: resData, links : {}});
+      res.send({total: sortedObj.length, data: resData, links : {}});
     });
 
     app.get('/api/v1/command', function(req, res) {
@@ -273,9 +303,10 @@ module.exports = {
       var itemsPerPage = startAt + 100;
       var counter = 0;
       var resData = [];
+
       var sortedObj = Object.keys(settings.commands).sort(
       function(a, b) {
-        return settings.commands[a].p.properties.name[0] > settings.commands[b].p.properties.name[0] ? 1 : -1;
+        return settings.commands[a].p.properties.name[0].toLowerCase() > settings.commands[b].p.properties.name[0].toLowerCase() ? 1 : -1;
       });
 
       for(var j in sortedObj) {
@@ -295,7 +326,7 @@ module.exports = {
 
         counter++;
       }
-      res.send({data: resData, links : {}});
+      res.send({total: sortedObj.length, data: resData, links : {}});
     });
 
 
@@ -570,7 +601,7 @@ module.exports = {
           callback(true, data, settings.commandPower.admin);
           return;
         }
-        
+
         if(data.token.user_id == channelid && data.token.valid) {
           callback(true, data, settings.commandPower.broadcaster);
           return;

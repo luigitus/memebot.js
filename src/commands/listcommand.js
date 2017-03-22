@@ -4,12 +4,13 @@ var text = require('../text.js');
 var ListCommand = function(base) {
   // inherit prototype
   this.p = base;
+  this.p.p.setDefaults({editcommandpower: 25});
 }
 
 ListCommand.prototype = {
   execute: function(data, channel, sender) {
     if(data[1] == 'add' &&
-    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25) &&
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.p.properties.editcommandpower) &&
     this.p.p.properties.ownerChannelID == channel.p.properties._id) {
       var inputString = data.slice(2).join(' ');
       if(inputString == '' || inputString == ' ') {
@@ -20,7 +21,7 @@ ListCommand.prototype = {
         return ['{sender}: Added item!'];
       }
     } else if(data[1] == 'remove' &&
-    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25) &&
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.p.properties.editcommandpower) &&
     this.p.p.properties.ownerChannelID == channel.p.properties._id) {
       var id = parseInt(data[2]);
       if(isNaN(id) || id >= this.p.p.properties.listContent.length) {
@@ -30,7 +31,7 @@ ListCommand.prototype = {
         return ['{sender}: Removed item!'];
       }
     } else if(data[1] == 'edit' &&
-    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25) &&
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.p.properties.editcommandpower) &&
     this.p.p.properties.ownerChannelID == channel.p.properties._id) {
       var inputString = data.slice(3).join(' ');
       var id = parseInt(data[2]);
@@ -45,7 +46,7 @@ ListCommand.prototype = {
         return ['{sender}: Edited item!'];
       }
     } else if(data[1] == 'approve' &&
-    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25) &&
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.p.properties.editcommandpower) &&
     this.p.p.properties.ownerChannelID == channel.p.properties._id) {
       var id = parseInt(data[2]);
       if(isNaN(id) || id >= this.p.p.properties.suggestedList.length) {
@@ -55,7 +56,7 @@ ListCommand.prototype = {
       this.p.p.properties.suggestedList.splice(id, 1);
       return ['{sender}: Approved suggested item!'];
     } else if(data[1] == 'deny' &&
-    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25) &&
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.p.properties.editcommandpower) &&
     this.p.p.properties.ownerChannelID == channel.p.properties._id) {
       var id = parseInt(data[2]);
       if(isNaN(id) || id >= this.p.p.properties.suggestedList.length) {

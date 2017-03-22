@@ -45,9 +45,15 @@ function commandquery() {
           .append('This Command Cannot Be Removed'));
         }
       });
+      getCommandList();
     });
+  } else {
+    getCommandList();
   }
+}
 
+
+function getCommandList() {
   $.getJSON("api/v1/commandlist?page=" + encodeURIComponent(page) + "&channelid=" + encodeURIComponent(channelid), function(data) {
     $.each(data.data, function(key, val) {
 

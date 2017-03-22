@@ -35,8 +35,16 @@ function newCommandPromt() {
   });
 }
 
-function editOptionPromt(option) {
-  var newValue = prompt("Please enter new value", '');
+function editOptionPromt(option, type) {
+  var element = document.getElementById(option);
+  var newValue = '';
+  if(type == 'button') {
+    newValue = prompt("Please enter new value", '');
+  } else if(type == 'check') {
+    newValue = element.checked;
+  } else if(type == 'selector') {
+    newValue = element.value;
+  }
   if(newValue == null) {
     return;
   }

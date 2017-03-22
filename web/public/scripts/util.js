@@ -30,6 +30,14 @@ function getAppInfo(callback) {
   });
 }
 
+function getBlog(callback) {
+  var page = getParameterByName('page');
+  if(!page) {page = 0;}
+  $.getJSON("api/v1/blog?page=" + page, function(data) {
+    callback(data);
+  });
+}
+
 function sortString(a, b) {
   return (a < b) ? -1 : (a > b) ? 1 : 0;
 }

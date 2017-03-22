@@ -31,12 +31,38 @@ function parseQueryData(data) {
   $.each(data.data, function(key, val) {
     if(key != 'listContent' && key != 'suggestedList') {
       if(checkCommandPower(authResponse.commandpower, 25)) {
+        var editAction = '<input class="remove_button" id='
+        + key + ' type="button" value="Edit Item" onclick="editOptionPromt(this.id, \'button\');" />';
+        if(typeof val === 'boolean') {
+          var checked = '';
+          if(val) {
+            checked = 'checked=true';
+          }
+          editAction = '<input class="remove_button" id='
+          + key + ' type="checkbox" ' + checked + ' onclick="editOptionPromt(this.id, \'check\');" />';
+        }
+
+        if(key == 'types') {
+          function createOption(value, currentValue, text) {
+            if(value == currentValue) {
+              return '<option value="' + value + '" selected="selected">' + text + '</option>'
+            }
+            return '<option value="' + value + '">' + text + '</option>'
+          }
+          editAction = '<select id=' + key
+          + ' onChange="editOptionPromt(this.id, \'selector\');">' +
+          createOption('default', val, 'Normal Command') +
+          createOption('list', val, 'List Command') +
+          createOption('counter', val, 'Counter Command') +
+          + '</select>';
+        }
+
         $('#ccontent').append(
             $('<tr></tr>').append(
               '<td>' + key + '</td>'
             ).append('<td>' + val + '</td>')
             .append('<td>' +
-            '<input class="remove_button" id=' + key + ' type="button" value="Edit Item" onclick="editOptionPromt(this.id);" />'
+            editAction
              + '</td>')
         );
       } else {

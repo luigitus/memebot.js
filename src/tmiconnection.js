@@ -206,7 +206,7 @@ ConnectionHandler.prototype = {
   },
 
   sendMessage: function(message, channel, sender, command, data, format, whisper) {
-    if(message == '' || channel.p.properties.silent) {
+    if(message == '' || channel.p.properties.silent || typeof message === 'undefined') {
       return;
     }
 
