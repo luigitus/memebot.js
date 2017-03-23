@@ -13,6 +13,9 @@ function getParameterByName(name, url) {
 }
 
 function getCookieByName(cookiename, cookiedata) {
+  if(!cookiedata) {
+    cookiedata = document.cookie
+  }
   var cookies = cookiedata.split('; ');
   for(var call in cookies) {
     var x = cookies[call].split('=');

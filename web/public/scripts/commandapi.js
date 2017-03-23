@@ -7,8 +7,10 @@ function removeCommandPopup(commandid) {
     '&commandid=' + encodeURIComponent(commandid) + '&oauth_token=' + cookie.access_token;
 
     $.getJSON(request + payload, function(data) {
-      commandquery();
-      $('#status').append(data.data[0]);
+      //$('#status').append('<p>' + data.data[0] + '</p>');
+      $('#td1_' + commandid).empty();
+      $('#td1_' + commandid).append(data.data[0]);
+      $('#td2_' + commandid).empty();
     });
   }
 }
@@ -31,7 +33,7 @@ function newCommandPromt() {
 
   $.getJSON(request + payload, function(data) {
     commandquery();
-    $('#status').append(data.data[0]);
+    //$('#status').append(data.data[0]);
   });
 }
 
@@ -62,8 +64,8 @@ function editOptionPromt(option, type) {
   }
 
   $.getJSON(request + payload, function(data) {
-    commandviewquery();
-    $('#status').append(data.data[0]);
+    reloadItem(option, newValue);
+    //$('#status').append(data.data[0]);
   });
 }
 
@@ -83,8 +85,8 @@ function newListItemPromt() {
   + '&oauth_token=' + cookie.access_token;
 
   $.getJSON(request + payload, function(data) {
-    commandviewquery();
-    $('#status').append(data.data[0]);
+    reloadItem('list');
+    //$('#status').append(data.data[0]);
   });
 }
 
@@ -105,8 +107,8 @@ function editListItemPromt(id) {
   + '&listid=' + id;
 
   $.getJSON(request + payload, function(data) {
-    commandviewquery();
-    $('#status').append(data.data[0]);
+    reloadItem('list');
+    //$('#status').append(data.data[0]);
   });
 }
 
@@ -122,8 +124,8 @@ function removeListItemPromt(id) {
   + '&listid=' + id;
 
   $.getJSON(request + payload, function(data) {
-    commandviewquery();
-    $('#status').append(data.data[0]);
+    reloadItem('list');
+    //$('#status').append(data.data[0]);
   });
 }
 
@@ -139,8 +141,8 @@ function editSuggestedListItemPromt(id) {
   + '&listid=' + id;
 
   $.getJSON(request + payload, function(data) {
-    commandviewquery();
-    $('#status').append(data.data[0]);
+    reloadItem('list');
+    //$('#status').append(data.data[0]);
   });
 }
 
@@ -156,7 +158,7 @@ function removeSuggestedListItemPromt(id) {
   + '&listid=' + id;
 
   $.getJSON(request + payload, function(data) {
-    commandviewquery();
-    $('#status').append(data.data[0]);
+    reloadItem('list');
+    //$('#status').append(data.data[0]);
   });
 }

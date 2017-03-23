@@ -19,6 +19,9 @@ $(document).ready(function() {
           + '" src="./images/private/logout_of_twitch_button.png">' +
           '</a></br>'
       );
+      $('#sb').append(
+        '<a href=commandlist?page=0&channelid=' + JSON.parse(getCookieByName('login', document.cookie))._id + '>My Channel</a></br>'
+      );
     }
   });
 

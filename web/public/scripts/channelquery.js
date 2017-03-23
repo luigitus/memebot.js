@@ -17,12 +17,21 @@ $(document).ready(function() {
       });
 
       $.each(data.data, function(key, val) {
-        $('#clist').append(
-            $('<li id='+ key +'></li>').append(
-              '<a href=./commandlist?page=0&channelid=' + val._id + '>' +
-              '<figcaption>' + val.name.replace('#', '') + '</figcaption></a>'
-          )
-        );
+        if(val.isLive) {
+          $('#clist_live').append(
+              $('<li class=channelli id='+ key +'></li>').append(
+                '<a href=./commandlist?page=0&channelid=' + val._id + '>' +
+                '<figcaption>' + val.name.replace('#', '') + '</figcaption></a>'
+            )
+          );
+        } else {
+          $('#clist').append(
+              $('<li class=channelli id='+ key +'></li>').append(
+                '<a href=./commandlist?page=0&channelid=' + val._id + '>' +
+                '<figcaption>' + val.name.replace('#', '') + '</figcaption></a>'
+            )
+          );
+        }
       });
 
       var timer = setInterval(function() {

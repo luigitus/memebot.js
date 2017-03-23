@@ -237,6 +237,18 @@ module.exports = {
     return null;
   },
 
+  getCommandsByChannel: function(channelID) {
+    var retCommands = {};
+    for(var key in module.exports.commands) {
+      if(typeof channelID === 'undefined'
+      || module.exports.commands[key].p.properties.ownerChannelID == channelID) {
+        retCommands[key] = module.exports.commands[key]
+      }
+    }
+
+    return retCommands;
+  },
+
   checkCommandPower: function(cp, neededcp) {
     if(typeof cp == 'undefined') {
       cp = 0;

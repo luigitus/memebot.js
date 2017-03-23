@@ -42,6 +42,10 @@ function parseQueryData(data) {
           + key + ' type="checkbox" ' + checked + ' onclick="editOptionPromt(this.id, \'check\');" />';
         }
 
+        if(key == '_id' || key == 'channelID' || key == 'ownerChannelID') {
+          editAction = 'This cannot be edited!';
+        }
+
         if(key == 'types') {
           function createOption(value, currentValue, text) {
             if(value == currentValue) {
@@ -60,7 +64,7 @@ function parseQueryData(data) {
         $('#ccontent').append(
             $('<tr></tr>').append(
               '<td>' + key + '</td>'
-            ).append('<td>' + val + '</td>')
+            ).append('<td id=' + key + '_value>' + val + '</td>')
             .append('<td>' +
             editAction
              + '</td>')
@@ -81,6 +85,28 @@ function parseQueryData(data) {
     );
   }
 
+  loadListContent(data);
+}
+
+function reloadItem(key, value) {
+  var commandid = getParameterByName('commandid');
+  $.getJSON("api/v1/command?id=" + encodeURIComponent(commandid), function(data) {
+      if(key == 'list') {
+        loadListContent(data)
+      } else {
+        $('#' + key + '_value').empty();
+        if(value) {
+          $('#' + key + '_value').append(value.toString());
+        } else {
+          $('#' + key + '_value').append(data.data[key].toString());
+        }
+      }
+  });
+}
+
+function loadListContent(data) {
+  $('#clist').empty();
+  $('#sclist').empty();
   if(data.data.listContent.length != 0) {
     if(checkCommandPower(authResponse.commandpower, 25)) {
       $('#clist').append($('<tr></tr>').append(

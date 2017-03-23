@@ -5,6 +5,7 @@ var cd = require('./cooldown.js');
 var cr = require('./commandreference.js');
 var sprintf = require("sprintf-js").sprintf;
 var text = require('./text.js');
+var log = require('./mlog.js');
 
 var Command = function(id, cs, path) {
   if(typeof path === 'undefined') {
@@ -53,7 +54,12 @@ var Command = function(id, cs, path) {
   this.p.load(this.afterLoad);
 
   // update function
-  setInterval(function() {
+  var updateInterval = setInterval(function() {
+    if(obj.p.wasRemoved) {
+      log.log('Clearing update interval of command ' + obj.p.properties._id);
+      clearInterval(updateInterval);
+      return;
+    }
     obj.p.save();
   }, 60 * 1000);
 }

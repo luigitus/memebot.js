@@ -20,7 +20,7 @@ module.exports = {
   initweb: function() {
     var obj = this;
     // Websocket
-    io.sockets.on('connection', function (socket) {
+    io.sockets.on('connection', function(socket) {
 	    socket.emit('chat', {time: new Date(), text: 'You are connected to the server!'});
 	    socket.on('chat', function (data) {
 		      io.sockets.emit('chat', {time: new Date(), name: data.name || 'null', text: data.text});
@@ -30,11 +30,17 @@ module.exports = {
         if(cmd == null) {return;}
         cmd.finishedCallback(data);
       });
+      socket.on('error', function(err) {
+        log.log(err)
+      });
+    });
+    io.sockets.on('error', function(err) {
+      log.log(err);
     });
 
     var limiter = new RateLimit({
       windowMs: 15*60*1000, // 15 minutes
-      max: 1000, // limit each IP to 1000 requests per windowMs
+      max: 10000, // limit each IP to 1000 requests per windowMs
       delayMs: 0 // disable delaying - full speed until the max limit is reached
     });
     // deliver website
@@ -43,6 +49,12 @@ module.exports = {
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
     app.use(limiter);
+
+    // error handler
+    app.use(function (err, req, res, next) {
+      log.log(err.stack);
+      res.status(500).send('Internal Server Error\n' + err.stack)
+    });
 
     // oauth might be used in the future
     app.oauth = oauthserver({
@@ -112,14 +124,20 @@ module.exports = {
           log.log(data);
           res.sendfile('./web/public/authenticated.html');
         }
+        var jsondata = {};
         try {
-          var jsondata = JSON.parse(data);
+          jsondata = JSON.parse(data);
         } catch(err) {
           res.send('500: Internal Server Error');
           return;
         }
         twitchapi.TwitchAPI.getInfoFromOauth(jsondata.access_token, function(channeldata) {
-          var jsonChannelData = JSON.parse(channeldata);
+          var jsonChannelData = {};
+          try {
+            jsonChannelData = JSON.parse(channeldata);
+          } catch(err) {
+            log.log(err);
+          }
           if(!jsonChannelData.token.valid) {
             res.sendfile('./web/public/authenticated.html');
           } else {
@@ -145,7 +163,9 @@ module.exports = {
 
     app.get('/api/v1/info', function(req, res) {
       res.setHeader('Content-Type', 'application/json');
-      res.send({data: settings.build, appinfo: {clientid: settings.gs.clientid,
+      res.send({data: settings.build, appinfo: {defaultchannel: settings.gs.defaultchannel,
+      defaultchannelid: settings.gs.defaultchannelid,
+      clientid: settings.gs.clientid,
       redirecturl: settings.gs.url + settings.gs.redirecturl, baseurl: settings.gs.url,
       scopes: settings.gs.scope
       }, links : {}});
@@ -190,8 +210,13 @@ module.exports = {
 
       var dirList = fs.readdirSync('./web/public/posts');
 
-      var startAt = page * 10;
-      var itemsPerPage = startAt + 10;
+      var items = parseInt(req.query.items);
+      if(!items || items > 255) {
+        items = 10;
+      }
+
+      var startAt = parseInt(page) * items;
+      var itemsPerPage = startAt + items;
       var counter = 0;
       var resData = [];
       var sortedObj = dirList.sort(
@@ -203,7 +228,12 @@ module.exports = {
       for(var j in sortedObj) {
         var i = sortedObj[j];
         if(counter >= startAt && counter < itemsPerPage) {
-          var fileParsed = JSON.parse(fs.readFileSync('./web/public/posts/' + i));
+          var fileParsed = {};
+          try {
+            fileParsed = JSON.parse(fs.readFileSync('./web/public/posts/' + i));
+          } catch(err) {
+            log.log(err);
+          }
           resData.push(fileParsed);
         }
 
@@ -216,7 +246,12 @@ module.exports = {
       res.setHeader('Content-Type', 'application/json');
       var channel = settings.joinedChannels[req.query.id];
       if(typeof channel !== 'undefined') {
-        var datatosend = JSON.parse(JSON.stringify(channel.p.properties));
+        var datatosend = {};
+        try {
+          datatosend = JSON.parse(JSON.stringify(channel.p.properties));
+        } catch(err) {
+          log.log(err);
+        }
         datatosend.botoauth = null;
         res.send({data: datatosend, links : {}});
       } else {
@@ -231,8 +266,13 @@ module.exports = {
       if(typeof page === 'undefined' || isNaN(page)) {
         page = 0;
       }
-      var startAt = page * 100;
-      var itemsPerPage = startAt + 100;
+      var items = parseInt(req.query.items);
+      if(!items || items > 255) {
+        items = 100;
+      }
+
+      var startAt = parseInt(page) * items;
+      var itemsPerPage = startAt + items;
       var counter = 0;
       var resData = [];
       var sortedObj = Object.keys(settings.joinedChannels).sort(
@@ -247,6 +287,7 @@ module.exports = {
           settings.joinedChannels[i].p.properties._id},
           name : settings.joinedChannels[i].p.properties.channel,
           _id : settings.joinedChannels[i].p.properties._id,
+          isLive : settings.joinedChannels[i].p.properties.isLive,
           });
         }
 
@@ -272,8 +313,13 @@ module.exports = {
       if(typeof page === 'undefined' || isNaN(page)) {
         page = 0;
       }
-      var startAt = page * 100;
-      var itemsPerPage = startAt + 100;
+      var items = parseInt(req.query.items);
+      if(!items || items > 255) {
+        items = 100;
+      }
+
+      var startAt = parseInt(page) * items;
+      var itemsPerPage = startAt + items;
       var counter = 0;
       var resData = [];
       var sortedObj = Object.keys(settings.users);
@@ -313,28 +359,33 @@ module.exports = {
       if(typeof page === 'undefined' || isNaN(page)) {
         page = 0;
       }
-      var startAt = page * 100;
-      var itemsPerPage = startAt + 100;
+      var items = parseInt(req.query.items);
+      if(!items || items > 255) {
+        items = 100;
+      }
+
+      var startAt = parseInt(page) * items;
+      var itemsPerPage = startAt + items;
       var counter = 0;
       var resData = [];
-
-      var sortedObj = Object.keys(settings.commands).sort(
+      var commandList = {};
+      if(typeof channelID === 'undefined') {
+        commandList = settings.commands;
+      } else {
+        commandList = settings.getCommandsByChannel(channelID);
+      }
+      var sortedObj = Object.keys(commandList).sort(
       function(a, b) {
-        return settings.commands[a].p.properties.name[0].toLowerCase() > settings.commands[b].p.properties.name[0].toLowerCase() ? 1 : -1;
+        return commandList[a].p.properties.name[0].toLowerCase() > commandList[b].p.properties.name[0].toLowerCase() ? 1 : -1;
       });
 
       for(var j in sortedObj) {
         var i = sortedObj[j];
         if(counter >= startAt && counter < itemsPerPage) {
-          if(typeof channelID != 'undefined') {
-            if(channelID != settings.commands[i].p.properties.ownerChannelID) {
-              continue;
-            }
-          }
           resData.push({links : {command : settings.gs.url + '/api/v1/command?id=' +
-          settings.commands[i].p.properties._id},
-          name: settings.commands[i].p.properties.name,
-          _id: settings.commands[i].p.properties._id
+          commandList[i].p.properties._id},
+          name: commandList[i].p.properties.name,
+          _id: commandList[i].p.properties._id
           });
         }
 
@@ -595,7 +646,11 @@ module.exports = {
   checkTwitchLogin: function(oauth, channelid, callback) {
     //var cookiejson = JSON.parse(req.cookies.login);
     twitchapi.TwitchAPI.getInfoFromOauth(oauth, function(data) {
-      data = JSON.parse(data);
+      try {
+        data = JSON.parse(data);
+      } catch(err) {
+        callback(false, data, -1);
+      }
       twitchapi.TwitchAPI.getUserInfromationForChannel(channelid, data.token.user_id, function(channelid, userid, userdata) {
         if(typeof userdata.badges === 'undefined') {
           userdata.badges = [{id: ''}];
