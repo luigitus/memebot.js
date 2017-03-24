@@ -22,12 +22,20 @@ settings.readIDs();
 memebotapi.initweb();
 importer.checkImport();
 
+settings.initCrashReporter();
+
 // setup discord
 this.discord = new discordconnection.ConnectionHandler();
 
 // shutdown hook
 process.on('exit', function() {
   log.log('About to exit.');
+  settings.saveAll();
+});
+
+process.on('uncaughtException', function (err) {
+  log.log(err, log.LOGLEVEL.CRITICAL);
+  settings.quit();
 });
 
 // general update function

@@ -55,9 +55,11 @@ function parseQueryData(data) {
           }
           editAction = '<select id=' + key
           + ' onChange="editOptionPromt(this.id, \'selector\');">' +
-          createOption('default', val, 'Normal Command') +
+          createOption('default', val, 'Default Command') +
           createOption('list', val, 'List Command') +
           createOption('counter', val, 'Counter Command') +
+          createOption('timeout', val, 'Timeout Command') +
+          createOption('ban', val, 'Ban Command') +
           + '</select>';
         }
 

@@ -31,5 +31,21 @@
   "websocketport" : 3001,
   "expressport" : 3000,
   "maxdberrors" : 10,
-  "discordtoken" : ""
+  "discordtoken" : "",
+  "exitifpidexists" : false,
+  "crashreporter" : {
+    "mailEnabled": true,
+    "mailTransportName": "SMTP",
+    "mailTransportConfig": {
+        "service": "Gmail",
+        "auth": {
+            "user": "yourmail@gmail.com",
+            "pass": "yourpass"
+        }
+    },
+    "mailSubject": "memebot.js crashreporter",
+    "mailFrom": "crashreporter <yourmail@gmail.com>",
+    "mailTo": "yourmail@gmail.com",
+    "exitOnCrash" : false
+  }
 }

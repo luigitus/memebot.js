@@ -94,7 +94,7 @@ module.exports = {
       pid.removeOnExit();
     } catch (err) {
       log.log(err);
-      if(!this.gs.debug) {
+      if(this.gs.exitifpidexists) {
         obj.quit(1);
       }
     }
@@ -115,6 +115,15 @@ module.exports = {
     // check for backup folder
     if(!fs.existsSync('./config/backups')) {
       fs.mkdirSync('./config/backups');
+    }
+    if(!fs.existsSync('./config/crashes')) {
+      fs.mkdirSync('./config/crashes');
+    }
+  },
+
+  initCrashReporter: function() {
+    if(this.gs.crashreporter) {
+      require('crashreporter').configure(this.gs.crashreporter);
     }
   },
 
