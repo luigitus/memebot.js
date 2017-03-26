@@ -681,10 +681,6 @@ module.exports = {
   checkTwitchLogin: function(oauth, channelid, callback) {
     //var cookiejson = JSON.parse(req.cookies.login);
     twitchapi.TwitchAPI.getInfoFromOauth(oauth, function(data) {
-      if(data.status >= 400 || !data.token.valid) {
-        callback(false, data, -1);
-        return;
-      }
       twitchapi.TwitchAPI.getUserInfromationForChannel(channelid, data.token.user_id, function(channelid, userid, userdata) {
         if(typeof userdata.badges === 'undefined') {
           userdata.badges = [{id: ''}];
