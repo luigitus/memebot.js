@@ -9,6 +9,10 @@ module.exports = {
   },
 
   log: function(message, level) {
+    var settings = require('./settings.js');
+    if(level == this.LOGLEVEL.DEBUG && !settings.gs.debug) {
+      return;
+    }
     if(typeof level === 'undefined') { level = this.LOGLEVEL.INFO; }
 
     var d = new Date;

@@ -30,5 +30,6 @@ module.exports = {
   websocket: require('./commands/websocketcommand.js').WebsocketCommand,
   timeout: require('./commands/timeoutcommand.js').TimeoutCommand,
   ban: require('./commands/bancommand.js').BanCommand,
-  dograce: require('./commands/dogracecommand.js').DogRaceCommand
+  dograce: require('./commands/dogracecommand.js').DogRaceCommand,
+  reconnect: require('./commands/reconnectcommand.js').ReconnectCommand
 }

@@ -11,6 +11,7 @@ var bodyParser = require('body-parser');
 var oauthserver = require('oauth2-server');
 var RateLimit = require('express-rate-limit');
 var fs = require('fs');
+var fuzzy = require('fuzzy');
 
 module.exports = {
   emitWSEvent: function(eventtype, eventdata) {
@@ -253,6 +254,7 @@ module.exports = {
           log.log(err);
         }
         datatosend.botoauth = null;
+        datatosend.connected = channel.connected;
         res.send({data: datatosend, links : {}});
       } else {
         res.send({error: 404, message: 'Not found'});
@@ -280,8 +282,22 @@ module.exports = {
         return settings.joinedChannels[a].p.properties.channel > settings.joinedChannels[b].p.properties.channel ? 1 : -1;
       });
 
+      var searchString = decodeURIComponent(req.query.search);
+      if(typeof req.query.search !== 'undefined') {
+        var options = {
+          extract: function(ch) {
+            return settings.joinedChannels[ch].p.properties.channel;
+          }
+        };
+        var results = fuzzy.filter(searchString, sortedObj, options);
+        sortedObj = results.map(function(ch) {
+          return settings.joinedChannels[ch.original].p.properties._id;
+        });
+      }
+
       for(var j in sortedObj) {
         var i = sortedObj[j];
+
         if(counter >= startAt && counter < itemsPerPage) {
           resData.push({links : {channel : settings.gs.url + '/api/v1/channel?id=' +
           settings.joinedChannels[i].p.properties._id},
@@ -323,6 +339,19 @@ module.exports = {
       var counter = 0;
       var resData = [];
       var sortedObj = Object.keys(settings.users);
+
+      var searchString = decodeURIComponent(req.query.search);
+      if(typeof req.query.search !== 'undefined') {
+        var options = {
+          extract: function(ch) {
+            return settings.users[ch].p.properties.username;
+          }
+        };
+        var results = fuzzy.filter(searchString, sortedObj, options);
+        sortedObj = results.map(function(ch) {
+          return settings.users[ch.original].p.properties._id;
+        });
+      }
 
       for(var j in sortedObj) {
         var i = sortedObj[j];
@@ -378,6 +407,19 @@ module.exports = {
       function(a, b) {
         return commandList[a].p.properties.name[0].toLowerCase() > commandList[b].p.properties.name[0].toLowerCase() ? 1 : -1;
       });
+
+      var searchString = decodeURIComponent(req.query.search);
+      if(typeof req.query.search !== 'undefined') {
+        var options = {
+          extract: function(ch) {
+            return commandList[ch].p.properties.name[0];
+          }
+        };
+        var results = fuzzy.filter(searchString, sortedObj, options);
+        sortedObj = results.map(function(ch) {
+          return commandList[ch.original].p.properties._id;
+        });
+      }
 
       for(var j in sortedObj) {
         var i = sortedObj[j];

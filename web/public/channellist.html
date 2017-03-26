@@ -12,22 +12,24 @@
     <body>
         <div id="header"></div> <script type="text/javascript"> $("#header").load("./header.html");</script>
         <div id="container" class="content">
+          <div class="buttons"></div>
           <h2>Live Channels</h2>
           <ul id="clist_live" class="channellist">
           </ul>
           <h2>Offline Channels</h2>
           <ul id="clist" class="channellist">
           </ul>
+          <div class="buttons"></div>
           <script>
             var page = parseInt(getParameterByName('page'));
             if(isNaN(page) || page == null) {page = 0;}
 
-            $('#container').append(
+            $('.buttons').append(
             $('<a></a>').append(
               'Previous').attr('href', './channellist?page=' + (page-1).toString()));
 
-            $('#container').append('     ');
-            $('#container').append(
+            $('.buttons').append('     ');
+            $('.buttons').append(
             $('<a></a>').append(
               'Next').attr('href', './channellist?page=' + (page+1).toString()));
           </script>

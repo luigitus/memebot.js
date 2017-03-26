@@ -7,6 +7,7 @@ module.exports = {
   replaceAll: function(input, toReplace, data) {
     if(typeof input === 'undefined') {
       input = '';
+      return input;
     }
     var formatted = input;
     // counter just in case
@@ -21,6 +22,11 @@ module.exports = {
     }
 
     return formatted;
+  },
+
+  splitNChars: function(txt, num) {
+    var result = txt.match(new RegExp('.{1,' + num + '}', 'g')) || [];
+    return result;
   },
 
   formatParameters: function(message, data) {
@@ -69,7 +75,12 @@ module.exports = {
     message = this.replaceAll(message, '{BUTT}', '💩');
     message = this.replaceAll(message, '{url}', settings.gs.url);
 
-    var randomUserName = '';
+    var userListKeys = Object.keys(settings.users);
+    var randomUser = settings.users[userListKeys[settings.getRandomInt(0, userListKeys.length -1)]];
+    var randomUserName = 'NONE';
+    if(randomUser) {
+      randomUserName = randomUser.p.properties.username;
+    }
     message = this.replaceAll(message, '{randomuser}', randomUserName);
 
     if(!(typeof(channel) === 'undefined')) {

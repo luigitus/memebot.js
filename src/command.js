@@ -22,6 +22,7 @@ var Command = function(id, cs, path) {
     _id: id,
     name: ['!unknown'],
     channelID: ['#all#'],
+    disabledIn: [],
     ownerChannelID: '#internal#',
     cooldownLength: 0,
     helptext: [],
@@ -48,7 +49,8 @@ var Command = function(id, cs, path) {
     cooldownbypasspower: settings.commandPower.broadcaster,
     parametres: 0,
     wscommand: 'executed',
-    defaultCooldownHandler: true
+    defaultCooldownHandler: true,
+    allowSplit: true
   }
 
   this.p.load(this.afterLoad);

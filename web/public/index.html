@@ -28,22 +28,24 @@
             Enchance your chat experience with the best memes today!
           </p>
           <h1>News</h1>
+          <div class="buttons"></div>
           <p id="blog">
           </p>
+          <div class="buttons"></div>
         </div>
 
         <script>
           var page = parseInt(getParameterByName('page'));
           if(isNaN(page) || page == null) {page = 0;}
 
-          $('#blog').append(
+          $('.buttons').append(
           $('<a></a>').append(
             'Previous').attr('href', './?page=' + (page-1).toString()));
 
 
-          $('#blog').append('     ');
+          $('.buttons').append('     ');
 
-          $('#blog').append(
+          $('.buttons').append(
           $('<a></a>').append(
             'Next').attr('href', './?page=' + (page+1).toString()));
         </script>

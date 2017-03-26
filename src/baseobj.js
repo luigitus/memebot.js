@@ -32,7 +32,7 @@ BaseObject.prototype = {
   load: function(callback, doc) {
     // if doc is undefined just load from database
     if(typeof doc === 'undefined') {
-      log.log(this.path + '>> Loading from database: ' + this.properties._id.toString())
+      log.log(this.path + '>> Loading from database: ' + this.properties._id.toString(), log.LOGLEVEL.DEBUG);
       var obj = this;
       settings.db[this.path].find({_id: this.properties._id}, function(err, doc) {
         if(err != null) {

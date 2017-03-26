@@ -20,6 +20,24 @@ ChannelManager.prototype = {
       }
 
       if(typeof obj === 'object') {
+        if(data[2] == 'alias'
+        && settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 100)) {
+          var id = data[4];
+          if(!id) {
+            return ['{sender}: Please sepcify an alias name!'];
+          }
+          if(data[3] == 'add' || data[3] == 'edit' || data[3] == 'set') {
+            var aliasOutput = data.slice(5);
+            if(aliasOutput.length <= 0) {
+              return ['{sender}: The output cannot be empty!']
+            }
+            channel.p.properties.alias[id] = aliasOutput;
+            return ['{sender}: Alias added!'];
+          } else if(data[3] == 'remove') {
+            delete channel.p.properties.alias[id];
+            return ['{sender}: Alias removed!'];
+          }
+        }
       } else if(typeof obj === 'number') {
         channel.p.properties[data[2]] = parseFloat(data[3]);
         return ['{sender}: Value edited!'];

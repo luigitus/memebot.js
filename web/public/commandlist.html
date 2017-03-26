@@ -9,28 +9,34 @@
         <script src="./bower_components/jquery/dist/jquery.min.js"></script>
         <script src="./scripts/commandquery.js"></script>
         <script src="./scripts/commandapi.js"></script>
+        <script src="./scripts/documentfunctions.js"></script>
     </head>
     <body>
       <div id="header"></div> <script type="text/javascript"> $("#header").load("./header.html");</script>
         <div id="container" class="content">
+          <div id="twitch"></div>
+          </br>
+          <div id="buttons"></div>
+          <div class="buttons"></br></br></div>
           <p id="status"> </p>
-          <table style="height: 189px; width: 100%;" id = 'clist'>
+          <table id = 'clist'>
           </table>
 
           </br></br>
+          <div class="buttons"></div>
           <script>
             var page = parseInt(getParameterByName('page'));
             var channelid = getParameterByName('channelid');
             if(isNaN(page) || page == null) {page = 0;}
 
-            $('#container').append(
+            $('.buttons').append(
             $('<a></a>').append(
               'Previous').attr('href', './commandlist?page=' + (page-1).toString() + '&channelid=' + channelid));
 
 
-            $('#container').append('     ');
+            $('.buttons').append('     ');
 
-            $('#container').append(
+            $('.buttons').append(
             $('<a></a>').append(
               'Next').attr('href', './commandlist?page=' + (page+1).toString() + '&channelid=' + channelid));
           </script>

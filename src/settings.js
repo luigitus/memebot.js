@@ -217,7 +217,6 @@ module.exports = {
   },
 
   getCommandByName: function(name, channelID) {
-    console.log(name);
     for(var key in module.exports.commands) {
       if(typeof module.exports.commands[key].p.properties.name === 'undefined') {
         return null

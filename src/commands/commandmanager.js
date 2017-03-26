@@ -1,6 +1,7 @@
 var settings = require('../settings.js');
 var log = require('../mlog.js');
 var http = require('http');
+var text = require('../text.js');
 
 var CommandManager = function(base) {
   // inherit prototype
@@ -23,6 +24,26 @@ CommandManager.prototype = {
           cmd.p.properties.channelID.splice(index, 1);
           return ['{sender}: Command removed'];
         }
+      }
+    } else if(data[1] == 'toggleinternal' &&
+    settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25)) {
+      if(data[2] == '!command' || data[2] == '2') {
+        return ['{sender}: You cannot disable the command manager!'];
+      }
+      var cmd = settings.getCommandByID(data[2], '#internal#');
+      if(cmd == null) {
+        cmd = settings.getCommandByName(data[2], '#internal#');
+        if(cmd == null) {
+          return ['{sender}: Command not found!'];
+        }
+      }
+      var index = cmd.p.properties.disabledIn.indexOf(channel.p.properties._id);
+      if(index != -1) {
+        cmd.p.properties.disabledIn.splice(index, 1);
+        return ['{sender}: Command enabled!'];
+      } else {
+        cmd.p.properties.disabledIn.push(channel.p.properties._id);
+        return ['{sender}: Command disabled!'];
       }
     } else if(data[1] == 'lc') {
       var list = 0;
@@ -68,7 +89,7 @@ CommandManager.prototype = {
         return ['{sender}: Please specify an output value!'];
       }
 
-      settings.loadCommand(newID, {name: [data[2]], ownerChannelID: channel.p.properties._id,
+      settings.loadCommand(newID, {name: [text.replaceAll(data[2], ' ', '_')], ownerChannelID: channel.p.properties._id,
       channelID: [channel.p.properties._id], output: [output]});
 
       return ['{sender}: Added command'];
@@ -153,7 +174,7 @@ CommandManager.prototype = {
       }
 
       var constantSettings = ['channelID', 'timesExecuted', 'ownerChannelID', 'channelID', '_id',
-      'pointsperupdate', 'createdAt', 'updatedAt'];
+      'pointsperupdate', 'createdAt', 'updatedAt', 'disabledIn'];
       if(constantSettings.indexOf(data[3]) != -1) {
         return ['{sender}: You cannot edit this setting!'];
       }
@@ -169,7 +190,7 @@ CommandManager.prototype = {
         // special case for name of commands
         if(data[3] == 'name') {
           if(option == 'add') {
-            cmd.p.properties.name.push(data[5]);
+            cmd.p.properties.name.push(text.replaceAll(data[5], ' ', '_'));
             return ['{sender}: Name added!'];
           } else if(option == 'remove') {
             if(cmd.p.properties.name.length == 1) {
@@ -189,7 +210,7 @@ CommandManager.prototype = {
             if(typeof id !== 'number') {
               return ['{sender}: The ID must be a number!'];
             } else if(typeof data[6] === 'string') {
-              cmd.p.properties.name[id] = data[6];
+              cmd.p.properties.name[id] = text.replaceAll(data[6], ' ', '_');
               return ['{sender}: Name edited!'];
             }
 
@@ -364,6 +385,10 @@ CommandManager.prototype = {
         if(cmd == null) {
           return ['{sender}: Could not find command!'];
         }
+      }
+      if(data[3] == 'link') {
+        return ['{sender}: A list of all items can be found here: ' +
+          settings.gs.url + '/commandview?commandid=' + cmd.p.properties._id];
       }
       var output = JSON.stringify(cmd.p.properties[data[3]]);
       if(typeof output === 'undefined') {

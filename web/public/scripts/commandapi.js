@@ -15,6 +15,20 @@ function removeCommandPopup(commandid) {
   }
 }
 
+function disableInternal(commandid, channelid) {
+  if(!channelid) {
+    channelid = getParameterByName('channelid')
+  }
+  var cookie = cookie = JSON.parse(getCookieByName('login', document.cookie));
+  var request = '/api/v1/executecommand?channelid=' + channelid +
+  '&oauth_token=' + cookie.access_token + '&message=' +
+  encodeURIComponent('!command toggleinternal ' + commandid);
+  $.getJSON(request, function(data) {
+    commandquery();
+    //$('#status').append(data.data[0]);
+  });
+}
+
 function newCommandPromt() {
   var name = prompt("Please enter new command's name:", '');
   if(name == null) {
@@ -37,6 +51,10 @@ function newCommandPromt() {
   });
 }
 
+function addText(key, value) {
+  $(key).val($(key).val() + ' ' + value);
+}
+
 function editOptionPromt(option, type) {
   var element = document.getElementById(option);
   var newValue = '';
@@ -46,6 +64,8 @@ function editOptionPromt(option, type) {
     newValue = element.checked;
   } else if(type == 'selector') {
     newValue = element.value;
+  } else if(type == 'textarea') {
+    newValue = $('#' + option + '_text').val();
   }
   if(newValue == null) {
     return;
@@ -70,7 +90,9 @@ function editOptionPromt(option, type) {
 }
 
 function newListItemPromt() {
-  var newValue = prompt("Please enter new item", '');
+  //var newValue = prompt("Please enter new item", '');
+  var newValue = $('#new_list_text').val();
+  $('#new_list_text').val('');
   if(newValue == null) {
     return;
   }
@@ -91,7 +113,9 @@ function newListItemPromt() {
 }
 
 function editListItemPromt(id) {
-  var newValue = prompt("Please enter new item", '');
+  //var newValue = prompt("Please enter new item", '');
+  newValue = $('#' + id + '_text_list').val();
+  console.log(newValue);
   if(newValue == null) {
     return;
   }

@@ -9,19 +9,35 @@
         <script src="./bower_components/jquery/dist/jquery.min.js"></script>
         <script src="./scripts/commandapi.js"></script>
         <script src="./scripts/commandviewquery.js"></script>
+        <script src="./scripts/documentfunctions.js"></script>
     </head>
     <body>
       <div id="header"></div> <script type="text/javascript"> $("#header").load("./header.html");</script>
         <div class="content">
+
+          <h4>Navigation</h4>
+          <ul id='index'>
+          </ul>
+
           <p id="status"> </p>
-          <table style="height: 189px; width: 100%;" id = 'ccontent'>
+
+          <a name="options">
+          <table id = 'ccontent'>
           </table>
-          <table style="height: 189px; width: 100%;" id = 'clist'>
-          </table>
+          </br></br>
+
+          <div id="new_item">
+          </div>
 
           </br></br>
 
-          <table style="height: 189px; width: 100%;" id = 'sclist'>
+          <a name="list">
+          <table id = 'clist'>
+          </table>
+          </br></br>
+
+          <a name="suggestedlist">
+          <table id = 'sclist'>
           </table>
         </div>
         <div id="sidebar"></div> <script type="text/javascript"> $("#sidebar").load("./sidebar.html");</script>
