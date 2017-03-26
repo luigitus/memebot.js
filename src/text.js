@@ -5,9 +5,14 @@ module.exports = {
   local: {},
 
   replaceAll: function(input, toReplace, data) {
+    if(typeof input === 'undefined') {
+      input = '';
+      return input;
+    }
     var formatted = input;
     // counter just in case
     var counter = 0;
+
     while(input.search(toReplace) != -1) {
       formatted = formatted.replace(toReplace, data);
       if(counter > 50) {
@@ -17,6 +22,11 @@ module.exports = {
     }
 
     return formatted;
+  },
+
+  splitNChars: function(txt, num) {
+    var result = txt.match(new RegExp('.{1,' + num + '}', 'g')) || [];
+    return result;
   },
 
   formatParameters: function(message, data) {
@@ -63,8 +73,14 @@ module.exports = {
     message = this.replaceAll(message, '{time}', timeFormat);
     message = this.replaceAll(message, '{date}', dformat);
     message = this.replaceAll(message, '{BUTT}', '💩');
+    message = this.replaceAll(message, '{url}', settings.gs.url);
 
-    var randomUserName = '';
+    var userListKeys = Object.keys(settings.users);
+    var randomUser = settings.users[userListKeys[settings.getRandomInt(0, userListKeys.length -1)]];
+    var randomUserName = 'NONE';
+    if(randomUser) {
+      randomUserName = randomUser.p.properties.username;
+    }
     message = this.replaceAll(message, '{randomuser}', randomUserName);
 
     if(!(typeof(channel) === 'undefined')) {
@@ -77,6 +93,10 @@ module.exports = {
 
     if(!(typeof(command) === 'undefined')) {
       message = this.replaceAll(message, '{counter}', command.p.properties.counter);
+      message = this.replaceAll(message, '{first}', 0);
+      message = this.replaceAll(message, '{last}', command.p.properties.listContent.length - 1);
+      message = this.replaceAll(message, '{suggestedFirst}', 0);
+      message = this.replaceAll(message, '{suggestedLast}', command.p.properties.suggestedList.length - 1);
     }
 
     if(!(typeof(user) === 'undefined')) {

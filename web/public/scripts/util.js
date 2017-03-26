@@ -13,6 +13,9 @@ function getParameterByName(name, url) {
 }
 
 function getCookieByName(cookiename, cookiedata) {
+  if(!cookiedata) {
+    cookiedata = document.cookie
+  }
   var cookies = cookiedata.split('; ');
   for(var call in cookies) {
     var x = cookies[call].split('=');
@@ -27,7 +30,15 @@ function getCookieByName(cookiename, cookiedata) {
 function getAppInfo(callback) {
   $.getJSON("api/v1/info", function(data) {
     callback(data.data, data.appinfo);
-  })
+  });
+}
+
+function getBlog(callback) {
+  var page = getParameterByName('page');
+  if(!page) {page = 0;}
+  $.getJSON("api/v1/blog?page=" + page, function(data) {
+    callback(data);
+  });
 }
 
 function sortString(a, b) {
@@ -41,6 +52,25 @@ function getRandomInt(min, max) {
     max = Number.MAX_SAFE_INTEGER
   }
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function checkAuth(callback, channelid) {
+  var cookie = {};
+  if(getCookieByName('login', document.cookie)) {
+    cookie = JSON.parse(getCookieByName('login', document.cookie));
+  }
+  $.getJSON('api/v1/checkauth?oauth_token=' + cookie.access_token
+  + '&channelid=' + channelid, function(data) {
+    console.log(data);
+    callback(data);
+  })
+}
+
+function checkCommandPower(cp, neededcp) {
+  if(typeof cp == 'undefined') {
+    cp = 0;
+  }
+  return cp >= neededcp;
 }
 
 // memes

@@ -23,7 +23,7 @@ PointsCommand.prototype = {
       } else {
         return ['{sender}: This user is currently not in chat!'];
       }
-    } else if(data[1] == 'set' && settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 75)) {
+    } else if(data[1] == 'set' && settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 50)) {
       var target = settings.getUserByName(data[2]);
       var pointsToSend = parseFloat(data[3]);
       if(target && !isNaN(pointsToSend)) {
@@ -31,14 +31,14 @@ PointsCommand.prototype = {
         target.p.properties.points[channel.p.properties._id] = pointsToSend;
         return [sprintf('{sender}: You set %s\'s {currency} to to %d!', data[2], pointsToSend)];
       }
-    } else if(data[1] == 'add' && settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 75)) {
+    } else if(data[1] == 'add' && settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 50)) {
       var target = settings.getUserByName(data[2]);
       var pointsToSend = parseFloat(data[3]);
       if(target && !isNaN(pointsToSend)) {
         target.receivePoints(channel.p.properties._id, pointsToSend);
         return [sprintf('{sender}: You added %d {currency} to %s\'s wallet!', pointsToSend, data[2])];
       }
-    } else if(data[1] == 'remove' && settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 75)) {
+    } else if(data[1] == 'remove' && settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 50)) {
       var target = settings.getUserByName(data[2]);
       var pointsToSend = parseFloat(data[3]);
       if(target && !isNaN(pointsToSend)) {

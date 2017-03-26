@@ -7,27 +7,37 @@
         <script src="./scripts/util.js"></script>
         <script src="socket.io/socket.io.js"></script>
         <script src="./bower_components/jquery/dist/jquery.min.js"></script>
+        <script src="./scripts/commandapi.js"></script>
         <script src="./scripts/commandviewquery.js"></script>
+        <script src="./scripts/documentfunctions.js"></script>
     </head>
     <body>
       <div id="header"></div> <script type="text/javascript"> $("#header").load("./header.html");</script>
         <div class="content">
-          <ul id = 'ccontent'>
+
+          <h4>Navigation</h4>
+          <ul id='index'>
           </ul>
-          <table style="height: 189px; width: 596px;" id = 'clist'>
-            <tr>
-              <td>List ID</td>
-              <td>List Content</td>
-            </tr>
+
+          <p id="status"> </p>
+
+          <a name="options">
+          <table id = 'ccontent'>
           </table>
+          </br></br>
+
+          <div id="new_item">
+          </div>
 
           </br></br>
 
-          <table style="height: 189px; width: 596px;" id = 'sclist'>
-            <tr>
-              <td>List ID</td>
-              <td>Suggested List Content</td>
-            </tr>
+          <a name="list">
+          <table id = 'clist'>
+          </table>
+          </br></br>
+
+          <a name="suggestedlist">
+          <table id = 'sclist'>
           </table>
         </div>
         <div id="sidebar"></div> <script type="text/javascript"> $("#sidebar").load("./sidebar.html");</script>

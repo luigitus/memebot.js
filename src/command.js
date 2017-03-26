@@ -5,6 +5,7 @@ var cd = require('./cooldown.js');
 var cr = require('./commandreference.js');
 var sprintf = require("sprintf-js").sprintf;
 var text = require('./text.js');
+var log = require('./mlog.js');
 
 var Command = function(id, cs, path) {
   if(typeof path === 'undefined') {
@@ -21,6 +22,7 @@ var Command = function(id, cs, path) {
     _id: id,
     name: ['!unknown'],
     channelID: ['#all#'],
+    disabledIn: [],
     ownerChannelID: '#internal#',
     cooldownLength: 0,
     helptext: [],
@@ -47,13 +49,19 @@ var Command = function(id, cs, path) {
     cooldownbypasspower: settings.commandPower.broadcaster,
     parametres: 0,
     wscommand: 'executed',
-    defaultCooldownHandler: true
+    defaultCooldownHandler: true,
+    allowSplit: true
   }
 
   this.p.load(this.afterLoad);
 
   // update function
-  setInterval(function() {
+  var updateInterval = setInterval(function() {
+    if(obj.p.wasRemoved) {
+      log.log('Clearing update interval of command ' + obj.p.properties._id);
+      clearInterval(updateInterval);
+      return;
+    }
     obj.p.save();
   }, 60 * 1000);
 }
@@ -103,7 +111,7 @@ Command.prototype = {
     this.success = true;
     if(!settings.checkCommandPower(sender.commandPower(channel.p.properties._id),
     this.p.properties.requriedCommandPower)) {
-      callback(['{sender}: You do not have sufficient permission to run this command!'], channel, sender);
+      callback(['{sender}: You do not have sufficient permission to run this command!'], channel, sender, this, data, other);
       return;
     }
 
@@ -134,7 +142,7 @@ Command.prototype = {
       // if parametres do not match return helptext
       if(data.length <= this.p.properties.parametres && this.p.properties.parametres != 0) {
         this.success = false;
-        callback(this.p.properties.helptext, channel, sender, this, data);
+        callback(this.p.properties.helptext, channel, sender, this, data, other);
         return;
       }
       // can be used to enable whispers, re-direct output to the website etc.

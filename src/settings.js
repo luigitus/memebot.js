@@ -94,7 +94,7 @@ module.exports = {
       pid.removeOnExit();
     } catch (err) {
       log.log(err);
-      if(!this.gs.debug) {
+      if(this.gs.exitifpidexists) {
         obj.quit(1);
       }
     }
@@ -115,6 +115,15 @@ module.exports = {
     // check for backup folder
     if(!fs.existsSync('./config/backups')) {
       fs.mkdirSync('./config/backups');
+    }
+    if(!fs.existsSync('./config/crashes')) {
+      fs.mkdirSync('./config/crashes');
+    }
+  },
+
+  initCrashReporter: function() {
+    if(this.gs.crashreporter) {
+      require('crashreporter').configure(this.gs.crashreporter);
     }
   },
 
@@ -208,7 +217,6 @@ module.exports = {
   },
 
   getCommandByName: function(name, channelID) {
-    console.log(name);
     for(var key in module.exports.commands) {
       if(typeof module.exports.commands[key].p.properties.name === 'undefined') {
         return null
@@ -235,6 +243,18 @@ module.exports = {
     }
 
     return null;
+  },
+
+  getCommandsByChannel: function(channelID) {
+    var retCommands = {};
+    for(var key in module.exports.commands) {
+      if(typeof channelID === 'undefined'
+      || module.exports.commands[key].p.properties.ownerChannelID == channelID) {
+        retCommands[key] = module.exports.commands[key]
+      }
+    }
+
+    return retCommands;
   },
 
   checkCommandPower: function(cp, neededcp) {
@@ -266,6 +286,39 @@ module.exports = {
     module.exports.users[userID] = usr;
 
     return usr;
+  },
+
+  setAdminPower(senderObject, channelid) {
+    // global mods/admins
+    for(var i in this.gs.moderators) {
+      if(this.gs.moderators[i] == senderObject.p.properties.username) {
+        senderObject.p.properties.commandpower[channelid] = this.commandPower.moderator;
+      }
+    }
+    for(var i in this.gs.admins) {
+      if(this.gs.admins[i] == senderObject.p.properties.username) {
+        senderObject.p.properties.commandpower[channelid] = this.commandPower.admin;
+      }
+    }
+  },
+
+  isModerator(id) {
+    for(var i in this.gs.moderators) {
+      if(this.gs.moderators[i] == id) {
+        return true;
+      }
+    }
+    return false;
+  },
+
+  isAdmin(id) {
+    for(var i in this.gs.admins) {
+      if(this.gs.admins[i] == id) {
+        return true;
+      }
+    }
+
+    return false;
   },
 
   saveAll: function() {

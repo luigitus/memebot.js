@@ -1,6 +1,9 @@
+var settings = require('../settings.js');
+
 var CounterCommand = function(base) {
   // inherit prototype
   this.p = base;
+  this.p.p.setDefaults({editcommandpower: 25});
 }
 
 CounterCommand.prototype = {
@@ -12,12 +15,17 @@ CounterCommand.prototype = {
     if(isNaN(amount)) {
       amount = 1;
     }
-    if(data[1] == '+' &&
-    this.p.p.properties.ownerChannelID == channel.p.properties._id) {
-      this.p.p.properties.counter += amount;
-    } else if(data[1] == '-' &&
-    this.p.p.properties.ownerChannelID == channel.p.properties._id) {
-      this.p.p.properties.counter -= amount;
+    if(settings.checkCommandPower(sender.commandPower(channel.p.properties._id), this.p.p.properties.editcommandpower)) {
+      if(data[1] == '+' &&
+      this.p.p.properties.ownerChannelID == channel.p.properties._id) {
+        this.p.p.properties.counter += amount;
+      } else if(data[1] == '-' &&
+      this.p.p.properties.ownerChannelID == channel.p.properties._id) {
+        this.p.p.properties.counter -= amount;
+      } else if(data[1] == '=' &&
+      this.p.p.properties.ownerChannelID == channel.p.properties._id) {
+        this.p.p.properties.counter = amount;
+      }
     }
 
     return this.p.p.properties.output;

@@ -37,6 +37,10 @@ var ConnectionHandler = function(cb, username, password) {
     log.log('Connection closed');
     cb.disconnect();
   });
+  this.client.on('error',function(){
+    log.log('Socket error');
+    cb.checkReconnect();
+  });
 
   // update function
   setInterval(function() {
@@ -49,7 +53,7 @@ ConnectionHandler.prototype = {
   messageCount: 0,
 
   writeBytes: function(message) {
-    this.client.write(message + '\n');
+    this.client.write(message + '\r\n');
   },
 
   parseTIM: function(rawmessage) {
@@ -147,32 +151,23 @@ ConnectionHandler.prototype = {
 
     if(senderObject != null) {
       // check if user is marked as being in this channel
-      if(senderObject.inChannels.indexOf(settings.getChannelByName(channel).p.properties._id) == -1) {
-        senderObject.inChannels.push(settings.getChannelByName(channel).p.properties._id);
-        senderObject.shouldSendGreet[settings.getChannelByName(channel).p.properties._id] = true;
+      if(settings.getChannelByName(channel) != null) {
+        if(senderObject.inChannels.indexOf(settings.getChannelByName(channel).p.properties._id) == -1) {
+          senderObject.inChannels.push(settings.getChannelByName(channel).p.properties._id);
+          senderObject.shouldSendGreet[settings.getChannelByName(channel).p.properties._id] = true;
+        }
       }
       senderObject.p.properties.displayName = ircTags['display-name'];
       senderObject.p.properties.username = senderName;
-      if(senderObject.p.isLoaded) {
-        if(ircTags['user-type'] == 'mod') {
+      if(senderObject.p.isLoaded && settings.getChannelByName(channel) != null) {
+        if('#' + senderObject.p.properties.username == channel) {
+         senderObject.p.properties.commandpower[settings.getChannelByName(channel).p.properties._id] = settings.commandPower.broadcaster;
+        } else if(ircTags['user-type'] == 'mod') {
           senderObject.p.properties.commandpower[settings.getChannelByName(channel).p.properties._id] = settings.commandPower.mod;
-        } else if('#' + senderObject.p.properties.username == channel) {
-          senderObject.p.properties.commandpower[settings.getChannelByName(channel).p.properties._id] = settings.commandPower.broadcaster;
         } else {
           senderObject.p.properties.commandpower[settings.getChannelByName(channel).p.properties._id] = settings.commandPower.user;
         }
-
-        // global mods/admins
-        for(var i in settings.gs.moderators) {
-          if(settings.gs.moderators[i] == senderObject.p.properties.username) {
-            senderObject.p.properties.commandpower[settings.getChannelByName(channel).p.properties._id] = settings.commandPower.moderator;
-          }
-        }
-        for(var i in settings.gs.admins) {
-          if(settings.gs.admins[i] == senderObject.p.properties.username) {
-            senderObject.p.properties.commandpower[settings.getChannelByName(channel).p.properties._id] = settings.commandPower.admin;
-          }
-        }
+        settings.setAdminPower(senderObject, settings.getChannelByName(channel).p.properties._id);
       }
 
 
@@ -204,6 +199,13 @@ ConnectionHandler.prototype = {
     };
   },
 
+  disconnect: function() {
+    try {
+      this.client.destroy();
+    } catch(err) {
+      log.log(err);
+    }
+  },
 
   sendCommand: function(message, channel) {
     if(this.messageCount > settings.gs.messageLimit) {
@@ -215,9 +217,11 @@ ConnectionHandler.prototype = {
   },
 
   sendMessage: function(message, channel, sender, command, data, format, whisper) {
-    if(message == '' || channel.p.properties.silent) {
+    if(message == '' || channel.p.properties.silent || typeof message === 'undefined') {
       return;
     }
+
+    message = message.replace(/\r?\n|\r/g, ' ');
 
     if(format || typeof(format) === 'undefined') {
       var bannedStrings = ['.ban', '!ban', '.timeout', '/timeout', '/color', '.color'];
@@ -238,9 +242,36 @@ ConnectionHandler.prototype = {
       return;
     }
 
-    this.messageCount++;
+    var messageSplit = text.splitNChars(message, 450);
+    if(command) {
+      if(!command.p.properties.allowSplit) {
+        messageSplit = [messageSplit[0]];
+      }
+    }
+    var obj = this;
 
-    this.writeBytes('PRIVMSG ' + channel.p.properties.channel + " : " + message);
+    function sendMessageAtIndex(msgAtIndex, timeoutTime) {
+      setTimeout(function() {
+        if(obj.messageCount > settings.gs.messageLimit) {return;}
+        if(!whisper) {
+          obj.writeBytes('PRIVMSG ' + channel.p.properties.channel + " : " + msgAtIndex);
+        } else {
+          obj.writeBytes('PRIVMSG ' + channel.p.properties.channel + " : /w " + sender.p.properties.username + ' ' + msgAtIndex);
+        }
+        obj.messageCount++;
+      }, timeoutTime);
+    }
+
+    for(var i in messageSplit) {
+      var timeoutMod = 200;
+      // remove line breaks
+      //messageSplit[i] = messageSplit[i].replace(/\r?\n|\r/g, '');
+      if(!messageSplit[i] || messageSplit[i] == '') {
+        continue;
+      }
+
+      sendMessageAtIndex(messageSplit[i], timeoutMod * i + 1);
+    }
   }
 }
 

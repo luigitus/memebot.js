@@ -32,7 +32,7 @@ BaseObject.prototype = {
   load: function(callback, doc) {
     // if doc is undefined just load from database
     if(typeof doc === 'undefined') {
-      log.log(this.path + '>> Loading from database: ' + this.properties._id.toString())
+      log.log(this.path + '>> Loading from database: ' + this.properties._id.toString(), log.LOGLEVEL.DEBUG);
       var obj = this;
       settings.db[this.path].find({_id: this.properties._id}, function(err, doc) {
         if(err != null) {
@@ -60,7 +60,7 @@ BaseObject.prototype = {
   save: function(callback) {
     // if command was removed do not save!
     if(this.wasRemoved) {
-      log.log('Skipping save of command: ' + this.properties._id + ' because it was deleted!');
+      log.log('Skipping save of object: ' + this.properties._id + ' because it was deleted!');
       return;
     }
     var obj = this;
@@ -112,8 +112,6 @@ BaseObject.prototype = {
         this.properties[key] = defaults[key];
       }
     }
-
-    //console.log(this.properties)
   }
 }
 

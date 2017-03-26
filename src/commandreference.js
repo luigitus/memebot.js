@@ -31,6 +31,7 @@ module.exports = {
   timeout: require('./commands/timeoutcommand.js').TimeoutCommand,
   ban: require('./commands/bancommand.js').BanCommand,
   dograce: require('./commands/dogracecommand.js').DogRaceCommand,
+  reconnect: require('./commands/reconnectcommand.js').ReconnectCommand,
   //wr: require('./commands/wrcommand.js').WorldRecordCommand,
   //src: require('./commands/srccommand.js').SrcCommand
 }

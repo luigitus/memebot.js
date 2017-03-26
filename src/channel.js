@@ -38,6 +38,7 @@ var Channel = function(id, cs, path) {
     isLive: false,
     automod: true,
     discordguildid: '83814260886474752',
+    alias: {'!commands' : ['!command', 'list']},
     srcuserid: '',
     srcgameid: '',
     srccategoryid: ''
@@ -71,6 +72,8 @@ var Channel = function(id, cs, path) {
       }
     }
 
+    obj.checkReconnect();
+
     obj.p.save();
   }, 60 * 1000);
 }
@@ -87,10 +90,27 @@ Channel.prototype = {
     }
   },
 
+  checkReconnect: function() {
+    // reconnect if disconnected and should join!
+    if(!this.connected && this.p.properties.shouldJoin && this.p.isLoaded) {
+      log.log('Reconnecting to chat ' + this.p.properties.channel)
+      this.join();
+      return true;
+    }
+
+    return false;
+  },
+
   join: function() {
     var tmi = require("./tmiconnection.js");
+    if(this.connected) {
+      this.closeConnection();
+    }
     this.connected = true;
-    this.p.properties.shouldJoin = true;
+    if(!this.p.properties.shouldJoin) {
+      return;
+    }
+    //this.p.properties.shouldJoin = true;
     log.log('Creating connection for channel ' + this.p.properties.channel);
     if(this.p.properties.useDefaultLogin && this.p.botName == '' && this.p.botoauth == '') {
       this.connection = new tmi.ConnectionHandler(this);
@@ -112,25 +132,48 @@ Channel.prototype = {
   },
 
   reJoin: function() {
-    this.connected = false;
+    //this.connected = true;
     this.p.properties.shouldJoin = true;
-    this.connection.writeBytes('JOIN ' + this.p.properties.channel);
+    if(!this.checkReconnect()) {
+      this.connection.writeBytes('JOIN ' + this.p.properties.channel);
+    }
   },
 
   part: function() {
-    this.connected = false;
+    if(!this.p.properties.shouldJoin && !this.connected) {
+      return;
+    }
+    //this.connected = false;
     this.p.properties.shouldJoin = false;
     this.connection.writeBytes('PART ' + this.p.properties.channel);
+    var obj = this;
+    var connection = obj.connection;
+    setTimeout(function() {
+      obj.closeConnection(connection);
+    }, 600)
   },
 
   message: function(message) {
-    var callback = this.commandCallback;
+    // handle alias
+    for(var key in this.p.properties.alias) {
+      var alias = this.p.properties.alias[key];
+      if(message.content.indexOf(key) == 0 && message.content[message.content.indexOf(key)] === key) {
+        // replace array element with alias
+        message.content = message.content.slice(0, message.content.indexOf(key))
+        .concat(alias).concat(message.content.slice(message.content.indexOf(key) + 1));
+      }
+    }
 
+    var callback = this.commandCallback;
+    var numberofCommandsExecuted = 0;
     if(message.service == 'discord') {
       callback = this.discordCommandCallback;
+    } else if(message.service == 'webui') {
+      callback = this.webCallback;
     }
+
     // parse commands here and add them to the queue
-    if((message.type == 'PRIVMSG' && message.service == 'twitch') || (message.service == 'discord')) {
+    if((message.type == 'PRIVMSG' && message.service == 'twitch') || (message.service == 'discord') || message.service == 'webui') {
       // apply automod filter if required
       if(this.p.properties.automod) {
         automod.executeFilter(message, this);
@@ -147,31 +190,78 @@ Channel.prototype = {
         }
 
         if((cmd.p.properties.channelID.indexOf(this.p.properties._id) == -1)
-          && (cmd.p.properties.channelID.indexOf('#all#') == -1)) {
+          && (cmd.p.properties.channelID.indexOf('#all#') == -1 ||
+          (cmd.p.properties.disabledIn.indexOf(this.p.properties._id) != -1))) {
             continue;
         }
         if(!cmd.p.properties.textTrigger) {
           if(cmd.p.properties.name.indexOf(message.content[0]) != -1) {
             this.commandQueue.push({command: cmd, msg: message,
             channel: this, callback: callback, other: message.other});
+            numberofCommandsExecuted++;
           }
         } else {
           for(var i in message.content) {
             if(cmd.p.properties.name.indexOf(message.content[i]) != -1) {
               this.commandQueue.push({command: cmd, msg: message,
               channel: this, callback: callback, other: message.other});
+              numberofCommandsExecuted++;
             }
           }
         }
 
       }
 
+    } else if((message.type == 'WHISPER' && message.service == 'twitch')) {
+      // handle whispers
+      var wChannel = message.content[0];
+      message.content = message.content.splice(1);
+      if(wChannel == this.p.properties.channel.replace('#', '')) {
+        // make sure commadn power is 0 unless it's a botadmin
+        if(message.sender.p.isLoaded) {
+          message.sender.p.properties.commandpower[this.p.properties._id] = settings.commandPower.user;
+          // global mods/admins
+          settings.setAdminPower(message.sender, this.p.properties._id);
+        }
+
+
+        for(var key in settings.commands) {
+          var cmd = settings.commands[key];
+          if(!cmd.p.isLoaded) {
+            continue;
+          }
+
+          if((cmd.p.properties.channelID.indexOf(this.p.properties._id) == -1)
+            && (cmd.p.properties.channelID.indexOf('#all#') == -1)
+            && cmd.p.properties.disabledIn.indexOf(this.p.properties._id) == -1) {
+              continue;
+          }
+          if(!cmd.p.properties.textTrigger) {
+            if(cmd.p.properties.name.indexOf(message.content[0]) != -1) {
+              this.commandQueue.push({command: cmd, msg: message,
+              channel: this, callback: this.whisperCallback, other: message.other});
+              numberofCommandsExecuted++;
+            }
+          }
+        }
+      }
+    }
+
+    if(numberofCommandsExecuted < 1 && message.service == 'webui') {
+      // callback for 404
+      message.other(['404']);
     }
   },
 
   commandCallback: function(messages, channel, sender, command, data, other) {
     for(message in messages) {
-      channel.connection.sendMessage(messages[message], channel, sender, command, data, true);
+      channel.connection.sendMessage(messages[message], channel, sender, command, data, true, false);
+    }
+  },
+
+  whisperCallback: function(messages, channel, sender, command, data, other) {
+    for(message in messages) {
+      channel.connection.sendMessage(messages[message], channel, sender, command, data, true, true);
     }
   },
 
@@ -184,6 +274,26 @@ Channel.prototype = {
         log.log(err);
       }
     }
+  },
+
+  webCallback: function(messages, channel, sender, command, data, other) {
+    var text = require('./text.js');
+
+    for(message in messages) {
+      messages[message] = text.formatText(messages[message], false, channel, sender, command, data)
+    }
+    other(messages);
+  },
+
+  closeConnection: function(connection) {
+    if(!connection) {
+      this.connection.disconnect();
+      this.connection = undefined;
+    } else {
+      connection.disconnect();
+      connection = undefined;
+    }
+    this.disconnect();
   },
 
   disconnect: function() {
