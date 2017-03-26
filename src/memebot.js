@@ -8,8 +8,6 @@ var text = require('./text.js');
 var base = require('./baseobj.js');
 var os = require('os');
 var command = require('./command.js');
-var twitchapi = require('./twitchapi.js');
-var srcapi = require('./srcapi.js');
 var fs = require('fs');
 var importer = require('./import.js');
 var discordconnection = require('./discordconnection.js');
@@ -47,6 +45,11 @@ setInterval(function() {
   }
 }, 180);
 
+var twitchapi = require('./twitchapi.js');
+var srcapi = require('./srcapi.js');
+twitchapi.TwitchAPI.init();
+srcapi.SrcAPI.init();
+
 // twitch api update
 setInterval(function() {
   twitchapi.TwitchAPI.updateAll();
@@ -54,7 +57,7 @@ setInterval(function() {
 
 // speedrun.com api update
 setInterval(function() {
-  //srcapi.SrcAPI.updateAll();
+  srcapi.SrcAPI.updateAll();
 }, 3600 * 100);
 
 // database backup

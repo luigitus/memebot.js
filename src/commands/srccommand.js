@@ -8,17 +8,18 @@ var SrcCommand = function(base) {
 }
 
 SrcCommand.prototype = {
-  execute: function(data, channel, sender) {
+  execute: function(data, channel, sender, callback) {
     var prop = channel.p.properties;
     if(data[1] == 'refresh' && settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25)) {
-      srcapi.SrcAPI.getGame(prop._id, prop.game, SrcCommand.refreshCallback);
+      srcapi.SrcAPI.getGame(prop._id, prop.game, true, callback, channel, sender, this.p, data);
+      return [''];
     } else if(data[1] == 'twitch' && settings.checkCommandPower(sender.commandPower(channel.p.properties._id), 25)) {
       twitchapi.TwitchAPI.updateAll();
     } else {
       if (prop.srcgameid !== '') {
-        srcapi.SrcAPI.getGameByID(prop._id, prop.srcgameid, SrcCommand.infoCallback);
+        srcapi.SrcAPI.getGameByID(prop._id, prop.srcgameid, false, SrcCommand.infoCallback);
       } else {
-        return ['[SpeedrunDotCom] Game: Not set, ID: Not set'];
+        return [''];
       }
     }
   }

@@ -6,19 +6,9 @@ var WorldRecordCommand = function(base) {
 }
 
 WorldRecordCommand.prototype = {
-  execute: function(data, channel, sender) {
-    //return ['test ' + srcapi.SrcAPI.getGame(1234567, 'Super Mario Bros.', WorldRecordCommand.recordCallback)];
-    //srcapi.SrcAPI.getRecord(channel, WorldRecordCommand.recordCallback);
-    var prop = channel.p.properties;
-    srcapi.SrcAPI.getGame(prop._id, prop.game, 'meme');
+  execute: function(data, channel, sender, callback) {
+
   }
-}
-
-
-WorldRecordCommand.recordCallback = function(channel, data) {
-  var msg = '';
-  msg += 'this is just a test.';
-  channel.connection.sendMessage(msg, channel);
 }
 
 module.exports = {

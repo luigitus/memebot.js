@@ -38,6 +38,9 @@ var Channel = function(id, cs, path) {
     isLive: false,
     automod: true,
     discordguildid: '83814260886474752',
+    srcuserid: '',
+    srcgameid: '',
+    srccategoryid: ''
   }
 
   var obj = this;
@@ -81,13 +84,6 @@ Channel.prototype = {
     p.p.setDefaults(p.defaults);
     if(p.p.properties.shouldJoin) {
       p.join();
-    }
-
-    if (p.p.properties.srcuserid === '') {
-      log.log('[SrcAPI] No User ID for this channel, trying to get one')
-      srcapi.SrcAPI.getUser(p.p.properties._id, p.p.properties.channel.substring(1))
-    } else {
-      log.log('[SrcAPI] ' + p.p.properties.channel + '\'s id is ' + p.p.properties.srcuserid)
     }
   },
 

@@ -52,7 +52,7 @@ module.exports = {
     });
 
     app.get('/', function (req, res) {
-      res.sendfile('./web/public/index.html');
+      res.sendfile('../web/public/index.html');
     });
 
     app.get('/about', function (req, res) {
@@ -96,19 +96,23 @@ module.exports = {
     });
 
     app.get('/authenticated', function (req, res) {
-      twitchapi.TwitchAPI.requestAccessToken(req.query.code, function(data) {
+      if (req.query.code === undefined) {
+        log.log('Invalid authentication');
+        res.sendfile('./web/public/authenticated.html');
+        return;
+      }
+      log.log('Request code is ' + req.query.code);
+      twitchapi.TwitchAPI.requestAccessToken(req.query.code, function(jsondata) {
         if(typeof data.error !== 'undefined') {
           log.log(data);
           res.sendfile('./web/public/authenticated.html');
         }
-        var jsondata = JSON.parse(data);
         twitchapi.TwitchAPI.getInfoFromOauth(jsondata.access_token, function(channeldata) {
-          var jsonChannelData = JSON.parse(channeldata);
-          if(!jsonChannelData.token.valid) {
+          if(!channeldata.token.valid) {
             res.sendfile('./web/public/authenticated.html');
           } else {
-            jsondata._id = jsonChannelData.token.user_id;
-            jsondata.username = jsonChannelData.token.user_name;
+            jsondata._id = channeldata.token.user_id;
+            jsondata.username = channeldata.token.user_name;
             res.cookie('login', JSON.stringify(jsondata));
             res.sendfile('./web/public/authenticated.html');
           }
@@ -330,7 +334,6 @@ module.exports = {
   checkTwitchLogin: function(oauth, channelid, requiredchannelid, callback) {
     //var cookiejson = JSON.parse(req.cookies.login);
     twitchapi.TwitchAPI.getInfoFromOauth(oauth, function(data) {
-      data = JSON.parse(data);
       if(data.status >= 400 || !data.token.valid) {
         callback(false, data);
         return;

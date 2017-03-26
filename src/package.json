@@ -22,6 +22,8 @@
     "socket.io": "^1.7.3",
     "sort-object": "^3.0.2",
     "sprintf-js": "^1.0.3",
-    "request": "^2.81.0"
+    "request": "^2.81.0",
+    "request-debug": "^0.2.0",
+    "simple-rate-limiter": "^0.2.2"
   }
 }
